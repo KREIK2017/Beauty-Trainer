@@ -1,0 +1,23 @@
+import type { Catalog, Stats } from "../../shared/schema";
+export async function api<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL ?? ""}/api${path}`,
+    {
+      ...init,
+      headers: { "Content-Type": "application/json", ...init?.headers },
+    },
+  ).catch(() => {
+    throw new Error(
+      "Не вдалося з’єднатися із сервером. Перевірте підключення та спробуйте ще раз.",
+    );
+  });
+  if (!response.ok) {
+    const data = (await response.json().catch(() => ({
+      error: "API недоступний. Запустіть Worker і застосуйте міграції.",
+    }))) as { error: string };
+    throw new Error(data.error);
+  }
+  return response.json() as Promise<T>;
+}
+export const fetchData = () =>
+  Promise.all([api<Catalog>("/catalog"), api<Stats>("/progress")]);
