@@ -63,18 +63,19 @@ export function generateQuestions(
   now = new Date(),
 ): Question[] {
   const pool: Question[] = [];
+  // Hash each candidate once; recomputing inside a comparator dominates large catalogs.
+  const shuffle = (values: string[], salt: string) =>
+    values
+      .map((value) => ({ value, key: hash(salt + value) }))
+      .sort((a, b) => a.key - b.key)
+      .map((entry) => entry.value);
   const add = (q: Omit<Question, "options">, distractors: string[]) => {
-    const other = [...new Set(distractors)]
-      .filter((x) => x !== q.answer)
-      .sort((a, b) => hash(seed + a) - hash(seed + b))
-      .slice(0, 3);
+    const other = shuffle(
+      [...new Set(distractors)].filter((x) => x !== q.answer),
+      seed,
+    ).slice(0, 3);
     if (!other.length) return;
-    pool.push({
-      ...q,
-      options: [q.answer, ...other].sort(
-        (a, b) => hash(seed + q.id + a) - hash(seed + q.id + b),
-      ),
-    });
+    pool.push({ ...q, options: shuffle([q.answer, ...other], seed + q.id) });
   };
   c.lines.forEach((l) => {
     const base = {
@@ -191,7 +192,10 @@ export function generateQuestions(
     if (!related.length) return 3;
     return 4;
   };
-  const eligible = pool.filter((q) => mode !== "weak" || rank(q) <= 2);
+  // Rank and hash stay constant for the whole call, so resolve them before sorting.
+  const ranks = new Map(pool.map((q) => [q, rank(q)]));
+  const order = new Map(pool.map((q) => [q, hash(seed + q.id)]));
+  const eligible = pool.filter((q) => mode !== "weak" || ranks.get(q)! <= 2);
   const selected: Question[] = [];
   const typeCounts = new Map<string, number>();
   const entityCounts = new Map<string, number>();
@@ -199,11 +203,11 @@ export function generateQuestions(
   while (eligible.length && selected.length < 10) {
     eligible.sort(
       (a, b) =>
-        rank(a) - rank(b) ||
+        ranks.get(a)! - ranks.get(b)! ||
         (typeCounts.get(a.type) ?? 0) - (typeCounts.get(b.type) ?? 0) ||
         (entityCounts.get(a.productId ?? a.lineId) ?? 0) -
           (entityCounts.get(b.productId ?? b.lineId) ?? 0) ||
-        hash(seed + a.id) - hash(seed + b.id),
+        order.get(a)! - order.get(b)!,
     );
     const q = eligible.shift()!;
     selected.push(q);

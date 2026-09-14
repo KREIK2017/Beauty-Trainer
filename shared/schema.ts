@@ -27,6 +27,19 @@ z.setErrorMap((issue) => {
 const text = z.string().trim().min(1).max(4000);
 const id = z.string().regex(/^[a-z0-9][a-z0-9-]{0,79}$/);
 const list = z.array(text).min(1).max(30);
+// Accept an external HTTPS address or a root-relative file served from the Worker assets.
+const image = z
+  .string()
+  .trim()
+  .min(1)
+  .max(500)
+  .refine(
+    (v) =>
+      v.startsWith("/")
+        ? /^\/[a-zA-Z0-9/._-]+$/.test(v) && !v.includes("..")
+        : /^https:\/\//.test(v) && z.string().url().safeParse(v).success,
+    "Вкажіть HTTPS-адресу або локальний шлях виду /images/файл.webp",
+  );
 export const brandSchema = z.object({ id, name: text, description: text });
 export const lineSchema = z.object({
   id,
@@ -38,6 +51,7 @@ export const lineSchema = z.object({
   purposes: list,
   benefits: list,
   keywords: list,
+  image: image.optional(),
 });
 export const productSchema = z.object({
   id,
@@ -50,14 +64,7 @@ export const productSchema = z.object({
   purpose: text,
   benefits: list,
   ingredients: list,
-  image: z
-    .string()
-    .url()
-    .refine(
-      (v) => v.startsWith("https://"),
-      "Адреса зображення має починатися з HTTPS",
-    )
-    .optional(),
+  image: image.optional(),
   usage: text.optional(),
 });
 export const catalogSchema = z

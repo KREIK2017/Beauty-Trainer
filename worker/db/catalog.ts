@@ -27,6 +27,7 @@ export async function getCatalog(db: D1Database): Promise<Catalog> {
       (l) =>
         ({
           ...l,
+          image: l.image ?? undefined,
           hair_types: JSON.parse(l.hair_types),
           purposes: JSON.parse(l.purposes),
           benefits: JSON.parse(l.benefits),
@@ -94,6 +95,7 @@ export function catalogStatements(
     "purposes",
     "benefits",
     "keywords",
+    "image",
   ];
   insert(
     "product_lines",
@@ -108,6 +110,7 @@ export function catalogStatements(
       JSON.stringify(l.purposes),
       JSON.stringify(l.benefits),
       JSON.stringify(l.keywords),
+      l.image ?? null,
     ]),
     upsert(lineColumns.slice(1)),
   );

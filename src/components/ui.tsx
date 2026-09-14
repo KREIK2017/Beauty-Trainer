@@ -61,7 +61,17 @@ export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
         <span className="brand-word">
           {catalog.brands.find((b) => b.id === line.brand_id)?.name}
         </span>
-        <Leaf size={54} strokeWidth={0.8} />
+        {line.image ? (
+          <img
+            className="line-photo"
+            src={line.image}
+            alt={line.name}
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <Leaf size={54} strokeWidth={0.8} />
+        )}
         <span className="art-caption">{line.keywords.join(" · ")}</span>
       </div>
       <div className="line-content">

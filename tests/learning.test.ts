@@ -5,7 +5,14 @@ import seed from "../data/products.json";
 const catalog = catalogSchema.parse(seed);
 describe("catalog validation", () => {
   it("validates seed and rejects missing parent references", () => {
-    expect(catalog.products).toHaveLength(14);
+    // Structural, so adding brands to the seed does not need a test edit.
+    expect(catalog.products.length).toBeGreaterThan(20);
+    for (const p of catalog.products)
+      expect(
+        catalog.lines.some(
+          (l) => l.id === p.line_id && l.brand_id === p.brand_id,
+        ),
+      ).toBe(true);
     expect(() => catalogSchema.parse({ ...seed, brands: [] })).toThrow();
   });
   it("rejects duplicate IDs and unsafe image URLs", () => {
@@ -52,7 +59,7 @@ describe("question generation", () => {
   it("prioritizes overdue reviews", () => {
     const p: Progress = {
       entity_type: "product",
-      entity_id: "thermo-protector",
+      entity_id: "lifestyling-thermo-protector",
       correct_answers: 1,
       incorrect_answers: 2,
       mastery_score: 0,

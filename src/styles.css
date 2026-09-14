@@ -741,6 +741,16 @@ main {
   transform: rotate(-25deg);
   opacity: 0.45;
 }
+.line-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 10px 12px 22px;
+  mix-blend-mode: multiply;
+}
 .tone-0 {
   background: #e9eddd;
   color: #607151;

@@ -24,6 +24,7 @@ const fields: Record<Kind, string[]> = {
     "purposes",
     "benefits",
     "keywords",
+    "image",
   ],
   products: [
     "id",
