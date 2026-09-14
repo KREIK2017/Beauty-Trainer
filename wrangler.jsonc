@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "beauty-trainer",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "3391da24-dbfb-48ad-99bb-f0546a8d1986",
       "migrations_dir": "migrations",
     },
   ],
