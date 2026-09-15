@@ -1,4 +1,5 @@
 import type { Catalog, Progress, EntityType } from "./schema";
+export const SESSION_LIVES = 3;
 export interface Question {
   id: string;
   type: string;

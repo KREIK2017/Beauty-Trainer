@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, Brain, Check, CircleX, Trophy, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Brain,
+  Check,
+  CircleX,
+  Heart,
+  Trophy,
+  Zap,
+} from "lucide-react";
+import { SESSION_LIVES } from "../../shared/learning";
 import { api } from "../services/api";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, ProgressBar } from "../components/ui";
@@ -29,6 +38,10 @@ export default function Training() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [finished, setFinished] = useState(false);
+  const lives = Math.max(
+    0,
+    SESSION_LIVES - answers.filter((a) => !a.correct).length,
+  );
   async function start() {
     setBusy(true);
     setError("");
@@ -53,7 +66,7 @@ export default function Training() {
     }
   }
   async function answer(option: string) {
-    if (!session || busy || feedback) return;
+    if (!session || busy || feedback || lives === 0 || finished) return;
     setBusy(true);
     setSelected(option);
     setError("");
@@ -140,6 +153,10 @@ export default function Training() {
             </span>
             <span>10 XP за правильну відповідь</span>
           </div>
+          <p>
+            У вас {SESSION_LIVES} життя. Кожна помилка забирає одне. Щоб скласти
+            тест, дайте відповідь на всі запитання, зберігши хоча б одне життя.
+          </p>
           {line && (
             <p>
               Порівнюйте продукти цієї серії. У невеликих лінійках тест буде
@@ -174,15 +191,30 @@ export default function Training() {
         </Empty>
       ) : finished ? (
         <div className="session-summary">
-          <Trophy size={48} className="gold" />
+          {lives > 0 ? (
+            <Trophy size={48} className="gold" />
+          ) : (
+            <CircleX size={48} />
+          )}
           <span className="eyebrow">ТРЕНУВАННЯ ЗАВЕРШЕНО</span>
-          <h2>Ще один крок до впевненості.</h2>
-          <p>Кожне запитання — нагода навчитися. Ось ваші результати.</p>
+          <h2>
+            {lives > 0
+              ? "Тест складено!"
+              : "Життя закінчилися — тест не складено"}
+          </h2>
+          <p>
+            {lives > 0
+              ? "Ви дійшли до кінця та зберегли життя."
+              : "Перегляньте помилки й спробуйте знову. Уже здобуті XP та прогрес збережено."}
+          </p>
+          <p>
+            Відповідей: {answers.length} із {session.questions.length}. Життя:{" "}
+            {lives} із {SESSION_LIVES}.
+          </p>
           <div className="summary-stats">
             <div>
               <strong>
-                {answers.filter((a) => a.correct).length} /{" "}
-                {session.questions.length}
+                {answers.filter((a) => a.correct).length} / {answers.length}
               </strong>
               <span>Правильні відповіді</span>
             </div>
@@ -231,6 +263,11 @@ export default function Training() {
             )}
           </section>
           <div className="actions">
+            {line && (
+              <Link className="button secondary" to={`/lines/${line.id}/cards`}>
+                Повторити картки
+              </Link>
+            )}
             <button
               className="button primary"
               onClick={() => void start()}
@@ -252,7 +289,26 @@ export default function Training() {
               {index + 1} / {session.questions.length}
             </strong>
           </div>
-          <ProgressBar value={(index / session.questions.length) * 100} />
+          <div
+            className="quiz-lives"
+            role="status"
+            aria-label={`Життя: ${lives} із ${SESSION_LIVES}`}
+          >
+            {Array.from({ length: SESSION_LIVES }, (_, i) => (
+              <Heart
+                key={i}
+                size={22}
+                aria-hidden="true"
+                fill={i < lives ? "currentColor" : "none"}
+              />
+            ))}
+            <span>
+              Життя: {lives} із {SESSION_LIVES}
+            </span>
+          </div>
+          <ProgressBar
+            value={(answers.length / session.questions.length) * 100}
+          />
           <article className="question-card">
             <span className="question-type">
               <Brain size={16} />
@@ -302,17 +358,23 @@ export default function Training() {
                   </span>
                 </div>
                 <p>{feedback.explanation}</p>
+                {lives === 0 && (
+                  <p>
+                    Це третя помилка. Тест завершено — перегляньте результати та
+                    повторіть матеріал.
+                  </p>
+                )}
                 <button
                   className="button primary"
                   onClick={() => {
-                    if (index + 1 === session.questions.length)
+                    if (lives === 0 || index + 1 === session.questions.length)
                       setFinished(true);
                     else setIndex(index + 1);
                     setFeedback(undefined);
                     setSelected("");
                   }}
                 >
-                  {index + 1 === session.questions.length
+                  {lives === 0 || index + 1 === session.questions.length
                     ? "Переглянути результати"
                     : "Наступне запитання"}
                   <ArrowRight size={17} />

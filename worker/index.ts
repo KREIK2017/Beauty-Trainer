@@ -7,7 +7,11 @@ import {
   type Progress,
   type History,
 } from "../shared/schema";
-import { generateQuestions, type Question } from "../shared/learning";
+import {
+  generateQuestions,
+  SESSION_LIVES,
+  type Question,
+} from "../shared/learning";
 import { getCatalog, catalogStatements } from "./db/catalog";
 import { errorMessage } from "../shared/uk";
 interface Env {
@@ -239,7 +243,7 @@ export default {
         const historyId = crypto.randomUUID();
         const statements = [
           env.DB.prepare(
-            "INSERT OR IGNORE INTO quiz_history VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            "INSERT OR IGNORE INTO quiz_history SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM quiz_history WHERE session_id=? AND correct=0) < ?",
           ).bind(
             historyId,
             userId,
@@ -252,6 +256,8 @@ export default {
             Number(correct),
             xp,
             now,
+            answerMatch[1],
+            SESSION_LIVES,
           ),
         ];
         // Conditional writes make retries and simultaneous submissions award progress only once.
@@ -288,6 +294,11 @@ export default {
         )
           .bind(answerMatch[1], q.id)
           .first<History>();
+        if (!saved)
+          return json(
+            { error: "Життя закінчилися. Почніть нове тренування." },
+            409,
+          );
         return json({
           correct: !!saved!.correct,
           xp: saved!.xp,
