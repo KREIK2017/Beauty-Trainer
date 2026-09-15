@@ -19,6 +19,7 @@ import { useData } from "./hooks/useData";
 import Dashboard from "./pages/Dashboard";
 import { CatalogPage, LinePage, ProductPage } from "./pages/Catalog";
 import Training from "./pages/Training";
+import Flashcards from "./pages/Flashcards";
 import { WeakAreas, ProgressPage } from "./pages/Progress";
 import Admin from "./pages/Admin";
 const nav = [
@@ -146,6 +147,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/lines/:id" element={<LinePage />} />
+            <Route path="/lines/:id/cards" element={<Flashcards />} />
             <Route path="/products/:id" element={<ProductPage />} />
             <Route
               path="/training"

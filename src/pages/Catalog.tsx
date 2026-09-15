@@ -176,9 +176,14 @@ export function LinePage() {
         title={line.name}
         description={line.short_description}
         action={
-          <Link className="button primary" to={`/training?line=${line.id}`}>
-            Пройти тест лінійки <ArrowRight size={16} />
-          </Link>
+          <div className="actions">
+            <Link className="button secondary" to={`/lines/${line.id}/cards`}>
+              Вивчити картки
+            </Link>
+            <Link className="button primary" to={`/training?line=${line.id}`}>
+              Пройти тест лінійки <ArrowRight size={16} />
+            </Link>
+          </div>
         }
       />
       <div className="detail-panel">
