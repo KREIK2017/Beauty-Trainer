@@ -10,7 +10,7 @@ import {
   Zap,
 } from "lucide-react";
 import { SESSION_LIVES } from "../../shared/learning";
-import { api } from "../services/api";
+import { api, ApiError } from "../services/api";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, ProgressBar } from "../components/ui";
 interface Session {
@@ -79,9 +79,26 @@ export default function Training() {
         }),
       });
       setFeedback(f);
-      setAnswers([...answers, f]);
+      const nextAnswers = [...answers, f];
+      setAnswers(nextAnswers);
+      if (nextAnswers.filter((a) => !a.correct).length >= SESSION_LIVES) {
+        setFinished(true);
+        setFeedback(undefined);
+      }
       await refresh();
     } catch (e) {
+      if (
+        e instanceof ApiError &&
+        e.code === "SESSION_EXHAUSTED" &&
+        Array.isArray(e.details)
+      ) {
+        setAnswers(e.details as Feedback[]);
+        setFeedback(undefined);
+        setFinished(true);
+        setError("");
+        await refresh();
+        return;
+      }
       setError((e as Error).message);
       setSelected("");
     } finally {
@@ -241,6 +258,16 @@ export default function Training() {
               )}
             </section>
           </div>
+          {lives === 0 && (
+            <section>
+              <h3>Ваші помилки</h3>
+              {answers
+                .filter((a) => !a.correct)
+                .map((a, i) => (
+                  <p key={i}>{a.explanation}</p>
+                ))}
+            </section>
+          )}
           <section>
             <h3>Продукти для повторення</h3>
             {[
@@ -285,26 +312,30 @@ export default function Training() {
         <div className="quiz-shell">
           <div className="row small">
             <span>ВАШЕ ТРЕНУВАННЯ</span>
-            <strong>
-              {index + 1} / {session.questions.length}
-            </strong>
-          </div>
-          <div
-            className="quiz-lives"
-            role="status"
-            aria-label={`Життя: ${lives} із ${SESSION_LIVES}`}
-          >
-            {Array.from({ length: SESSION_LIVES }, (_, i) => (
-              <Heart
-                key={i}
-                size={22}
-                aria-hidden="true"
-                fill={i < lives ? "currentColor" : "none"}
-              />
-            ))}
-            <span>
-              Життя: {lives} із {SESSION_LIVES}
-            </span>
+            <div className="quiz-counters">
+              <strong>
+                {index + 1} / {session.questions.length}
+              </strong>
+              <div
+                className="quiz-lives"
+                role="status"
+                aria-label={`Життя: ${lives} із ${SESSION_LIVES}`}
+              >
+                <span className="lives-desktop" aria-hidden="true">
+                  {Array.from({ length: SESSION_LIVES }, (_, i) => (
+                    <Heart
+                      key={i}
+                      size={22}
+                      aria-hidden="true"
+                      fill={i < lives ? "currentColor" : "none"}
+                    />
+                  ))}
+                </span>
+                <span className="lives-mobile" aria-hidden="true">
+                  {lives} <Heart size={20} fill="currentColor" />
+                </span>
+              </div>
+            </div>
           </div>
           <ProgressBar
             value={(answers.length / session.questions.length) * 100}

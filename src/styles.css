@@ -2056,6 +2056,30 @@ footer {
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 14px 0;
-  color: var(--green);
+  color: #ce5264;
+}
+.quiz-counters,
+.lives-desktop,
+.lives-mobile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quiz-counters {
+  gap: 18px;
+  flex-shrink: 0;
+}
+.lives-mobile {
+  display: none;
+}
+@media (max-width: 760px) {
+  .lives-desktop {
+    display: none;
+  }
+  .lives-mobile {
+    display: flex;
+  }
+  .quiz-counters {
+    gap: 10px;
+  }
 }

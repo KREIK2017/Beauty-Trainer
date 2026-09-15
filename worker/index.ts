@@ -294,11 +294,31 @@ export default {
         )
           .bind(answerMatch[1], q.id)
           .first<History>();
-        if (!saved)
+        if (!saved) {
+          const history = await env.DB.prepare(
+            "SELECT * FROM quiz_history WHERE session_id=? ORDER BY created_at",
+          )
+            .bind(answerMatch[1])
+            .all<History>();
           return json(
-            { error: "Життя закінчилися. Почніть нове тренування." },
+            {
+              error: "Життя закінчилися. Почніть нове тренування.",
+              code: "SESSION_EXHAUSTED",
+              answers: history.results.map((h) => ({
+                correct: !!h.correct,
+                xp: h.xp,
+                answer: h.correct_answer,
+                explanation:
+                  (JSON.parse(session.questions) as Question[]).find(
+                    (item) => item.id === h.question_id,
+                  )?.explanation ?? h.correct_answer,
+                productId: h.product_id ?? undefined,
+                lineId: h.line_id,
+              })),
+            },
             409,
           );
+        }
         return json({
           correct: !!saved!.correct,
           xp: saved!.xp,
