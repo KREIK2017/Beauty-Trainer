@@ -19,6 +19,8 @@ interface Feedback {
 export default function Training() {
   const [params] = useSearchParams();
   const { catalog, refresh } = useData();
+  const lineId = params.get("line");
+  const line = catalog.lines.find((l) => l.id === lineId);
   const [session, setSession] = useState<Session>();
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Feedback[]>([]);
@@ -35,6 +37,7 @@ export default function Training() {
         method: "POST",
         body: JSON.stringify({
           mode: params.get("mode") === "weak" ? "weak" : "all",
+          lineId: lineId ?? undefined,
         }),
       });
       setSession(s);
@@ -88,14 +91,27 @@ export default function Training() {
     ),
   ];
   const weak = [...new Set(answers.filter((a) => !a.correct).map(topic))];
+  if (lineId && !line)
+    return (
+      <Empty title="Лінійку не знайдено">
+        <Link to="/catalog">До каталогу</Link>
+      </Empty>
+    );
   return (
     <>
+      {line && (
+        <Link className="back-link" to={`/lines/${line.id}`}>
+          До лінійки {line.name}
+        </Link>
+      )}
       <PageHeading
         eyebrow="ПРАКТИКА ЗАКРІПЛЮЄ ЗНАННЯ"
         title={
-          params.get("mode") === "weak"
-            ? "Приділіть увагу слабким темам."
-            : "Кожне тренування — крок уперед."
+          line
+            ? `Тест лінійки ${line.name}`
+            : params.get("mode") === "weak"
+              ? "Приділіть увагу слабким темам."
+              : "Кожне тренування — крок уперед."
         }
         description="Спочатку пригадайте. Прочитайте пояснення. Закріпіть знання."
       />
@@ -117,9 +133,19 @@ export default function Training() {
           </p>
           <div className="session-facts">
             <span>До 10 запитань</span>
-            <span>7 типів запитань</span>
+            <span>
+              {line
+                ? "Лише обрана лінійка · до 5 типів запитань"
+                : "7 типів запитань"}
+            </span>
             <span>10 XP за правильну відповідь</span>
           </div>
+          {line && (
+            <p>
+              Порівнюйте продукти цієї серії. У невеликих лінійках тест буде
+              коротшим: запитання без різних варіантів відповідей пропускаються.
+            </p>
+          )}
           <button
             className="button primary"
             disabled={busy}

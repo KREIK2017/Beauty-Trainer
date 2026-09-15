@@ -147,7 +147,10 @@ export default function App() {
             <Route path="/catalog" element={<CatalogPage />} />
             <Route path="/lines/:id" element={<LinePage />} />
             <Route path="/products/:id" element={<ProductPage />} />
-            <Route path="/training" element={<Training />} />
+            <Route
+              path="/training"
+              element={<Training key={location.search} />}
+            />
             <Route path="/weak" element={<WeakAreas />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/admin" element={<Admin />} />

@@ -61,7 +61,9 @@ export function generateQuestions(
   mode = "all",
   seed = "daily",
   now = new Date(),
+  lineId?: string,
 ): Question[] {
+  const products = c.products.filter((p) => !lineId || p.line_id === lineId);
   const pool: Question[] = [];
   // Hash each candidate once; recomputing inside a comparator dominates large catalogs.
   const shuffle = (values: string[], salt: string) =>
@@ -70,6 +72,8 @@ export function generateQuestions(
       .sort((a, b) => a.key - b.key)
       .map((entry) => entry.value);
   const add = (q: Omit<Question, "options">, distractors: string[]) => {
+    // Naming the selected line would reveal the answer to recognition questions.
+    if (lineId && (q.id.endsWith(":A") || q.id.endsWith(":B"))) return;
     const other = shuffle(
       [...new Set(distractors)].filter((x) => x !== q.answer),
       seed,
@@ -78,6 +82,7 @@ export function generateQuestions(
     pool.push({ ...q, options: shuffle([q.answer, ...other], seed + q.id) });
   };
   c.lines.forEach((l) => {
+    if (lineId && l.id !== lineId) return;
     const base = {
       brandId: l.brand_id,
       lineId: l.id,
@@ -125,7 +130,7 @@ export function generateQuestions(
         ["Правда", "Неправда"],
       );
   });
-  c.products.forEach((p) => {
+  products.forEach((p) => {
     const line = c.lines.find((l) => l.id === p.line_id)!;
     const base = {
       brandId: p.brand_id,
@@ -141,7 +146,7 @@ export function generateQuestions(
         prompt: `Який продукт лінійки ${line.name} відповідає потребі «${p.purpose.toLowerCase()}»?`,
         answer: p.name,
       },
-      c.products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
+      products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
     );
     add(
       {
@@ -151,7 +156,7 @@ export function generateQuestions(
         prompt: `Яка перевага характерна для ${p.name}?`,
         answer: p.benefits[0],
       },
-      c.products
+      products
         .flatMap((x) => x.benefits)
         .filter((x) => !p.benefits.includes(x)),
     );
@@ -163,7 +168,7 @@ export function generateQuestions(
         prompt: `Яке основне призначення ${p.name}?`,
         answer: p.purpose,
       },
-      c.products.map((x) => x.purpose),
+      products.map((x) => x.purpose),
     );
     add(
       {
@@ -173,7 +178,7 @@ export function generateQuestions(
         prompt: `Клієнт шукає засіб для потреби «${p.purpose.toLowerCase()}». Тип волосся: ${p.hair_types.join(" / ").toLowerCase()}. Який продукт ви порекомендуєте?`,
         answer: p.name,
       },
-      c.products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
+      products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
     );
   });
   const rank = (q: Question) => {

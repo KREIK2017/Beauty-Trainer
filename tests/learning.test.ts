@@ -31,6 +31,43 @@ describe("catalog validation", () => {
   });
 });
 describe("question generation", () => {
+  it("keeps line sessions and product distractors within the selected line", () => {
+    const now = new Date("2026-09-15T12:00:00Z");
+    for (const line of catalog.lines) {
+      const products = catalog.products.filter((p) => p.line_id === line.id);
+      const questions = generateQuestions(
+        catalog,
+        [],
+        "all",
+        "line-test",
+        now,
+        line.id,
+      );
+      expect(questions.length).toBeLessThanOrEqual(10);
+      expect(new Set(questions.map((q) => q.id)).size).toBe(questions.length);
+      for (const q of questions) {
+        expect(q.lineId).toBe(line.id);
+        expect(q.options).toContain(q.answer);
+        expect(q.options.length).toBeGreaterThan(1);
+        expect(q.id).not.toMatch(/:[AB]$/);
+        if (q.productId)
+          expect(products.some((p) => p.id === q.productId)).toBe(true);
+        if (/:[CF]$/.test(q.id))
+          expect(
+            q.options.every((name) => products.some((p) => p.name === name)),
+          ).toBe(true);
+      }
+    }
+    expect(
+      generateQuestions(catalog, [], "all", "line-test", now, "curl-passion"),
+    ).toHaveLength(10);
+    expect(
+      generateQuestions(catalog, [], "weak", "line-test", now, "curl-passion"),
+    ).toEqual([]);
+    expect(
+      generateQuestions(catalog, [], "all", "line-test", now, "missing-line"),
+    ).toEqual([]);
+  });
   it("is deterministic, has unique questions and distinct valid options", () => {
     const first = generateQuestions(catalog, [], "all", "test");
     expect(first).toEqual(generateQuestions(catalog, [], "all", "test"));

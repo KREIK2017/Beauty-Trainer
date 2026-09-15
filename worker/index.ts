@@ -161,15 +161,23 @@ export default {
       }
       if (path === "/api/sessions" && request.method === "POST") {
         const input = z
-          .object({ mode: z.enum(["all", "weak"]).default("all") })
+          .object({
+            mode: z.enum(["all", "weak"]).default("all"),
+            lineId: lineSchema.shape.id.optional(),
+          })
           .parse(await body(request));
+        const catalog = await getCatalog(env.DB);
+        if (input.lineId && !catalog.lines.some((l) => l.id === input.lineId))
+          return json({ error: "Лінійку не знайдено" }, 404);
         const id = crypto.randomUUID();
         const s = await stats(env.DB);
         const questions = generateQuestions(
-          await getCatalog(env.DB),
+          catalog,
           s.progress,
           input.mode,
           id,
+          new Date(),
+          input.lineId,
         );
         await env.DB.prepare("INSERT INTO quiz_sessions VALUES (?,?,?,?)")
           .bind(id, userId, JSON.stringify(questions), new Date().toISOString())
