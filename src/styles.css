@@ -2146,6 +2146,59 @@ footer {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+.question-photo {
+  display: block;
+  width: 100%;
+  height: 240px;
+  object-fit: contain;
+  margin: 20px auto;
+}
+.complex-question fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px;
+  min-width: 0;
+}
+.complex-question legend {
+  margin-bottom: 12px;
+}
+.complex-question .answer {
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+.complex-question input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--ink);
+}
+.question-select {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.question-select > span {
+  text-transform: none;
+}
+.question-select .selected-explanation {
+  font-weight: 400;
+  font-size: 15px;
+}
+.matching-options {
+  padding-left: 24px;
+  margin: 0 0 24px;
+}
+.matching-options li {
+  padding-left: 6px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.question-select select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  font: inherit;
+}
 .nested-products a svg {
   margin-top: 5px;
 }

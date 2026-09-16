@@ -1,3 +1,4 @@
+import { anyAnswer, answerInBrowser } from "./quiz-helpers";
 import { test, expect } from "@playwright/test";
 import type { Catalog } from "../../shared/schema";
 
@@ -31,14 +32,18 @@ test("line training creates a scoped session and saves an answer", async ({
   expect(session.questions.length).toBeGreaterThan(0);
   for (const q of session.questions) {
     expect(q.answer).toBeUndefined();
-    expect(products.has(q.id.split(":")[0]) || q.id === "curl-passion:G").toBe(
-      true,
-    );
+    expect(
+      products.has(q.id.split(":")[0]) || q.id.startsWith("curl-passion:"),
+    ).toBe(true);
   }
   const answerPromise = page.waitForResponse((r) =>
     r.url().endsWith("/answers"),
   );
-  await page.locator(".answer").first().click();
+  await answerInBrowser(
+    page,
+    session.questions[0],
+    anyAnswer(session.questions[0]),
+  );
   const feedback = await (await answerPromise).json();
   expect(feedback.lineId).toBe("curl-passion");
   await expect(page.locator(".feedback")).toBeVisible();

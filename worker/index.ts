@@ -9,6 +9,8 @@ import {
 } from "../shared/schema";
 import {
   generateQuestions,
+  normalizeAnswer,
+  formatAnswer,
   SESSION_LIVES,
   type Question,
 } from "../shared/learning";
@@ -193,6 +195,10 @@ export default {
             type: q.type,
             prompt: q.prompt,
             options: q.options,
+            interaction: q.interaction,
+            image: q.image,
+            items: q.items,
+            reasons: q.reasons,
           })),
         });
       }
@@ -212,7 +218,7 @@ export default {
         const q = (JSON.parse(session.questions) as Question[]).find(
           (q) => q.id === input.questionId,
         );
-        if (!q || !q.options.includes(input.answer))
+        if (!q || normalizeAnswer(q, input.answer) === undefined)
           return json({ error: "Некоректне запитання або відповідь" }, 400);
         const old = await env.DB.prepare(
           "SELECT * FROM quiz_history WHERE session_id=? AND question_id=?",
@@ -237,7 +243,7 @@ export default {
             { error: "Каталог змінився. Почніть нове тренування." },
             409,
           );
-        const correct = input.answer === q.answer;
+        const correct = normalizeAnswer(q, input.answer) === q.answer;
         const xp = correct ? 10 : 0;
         const now = new Date().toISOString();
         const historyId = crypto.randomUUID();
@@ -251,8 +257,8 @@ export default {
             q.id,
             q.productId ?? null,
             q.lineId,
-            input.answer,
-            q.answer,
+            formatAnswer(q, input.answer),
+            formatAnswer(q, q.answer),
             Number(correct),
             xp,
             now,

@@ -1,3 +1,4 @@
+import { anyAnswer, wrongAnswer, answerInBrowser } from "./quiz-helpers";
 import { test, expect } from "@playwright/test";
 import { generateQuestions, type Question } from "../../shared/learning";
 import type { Catalog, Stats } from "../../shared/schema";
@@ -43,9 +44,9 @@ test("three mistakes end the quiz, retries preserve lives, and restart resets th
   });
   for (let i = 0; i < 3; i++) {
     const q = session.questions[i];
-    const wrong = q.options.find((o) => o !== answers.get(q.id))!;
+    const wrong = wrongAnswer(q, answers.get(q.id)!);
     const saved = page.waitForResponse((r) => r.url().endsWith("/answers"));
-    await page.locator(".answer").nth(q.options.indexOf(wrong)).click();
+    await answerInBrowser(page, q, wrong);
     expect((await saved).ok()).toBe(true);
     if (i < 2)
       await expect(page.getByLabel(`Життя: ${2 - i} із 3`)).toBeVisible();
@@ -68,7 +69,7 @@ test("three mistakes end the quiz, retries preserve lives, and restart resets th
   const blocked = await request.post(`/api/sessions/${session.id}/answers`, {
     data: {
       questionId: session.questions[3].id,
-      answer: session.questions[3].options[0],
+      answer: anyAnswer(session.questions[3]),
     },
   });
   expect(blocked.status()).toBe(409);
@@ -105,12 +106,16 @@ test("server-exhausted session opens its saved results instead of an error", asy
     const r = await request.post(`/api/sessions/${session.id}/answers`, {
       data: {
         questionId: q.id,
-        answer: q.options.find((o) => o !== answers.get(q.id))!,
+        answer: wrongAnswer(q, answers.get(q.id)!),
       },
     });
     expect(r.ok()).toBe(true);
   }
-  await page.locator(".answer").first().click();
+  await answerInBrowser(
+    page,
+    session.questions[0],
+    anyAnswer(session.questions[0]),
+  );
   await expect(
     page.getByRole("heading", { name: "Життя закінчилися — тест не складено" }),
   ).toBeVisible();
@@ -139,7 +144,7 @@ test("simultaneous submissions cannot spend more than three lives", async ({
     request.post(`/api/sessions/${session.id}/answers`, {
       data: {
         questionId: q.id,
-        answer: q.options.find((o) => o !== answers.get(q.id))!,
+        answer: wrongAnswer(q, answers.get(q.id)!),
       },
     });
   for (const q of session.questions.slice(0, 2))
@@ -176,14 +181,11 @@ test("correct answers retain all lives and finish with a pass", async ({
     ]),
   );
   for (let i = 0; i < session.questions.length; i++) {
-    await page
-      .locator(".answer")
-      .nth(
-        session.questions[i].options.indexOf(
-          answers.get(session.questions[i].id)!,
-        ),
-      )
-      .click();
+    await answerInBrowser(
+      page,
+      session.questions[i],
+      answers.get(session.questions[i].id)!,
+    );
     await expect(page.locator(".feedback.success")).toBeVisible();
     await expect(page.getByLabel("Життя: 3 із 3")).toBeVisible();
     await page

@@ -9,13 +9,14 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import { SESSION_LIVES } from "../../shared/learning";
+import { SESSION_LIVES, type PublicQuestion } from "../../shared/learning";
+import { QuestionChoices } from "../components/QuestionChoices";
 import { api, ApiError } from "../services/api";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, ProgressBar } from "../components/ui";
 interface Session {
   id: string;
-  questions: { id: string; type: string; prompt: string; options: string[] }[];
+  questions: PublicQuestion[];
 }
 interface Feedback {
   correct: boolean;
@@ -165,8 +166,8 @@ export default function Training() {
             <span>До 10 запитань</span>
             <span>
               {line
-                ? "Лише обрана лінійка · до 5 типів запитань"
-                : "7 типів запитань"}
+                ? "Різні формати · лише обрана лінійка"
+                : "Різні формати для активного пригадування"}
             </span>
             <span>10 XP за правильну відповідь</span>
           </div>
@@ -346,25 +347,43 @@ export default function Training() {
               {session.questions[index].type}
             </span>
             <h2>{session.questions[index].prompt}</h2>
-            <p className="muted">Оберіть найкращу відповідь.</p>
-            <div className="answers">
-              {session.questions[index].options.map((option, i) => (
-                <button
-                  key={option}
-                  disabled={busy || !!feedback}
-                  onClick={() => void answer(option)}
-                  className={`answer ${feedback && option === feedback.answer ? "correct" : ""} ${feedback && selected === option && !feedback.correct ? "incorrect" : ""} ${selected === option ? "selected" : ""}`}
-                >
-                  <span className="answer-letter">
-                    {["А", "Б", "В", "Г"][i]}
-                  </span>
-                  {option}
-                  {feedback && option === feedback.answer && (
-                    <Check size={18} />
-                  )}
-                </button>
-              ))}
-            </div>
+            {session.questions[index].image && (
+              <img
+                className="question-photo"
+                src={session.questions[index].image}
+                alt="Продукт для розпізнавання"
+              />
+            )}
+            {session.questions[index].interaction ? (
+              <QuestionChoices
+                key={session.questions[index].id}
+                question={session.questions[index]}
+                disabled={busy || !!feedback}
+                submit={(option) => void answer(option)}
+              />
+            ) : (
+              <>
+                <p className="muted">Оберіть найкращу відповідь.</p>
+                <div className="answers">
+                  {session.questions[index].options.map((option, i) => (
+                    <button
+                      key={option}
+                      disabled={busy || !!feedback}
+                      onClick={() => void answer(option)}
+                      className={`answer ${feedback && option === feedback.answer ? "correct" : ""} ${feedback && selected === option && !feedback.correct ? "incorrect" : ""} ${selected === option ? "selected" : ""}`}
+                    >
+                      <span className="answer-letter">
+                        {["А", "Б", "В", "Г"][i]}
+                      </span>
+                      {option}
+                      {feedback && option === feedback.answer && (
+                        <Check size={18} />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
             {feedback && (
               <div
                 className={`feedback ${feedback.correct ? "success" : "retry"}`}

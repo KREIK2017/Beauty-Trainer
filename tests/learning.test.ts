@@ -1,8 +1,53 @@
 import { describe, it, expect } from "vitest";
 import { catalogSchema, type Progress } from "../shared/schema";
-import { generateQuestions, nextProgress } from "../shared/learning";
+import {
+  generateQuestions,
+  nextProgress,
+  normalizeAnswer,
+  formatAnswer,
+  type PublicQuestion,
+} from "../shared/learning";
 import seed from "../data/products.json";
 const catalog = catalogSchema.parse(seed);
+describe("compound answer validation", () => {
+  const base: PublicQuestion = {
+    id: "test",
+    type: "test",
+    prompt: "test",
+    options: ["a", "b", "c"],
+  };
+  it("compares sets independent of order but rejects duplicates, invalid values and malformed JSON", () => {
+    const q = { ...base, interaction: "multiple" as const };
+    expect(normalizeAnswer(q, '["b","a"]')).toBe('["a","b"]');
+    for (const invalid of ["[]", '["a","a"]', '["unknown"]', "[1]", "{}", "a"])
+      expect(normalizeAnswer(q, invalid)).toBeUndefined();
+    expect(normalizeAnswer(q, '["a"]')).not.toBe('["a","b"]');
+  });
+  it("requires complete unique matching, preserves order and formats history", () => {
+    const q = {
+      ...base,
+      interaction: "matching" as const,
+      items: ["first", "second", "third"],
+    };
+    expect(normalizeAnswer(q, '["b","a","c"]')).toBe('["b","a","c"]');
+    expect(normalizeAnswer(q, '["a","b"]')).toBeUndefined();
+    expect(normalizeAnswer(q, '["a","a","c"]')).toBeUndefined();
+    expect(formatAnswer(q, '["b","a","c"]')).toBe(
+      "first → b; second → a; third → c",
+    );
+  });
+  it("requires a product and an allowed explanation, and keeps legacy answers compatible", () => {
+    const q = {
+      ...base,
+      interaction: "reasoning" as const,
+      reasons: ["reason"],
+    };
+    expect(normalizeAnswer(q, '["a","reason"]')).toBe('["a","reason"]');
+    expect(normalizeAnswer(q, '["a"]')).toBeUndefined();
+    expect(normalizeAnswer(q, '["a","b"]')).toBeUndefined();
+    expect(normalizeAnswer(base, "a")).toBe("a");
+  });
+});
 describe("catalog validation", () => {
   it("validates seed and rejects missing parent references", () => {
     // Structural, so adding brands to the seed does not need a test edit.
@@ -47,7 +92,7 @@ describe("question generation", () => {
       expect(new Set(questions.map((q) => q.id)).size).toBe(questions.length);
       for (const q of questions) {
         expect(q.lineId).toBe(line.id);
-        expect(q.options).toContain(q.answer);
+        expect(normalizeAnswer(q, q.answer)).toBe(q.answer);
         expect(q.options.length).toBeGreaterThan(1);
         expect(q.id).not.toMatch(/:[AB]$/);
         if (q.productId)
@@ -74,19 +119,20 @@ describe("question generation", () => {
     expect(first).toHaveLength(10);
     expect(new Set(first.map((q) => q.id)).size).toBe(10);
     for (const q of first) {
-      expect(q.options).toContain(q.answer);
+      expect(normalizeAnswer(q, q.answer)).toBe(q.answer);
       expect(new Set(q.options).size).toBe(q.options.length);
       expect(q.options.length).toBeGreaterThan(1);
     }
   });
-  it("can generate all seven formats", () => {
+  it("can generate all thirteen formats without ingredient questions", () => {
     const types = new Set<string>();
     for (let i = 0; i < 50; i++)
       generateQuestions(catalog, [], "all", String(i)).forEach((q) =>
         types.add(q.type),
       );
-    expect(types.size).toBe(7);
-  });
+    expect(types.size).toBe(13);
+    expect([...types].some((t) => /складник/i.test(t))).toBe(false);
+  }, 15000);
   it("returns no weak-topic questions for a new learner and no questions for empty catalog", () => {
     expect(generateQuestions(catalog, [], "weak")).toEqual([]);
     expect(

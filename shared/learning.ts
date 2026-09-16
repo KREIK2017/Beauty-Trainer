@@ -10,6 +10,69 @@ export interface Question {
   brandId: string;
   lineId: string;
   productId?: string;
+  interaction?: "multiple" | "matching" | "reasoning";
+  image?: string;
+  items?: string[];
+  reasons?: string[];
+}
+export type PublicQuestion = Pick<
+  Question,
+  | "id"
+  | "type"
+  | "prompt"
+  | "options"
+  | "interaction"
+  | "image"
+  | "items"
+  | "reasons"
+>;
+
+// Complex answers remain strings in existing session/history storage.
+export function normalizeAnswer(
+  q: PublicQuestion,
+  answer: string,
+): string | undefined {
+  if (!q.interaction) return q.options.includes(answer) ? answer : undefined;
+  try {
+    const values: unknown = JSON.parse(answer);
+    if (
+      !Array.isArray(values) ||
+      !values.every((v): v is string => typeof v === "string")
+    )
+      return;
+    if (q.interaction === "reasoning") {
+      if (
+        values.length === 2 &&
+        q.options.includes(values[0]) &&
+        q.reasons?.includes(values[1])
+      )
+        return JSON.stringify(values);
+      return;
+    }
+    if (
+      !values.length ||
+      new Set(values).size !== values.length ||
+      !values.every((v) => q.options.includes(v))
+    )
+      return;
+    if (q.interaction === "matching")
+      return values.length === q.items?.length
+        ? JSON.stringify(values)
+        : undefined;
+    return JSON.stringify([...values].sort());
+  } catch {
+    return;
+  }
+}
+
+export function formatAnswer(q: PublicQuestion, answer: string): string {
+  if (!q.interaction) return answer;
+  const normalized = normalizeAnswer(q, answer);
+  if (!normalized) return answer;
+  const values = JSON.parse(normalized) as string[];
+  return values
+    .map((v, i) => (q.interaction === "matching" ? `${q.items![i]} → ${v}` : v))
+    .join("; ");
 }
 export function nextProgress(
   previous: Progress | undefined,
@@ -81,13 +144,16 @@ export function generateQuestions(
       .map((value) => ({ value, key: cachedHash(salt + value) }))
       .sort((a, b) => a.key - b.key)
       .map((entry) => entry.value);
-  const add = (q: Omit<Question, "options">, distractors: string[]) => {
+  // `ordered` keeps the caller's ranking of distractors instead of reshuffling it.
+  const add = (
+    q: Omit<Question, "options">,
+    distractors: string[],
+    ordered = false,
+  ) => {
     // Naming the selected line would reveal the answer to recognition questions.
     if (lineId && (q.id.endsWith(":A") || q.id.endsWith(":B"))) return;
-    const other = shuffle(
-      [...new Set(distractors)].filter((x) => x !== q.answer),
-      seed,
-    ).slice(0, 3);
+    const candidates = [...new Set(distractors)].filter((x) => x !== q.answer);
+    const other = (ordered ? candidates : shuffle(candidates, seed)).slice(0, 3);
     if (!other.length) return;
     pool.push({ ...q, options: shuffle([q.answer, ...other], seed + q.id) });
   };
@@ -98,6 +164,29 @@ export function generateQuestions(
       lineId: l.id,
       explanation: `${l.name}: ${l.description}`,
     };
+    const members = products.filter((p) => p.line_id === l.id);
+    const distinct = members
+      .filter(
+        (p, i) =>
+          members.findIndex(
+            (x) => x.purpose === p.purpose || x.name === p.name,
+          ) === i,
+      )
+      .slice(0, 3);
+    if (distinct.length === 3) {
+      const values = distinct.map((p) => p.purpose);
+      pool.push({
+        ...base,
+        id: `${l.id}:pairs`,
+        type: "Зіставлення пар",
+        interaction: "matching",
+        prompt: `Зіставте продукти ${l.name} з їхнім основним призначенням у каталозі.`,
+        items: distinct.map((p) => p.name),
+        options: shuffle(values, seed + l.id),
+        answer: JSON.stringify(values),
+        explanation: distinct.map((p) => `${p.name} — ${p.purpose}.`).join(" "),
+      });
+    }
     add(
       {
         ...base,
@@ -148,6 +237,109 @@ export function generateQuestions(
       productId: p.id,
       explanation: `${p.name} належить до лінійки ${line.name}. ${p.description} Основне призначення: ${p.purpose}.`,
     };
+    if (p.image) {
+      // The bottle carries the line name and product names are prefixed with it,
+      // so same-line products must be offered first; otherwise the label alone
+      // identifies the answer without recognising the product.
+      const photographed = products.filter((x) => x.image && x.id !== p.id);
+      const byLine = (sameLine: boolean) =>
+        shuffle(
+          photographed
+            .filter((x) => (x.line_id === p.line_id) === sameLine)
+            .map((x) => x.name),
+          seed + p.id,
+        );
+      add(
+        {
+          ...base,
+          id: `${p.id}:photo`,
+          type: "Впізнайте за фото",
+          image: p.image,
+          prompt: "Який продукт зображено на фото?",
+          answer: p.name,
+        },
+        [...byLine(true), ...byLine(false)],
+        true,
+      );
+    }
+    if (p.usage)
+      add(
+        {
+          ...base,
+          id: `${p.id}:usage`,
+          type: "Спосіб застосування",
+          prompt: `Яка інструкція наведена в каталозі для ${p.name}?`,
+          answer: p.usage,
+          explanation: `${p.name}: ${p.usage}`,
+        },
+        products.flatMap((x) => (x.usage ? [x.usage] : [])),
+      );
+
+    const benefits = [...new Set(p.benefits)].slice(0, 2);
+    const others = shuffle(
+      [...new Set(products.flatMap((x) => x.benefits))].filter(
+        (x) => !p.benefits.includes(x),
+      ),
+      seed,
+    ).slice(0, 2);
+    if (benefits.length === 2 && others.length === 2)
+      pool.push({
+        ...base,
+        id: `${p.id}:multiple`,
+        type: "Кілька правильних відповідей",
+        interaction: "multiple",
+        prompt: `Оберіть дві переваги, прямо зазначені в картці ${p.name}.`,
+        options: shuffle([...benefits, ...others], seed + p.id),
+        answer: JSON.stringify([...benefits].sort()),
+        explanation: `У картці ${p.name} зазначено: ${benefits.join("; ")}. Інші варіанти не наведено в цій картці — це не твердження про відсутність таких властивостей.`,
+      });
+    const otherCategory = products.find(
+      (x) => x.category !== p.category,
+    )?.category;
+    if (otherCategory)
+      add(
+        {
+          ...base,
+          id: `${p.id}:error`,
+          type: "Знайдіть помилку",
+          prompt: `Консультант описує ${p.name}. Яке твердження суперечить картці продукту?`,
+          answer: `Категорія: ${otherCategory}`,
+          explanation: `${p.name}: правильна категорія — ${p.category}. ${base.explanation}`,
+        },
+        [
+          `Лінійка: ${line.name}`,
+          `Призначення: ${p.purpose}`,
+          `Перевага: ${p.benefits[0]}`,
+        ],
+      );
+    const alternatives = shuffle(
+      [
+        ...new Set(
+          products
+            .filter((x) => x.purpose !== p.purpose && x.name !== p.name)
+            .map((x) => x.name),
+        ),
+      ],
+      seed,
+    ).slice(0, 2);
+    const reasons = shuffle(
+      [...new Set(products.flatMap((x) => x.benefits))].filter(
+        (x) => !p.benefits.includes(x),
+      ),
+      seed,
+    ).slice(0, 2);
+    if (alternatives.length && reasons.length)
+      pool.push({
+        ...base,
+        id: `${p.id}:reason`,
+        type: "Вибір із поясненням",
+        interaction: "reasoning",
+        prompt: `Потреба клієнта: «${p.purpose}». Оберіть продукт, а потім перевагу, прямо зазначену в його картці, щоб пояснити рекомендацію.`,
+        options: shuffle([p.name, ...alternatives], seed + p.id),
+        reasons: shuffle([p.benefits[0], ...reasons], seed + p.id + "reason"),
+        answer: JSON.stringify([p.name, p.benefits[0]]),
+        explanation: `${base.explanation} Перевага з картки: ${p.benefits[0]}.`,
+      });
     add(
       {
         ...base,

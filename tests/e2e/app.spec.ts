@@ -1,3 +1,5 @@
+import { wrongAnswer, answerInBrowser } from "./quiz-helpers";
+import type { PublicQuestion } from "../../shared/learning";
 import { fieldLabels } from "../../shared/uk";
 import { test, expect } from "@playwright/test";
 import { generateQuestions, nextProgress } from "../../shared/learning";
@@ -78,7 +80,7 @@ test("complete ten-question browser session with feedback and persisted progress
   expect(response.status()).toBe(200);
   const session = (await response.json()) as {
     id: string;
-    questions: { id: string; options: string[] }[];
+    questions: PublicQuestion[];
   };
   const questions = generateQuestions(
     catalog,
@@ -92,14 +94,8 @@ test("complete ten-question browser session with feedback and persisted progress
     const q = session.questions[i];
     const generated = questions.find((x) => x.id === q.id)!;
     const answer =
-      i === 0
-        ? q.options.find((o) => o !== generated.answer)!
-        : generated.answer;
-    await page
-      .getByRole("button")
-      .filter({ hasText: answer })
-      .filter({ has: page.locator(".answer-letter") })
-      .click();
+      i === 0 ? wrongAnswer(q, generated.answer) : generated.answer;
+    await answerInBrowser(page, q, answer);
     await expect(page.locator(".feedback")).toBeVisible();
     if (i !== 0) xp += 10;
     await page
@@ -235,7 +231,7 @@ test("API rejects invalid import, preserves data, and makes answer retries idemp
   const before = (await (await request.get("/api/progress")).json()) as Stats;
   const session = (await (
     await request.post("/api/sessions", { data: { mode: "all" } })
-  ).json()) as { id: string; questions: { id: string; options: string[] }[] };
+  ).json()) as { id: string; questions: PublicQuestion[] };
   expect(session.questions[0]).not.toHaveProperty("answer");
   const q = generateQuestions(catalog, before.progress, "all", session.id)[0];
   const payload = { questionId: q.id, answer: q.answer };
@@ -248,7 +244,7 @@ test("API rejects invalid import, preserves data, and makes answer retries idemp
     expect((await r.json()).correct).toBe(true);
   }
   const replay = await request.post(`/api/sessions/${session.id}/answers`, {
-    data: { questionId: q.id, answer: q.options.find((a) => a !== q.answer) },
+    data: { questionId: q.id, answer: wrongAnswer(q, q.answer) },
   });
   expect((await replay.json()).correct).toBe(true);
   const after = (await (await request.get("/api/progress")).json()) as Stats;
@@ -300,7 +296,7 @@ test("API rejects invalid import, preserves data, and makes answer retries idemp
   const wrong = await request.post(`/api/sessions/${session.id}/answers`, {
     data: {
       questionId: second.id,
-      answer: second.options.find((a) => a !== second.answer),
+      answer: wrongAnswer(second, second.answer),
     },
   });
   expect((await wrong.json()).correct).toBe(false);
