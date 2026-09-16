@@ -9,7 +9,11 @@ import {
   Trophy,
   Zap,
 } from "lucide-react";
-import { SESSION_LIVES, type PublicQuestion } from "../../shared/learning";
+import {
+  SESSION_LIVES,
+  type PublicQuestion,
+  type Difficulty,
+} from "../../shared/learning";
 import { QuestionChoices } from "../components/QuestionChoices";
 import { api, ApiError } from "../services/api";
 import { useData } from "../hooks/useData";
@@ -32,6 +36,7 @@ export default function Training() {
   const lineId = params.get("line");
   const line = catalog.lines.find((l) => l.id === lineId);
   const [session, setSession] = useState<Session>();
+  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Feedback[]>([]);
   const [selected, setSelected] = useState("");
@@ -52,6 +57,7 @@ export default function Training() {
         body: JSON.stringify({
           mode: params.get("mode") === "weak" ? "weak" : "all",
           lineId: lineId ?? undefined,
+          difficulty,
         }),
       });
       setSession(s);
@@ -171,6 +177,41 @@ export default function Training() {
             </span>
             <span>10 XP за правильну відповідь</span>
           </div>
+          <fieldset className="difficulty-picker" disabled={busy}>
+            <legend>Оберіть режим</legend>
+            <label className={difficulty === "normal" ? "active" : ""}>
+              <input
+                type="radio"
+                name="difficulty"
+                value="normal"
+                checked={difficulty === "normal"}
+                onChange={() => setDifficulty("normal")}
+              />
+              <span>
+                <strong>Звичайний</strong>
+                <small>
+                  Знайомі запитання з однією відповіддю. Для спокійного
+                  повторення основ.
+                </small>
+              </span>
+            </label>
+            <label className={difficulty === "hard" ? "active" : ""}>
+              <input
+                type="radio"
+                name="difficulty"
+                value="hard"
+                checked={difficulty === "hard"}
+                onChange={() => setDifficulty("hard")}
+              />
+              <span>
+                <strong>Складний</strong>
+                <small>
+                  Фото, пари, кілька відповідей, застосування, пошук помилки та
+                  вибір із поясненням.
+                </small>
+              </span>
+            </label>
+          </fieldset>
           <p>
             У вас {SESSION_LIVES} життя. Кожна помилка забирає одне. Щоб скласти
             тест, дайте відповідь на всі запитання, зберігши хоча б одне життя.
@@ -197,6 +238,12 @@ export default function Training() {
               ? "Спершу пройдіть звичайне тренування, щоб визначити теми для повторення."
               : "Додайте більше різних продуктів і лінійок, щоб сформувати варіанти відповідей."}
           </p>
+          <button
+            className="button secondary"
+            onClick={() => setSession(undefined)}
+          >
+            Змінити режим
+          </button>
           <Link
             className="button primary"
             to={params.get("mode") === "weak" ? "/training" : "/admin"}
@@ -215,6 +262,9 @@ export default function Training() {
             <CircleX size={48} />
           )}
           <span className="eyebrow">ТРЕНУВАННЯ ЗАВЕРШЕНО</span>
+          <p>
+            {difficulty === "normal" ? "Звичайний режим" : "Складний режим"}
+          </p>
           <h2>
             {lives > 0
               ? "Тест складено!"
@@ -291,6 +341,15 @@ export default function Training() {
             )}
           </section>
           <div className="actions">
+            <button
+              className="button secondary"
+              onClick={() => {
+                setSession(undefined);
+                setError("");
+              }}
+            >
+              Змінити режим
+            </button>
             {line && (
               <Link className="button secondary" to={`/lines/${line.id}/cards`}>
                 Повторити картки
@@ -312,7 +371,9 @@ export default function Training() {
       ) : (
         <div className="quiz-shell">
           <div className="row small">
-            <span>ВАШЕ ТРЕНУВАННЯ</span>
+            <span>
+              {difficulty === "normal" ? "ЗВИЧАЙНИЙ РЕЖИМ" : "СКЛАДНИЙ РЕЖИМ"}
+            </span>
             <div className="quiz-counters">
               <strong>
                 {index + 1} / {session.questions.length}

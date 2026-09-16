@@ -169,6 +169,7 @@ export default {
         const input = z
           .object({
             mode: z.enum(["all", "weak"]).default("all"),
+            difficulty: z.enum(["normal", "hard"]).default("normal"),
             lineId: lineSchema.shape.id.optional(),
           })
           .parse(await body(request));
@@ -184,6 +185,7 @@ export default {
           id,
           new Date(),
           input.lineId,
+          input.difficulty,
         );
         await env.DB.prepare("INSERT INTO quiz_sessions VALUES (?,?,?,?)")
           .bind(id, userId, JSON.stringify(questions), new Date().toISOString())

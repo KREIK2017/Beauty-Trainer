@@ -1,5 +1,6 @@
 import type { Catalog, Progress, EntityType } from "./schema";
 export const SESSION_LIVES = 3;
+export type Difficulty = "normal" | "hard";
 export interface Question {
   id: string;
   type: string;
@@ -126,6 +127,7 @@ export function generateQuestions(
   seed = "daily",
   now = new Date(),
   lineId?: string,
+  difficulty: Difficulty = "normal",
 ): Question[] {
   const products = c.products.filter((p) => !lineId || p.line_id === lineId);
   const pool: Question[] = [];
@@ -150,10 +152,14 @@ export function generateQuestions(
     distractors: string[],
     ordered = false,
   ) => {
+    if ((difficulty === "normal") !== /:[A-G]$/.test(q.id)) return;
     // Naming the selected line would reveal the answer to recognition questions.
     if (lineId && (q.id.endsWith(":A") || q.id.endsWith(":B"))) return;
     const candidates = [...new Set(distractors)].filter((x) => x !== q.answer);
-    const other = (ordered ? candidates : shuffle(candidates, seed)).slice(0, 3);
+    const other = (ordered ? candidates : shuffle(candidates, seed)).slice(
+      0,
+      3,
+    );
     if (!other.length) return;
     pool.push({ ...q, options: shuffle([q.answer, ...other], seed + q.id) });
   };
@@ -173,7 +179,7 @@ export function generateQuestions(
           ) === i,
       )
       .slice(0, 3);
-    if (distinct.length === 3) {
+    if (difficulty === "hard" && distinct.length === 3) {
       const values = distinct.map((p) => p.purpose);
       pool.push({
         ...base,
@@ -237,109 +243,111 @@ export function generateQuestions(
       productId: p.id,
       explanation: `${p.name} належить до лінійки ${line.name}. ${p.description} Основне призначення: ${p.purpose}.`,
     };
-    if (p.image) {
-      // The bottle carries the line name and product names are prefixed with it,
-      // so same-line products must be offered first; otherwise the label alone
-      // identifies the answer without recognising the product.
-      const photographed = products.filter((x) => x.image && x.id !== p.id);
-      const byLine = (sameLine: boolean) =>
-        shuffle(
-          photographed
-            .filter((x) => (x.line_id === p.line_id) === sameLine)
-            .map((x) => x.name),
-          seed + p.id,
+    if (difficulty === "hard") {
+      if (p.image) {
+        // The bottle carries the line name and product names are prefixed with it,
+        // so same-line products must be offered first; otherwise the label alone
+        // identifies the answer without recognising the product.
+        const photographed = products.filter((x) => x.image && x.id !== p.id);
+        const byLine = (sameLine: boolean) =>
+          shuffle(
+            photographed
+              .filter((x) => (x.line_id === p.line_id) === sameLine)
+              .map((x) => x.name),
+            seed + p.id,
+          );
+        add(
+          {
+            ...base,
+            id: `${p.id}:photo`,
+            type: "Впізнайте за фото",
+            image: p.image,
+            prompt: "Який продукт зображено на фото?",
+            answer: p.name,
+          },
+          [...byLine(true), ...byLine(false)],
+          true,
         );
-      add(
-        {
-          ...base,
-          id: `${p.id}:photo`,
-          type: "Впізнайте за фото",
-          image: p.image,
-          prompt: "Який продукт зображено на фото?",
-          answer: p.name,
-        },
-        [...byLine(true), ...byLine(false)],
-        true,
-      );
-    }
-    if (p.usage)
-      add(
-        {
-          ...base,
-          id: `${p.id}:usage`,
-          type: "Спосіб застосування",
-          prompt: `Яка інструкція наведена в каталозі для ${p.name}?`,
-          answer: p.usage,
-          explanation: `${p.name}: ${p.usage}`,
-        },
-        products.flatMap((x) => (x.usage ? [x.usage] : [])),
-      );
+      }
+      if (p.usage)
+        add(
+          {
+            ...base,
+            id: `${p.id}:usage`,
+            type: "Спосіб застосування",
+            prompt: `Яка інструкція наведена в каталозі для ${p.name}?`,
+            answer: p.usage,
+            explanation: `${p.name}: ${p.usage}`,
+          },
+          products.flatMap((x) => (x.usage ? [x.usage] : [])),
+        );
 
-    const benefits = [...new Set(p.benefits)].slice(0, 2);
-    const others = shuffle(
-      [...new Set(products.flatMap((x) => x.benefits))].filter(
-        (x) => !p.benefits.includes(x),
-      ),
-      seed,
-    ).slice(0, 2);
-    if (benefits.length === 2 && others.length === 2)
-      pool.push({
-        ...base,
-        id: `${p.id}:multiple`,
-        type: "Кілька правильних відповідей",
-        interaction: "multiple",
-        prompt: `Оберіть дві переваги, прямо зазначені в картці ${p.name}.`,
-        options: shuffle([...benefits, ...others], seed + p.id),
-        answer: JSON.stringify([...benefits].sort()),
-        explanation: `У картці ${p.name} зазначено: ${benefits.join("; ")}. Інші варіанти не наведено в цій картці — це не твердження про відсутність таких властивостей.`,
-      });
-    const otherCategory = products.find(
-      (x) => x.category !== p.category,
-    )?.category;
-    if (otherCategory)
-      add(
-        {
-          ...base,
-          id: `${p.id}:error`,
-          type: "Знайдіть помилку",
-          prompt: `Консультант описує ${p.name}. Яке твердження суперечить картці продукту?`,
-          answer: `Категорія: ${otherCategory}`,
-          explanation: `${p.name}: правильна категорія — ${p.category}. ${base.explanation}`,
-        },
-        [
-          `Лінійка: ${line.name}`,
-          `Призначення: ${p.purpose}`,
-          `Перевага: ${p.benefits[0]}`,
-        ],
-      );
-    const alternatives = shuffle(
-      [
-        ...new Set(
-          products
-            .filter((x) => x.purpose !== p.purpose && x.name !== p.name)
-            .map((x) => x.name),
+      const benefits = [...new Set(p.benefits)].slice(0, 2);
+      const others = shuffle(
+        [...new Set(products.flatMap((x) => x.benefits))].filter(
+          (x) => !p.benefits.includes(x),
         ),
-      ],
-      seed,
-    ).slice(0, 2);
-    const reasons = shuffle(
-      [...new Set(products.flatMap((x) => x.benefits))].filter(
-        (x) => !p.benefits.includes(x),
-      ),
-      seed,
-    ).slice(0, 2);
-    if (alternatives.length && reasons.length)
-      pool.push({
-        ...base,
-        id: `${p.id}:reason`,
-        type: "Вибір із поясненням",
-        interaction: "reasoning",
-        prompt: `Потреба клієнта: «${p.purpose}». Оберіть продукт, а потім перевагу, прямо зазначену в його картці, щоб пояснити рекомендацію.`,
-        options: shuffle([p.name, ...alternatives], seed + p.id),
-        reasons: shuffle([p.benefits[0], ...reasons], seed + p.id + "reason"),
-        answer: JSON.stringify([p.name, p.benefits[0]]),
-        explanation: `${base.explanation} Перевага з картки: ${p.benefits[0]}.`,
-      });
+        seed,
+      ).slice(0, 2);
+      if (benefits.length === 2 && others.length === 2)
+        pool.push({
+          ...base,
+          id: `${p.id}:multiple`,
+          type: "Кілька правильних відповідей",
+          interaction: "multiple",
+          prompt: `Оберіть дві переваги, прямо зазначені в картці ${p.name}.`,
+          options: shuffle([...benefits, ...others], seed + p.id),
+          answer: JSON.stringify([...benefits].sort()),
+          explanation: `У картці ${p.name} зазначено: ${benefits.join("; ")}. Інші варіанти не наведено в цій картці — це не твердження про відсутність таких властивостей.`,
+        });
+      const otherCategory = products.find(
+        (x) => x.category !== p.category,
+      )?.category;
+      if (otherCategory)
+        add(
+          {
+            ...base,
+            id: `${p.id}:error`,
+            type: "Знайдіть помилку",
+            prompt: `Консультант описує ${p.name}. Яке твердження суперечить картці продукту?`,
+            answer: `Категорія: ${otherCategory}`,
+            explanation: `${p.name}: правильна категорія — ${p.category}. ${base.explanation}`,
+          },
+          [
+            `Лінійка: ${line.name}`,
+            `Призначення: ${p.purpose}`,
+            `Перевага: ${p.benefits[0]}`,
+          ],
+        );
+      const alternatives = shuffle(
+        [
+          ...new Set(
+            products
+              .filter((x) => x.purpose !== p.purpose && x.name !== p.name)
+              .map((x) => x.name),
+          ),
+        ],
+        seed,
+      ).slice(0, 2);
+      const reasons = shuffle(
+        [...new Set(products.flatMap((x) => x.benefits))].filter(
+          (x) => !p.benefits.includes(x),
+        ),
+        seed,
+      ).slice(0, 2);
+      if (alternatives.length && reasons.length)
+        pool.push({
+          ...base,
+          id: `${p.id}:reason`,
+          type: "Вибір із поясненням",
+          interaction: "reasoning",
+          prompt: `Потреба клієнта: «${p.purpose}». Оберіть продукт, а потім перевагу, прямо зазначену в його картці, щоб пояснити рекомендацію.`,
+          options: shuffle([p.name, ...alternatives], seed + p.id),
+          reasons: shuffle([p.benefits[0], ...reasons], seed + p.id + "reason"),
+          answer: JSON.stringify([p.name, p.benefits[0]]),
+          explanation: `${base.explanation} Перевага з картки: ${p.benefits[0]}.`,
+        });
+    }
     add(
       {
         ...base,
@@ -402,7 +410,13 @@ export function generateQuestions(
   // Rank and hash stay constant for the whole call, so resolve them before sorting.
   const ranks = new Map(pool.map((q) => [q, rank(q)]));
   const order = new Map(pool.map((q) => [q, hash(seed + q.id)]));
-  const eligible = pool.filter((q) => mode !== "weak" || ranks.get(q)! <= 2);
+  const eligible = pool.filter(
+    (q) =>
+      (difficulty === "normal"
+        ? /:[A-G]$/.test(q.id)
+        : !/:[A-G]$/.test(q.id)) &&
+      (mode !== "weak" || ranks.get(q)! <= 2),
+  );
   const selected: Question[] = [];
   const typeCounts = new Map<string, number>();
   const entityCounts = new Map<string, number>();

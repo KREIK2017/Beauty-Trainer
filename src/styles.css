@@ -2184,14 +2184,100 @@ footer {
   font-weight: 400;
   font-size: 15px;
 }
-.matching-options {
-  padding-left: 24px;
-  margin: 0 0 24px;
+.difficulty-picker {
+  border: 0;
+  padding: 0;
+  margin: 24px 0;
+  display: grid;
+  gap: 12px;
+  text-align: left;
+  min-width: 0;
 }
-.matching-options li {
-  padding-left: 6px;
+.difficulty-picker legend {
   margin-bottom: 12px;
-  line-height: 1.6;
+  font-weight: 600;
+}
+.difficulty-picker label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.difficulty-picker label.active {
+  border-color: var(--green);
+  background: var(--pale);
+}
+.difficulty-picker input {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 3px;
+  accent-color: var(--green);
+}
+.difficulty-picker label > span {
+  text-transform: none;
+  margin: 0;
+}
+.difficulty-picker strong,
+.difficulty-picker small {
+  display: block;
+}
+.difficulty-picker strong {
+  font-size: 17px;
+}
+.difficulty-picker small {
+  font-size: 15px;
+  font-weight: 400;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.matching-board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.matching-board h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.match-choice {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  text-align: left;
+  padding: 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.match-choice strong {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.match-choice span {
+  font-size: 13px;
+  color: var(--muted);
+}
+.match-choice.active {
+  border-color: var(--green);
+  background: var(--pale);
+}
+.matching-board .match-choice:disabled {
+  opacity: 1;
+  cursor: default;
+}
+@media (max-width: 600px) {
+  .matching-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 .question-select select {
   width: 100%;

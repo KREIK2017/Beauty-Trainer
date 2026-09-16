@@ -31,6 +31,14 @@ export async function answerInBrowser(
   if (q.interaction === "multiple") {
     for (const value of values)
       await page.getByRole("checkbox", { name: value, exact: true }).check();
+  } else if (q.interaction === "matching") {
+    for (let i = 0; i < values.length; i++) {
+      await page.locator("[data-match-product]").nth(i).click();
+      await page
+        .locator("[data-match-option]")
+        .nth(q.options.indexOf(values[i]))
+        .click();
+    }
   } else {
     for (let i = 0; i < values.length; i++)
       await page.getByRole("combobox").nth(i).selectOption(values[i]);

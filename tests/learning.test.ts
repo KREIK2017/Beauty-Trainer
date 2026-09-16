@@ -126,13 +126,56 @@ describe("question generation", () => {
   });
   it("can generate all thirteen formats without ingredient questions", () => {
     const types = new Set<string>();
-    for (let i = 0; i < 50; i++)
-      generateQuestions(catalog, [], "all", String(i)).forEach((q) =>
-        types.add(q.type),
-      );
+    for (const difficulty of ["normal", "hard"] as const) {
+      const modeTypes = new Set<string>();
+      for (let i = 0; i < 15; i++)
+        generateQuestions(
+          catalog,
+          [],
+          "all",
+          String(i),
+          new Date(),
+          undefined,
+          difficulty,
+        ).forEach((q) => {
+          types.add(q.type);
+          modeTypes.add(q.type);
+          expect(/:[A-G]$/.test(q.id)).toBe(difficulty === "normal");
+          expect(normalizeAnswer(q, q.answer)).toBe(q.answer);
+        });
+      expect(modeTypes.size).toBe(difficulty === "normal" ? 7 : 6);
+    }
     expect(types.size).toBe(13);
     expect([...types].some((t) => /складник/i.test(t))).toBe(false);
   }, 15000);
+  it("keeps hard line sessions scoped and weak mode empty for a new learner", () => {
+    const questions = generateQuestions(
+      catalog,
+      [],
+      "all",
+      "hard-line",
+      new Date(),
+      "elasti-curl",
+      "hard",
+    );
+    expect(questions.length).toBeGreaterThan(0);
+    expect(
+      questions.every(
+        (q) => q.lineId === "elasti-curl" && !/:[A-G]$/.test(q.id),
+      ),
+    ).toBe(true);
+    expect(
+      generateQuestions(
+        catalog,
+        [],
+        "weak",
+        "hard-line",
+        new Date(),
+        "elasti-curl",
+        "hard",
+      ),
+    ).toEqual([]);
+  });
   it("returns no weak-topic questions for a new learner and no questions for empty catalog", () => {
     expect(generateQuestions(catalog, [], "weak")).toEqual([]);
     expect(
