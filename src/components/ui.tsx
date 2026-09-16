@@ -58,9 +58,6 @@ export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
   return (
     <Link to={`/lines/${line.id}`} className="line-card">
       <div className={`line-art tone-${index % 4}`}>
-        <span className="brand-word">
-          {catalog.brands.find((b) => b.id === line.brand_id)?.name}
-        </span>
         {line.image ? (
           <img
             className="line-photo"
@@ -72,14 +69,21 @@ export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
         ) : (
           <Leaf size={54} strokeWidth={0.8} />
         )}
-        <span className="art-caption">{line.keywords.join(" · ")}</span>
       </div>
       <div className="line-content">
+        <span className="line-brand">
+          {catalog.brands.find((b) => b.id === line.brand_id)?.name}
+        </span>
         <div className="row">
           <h3>{line.name}</h3>
           <ArrowUpRight size={17} />
         </div>
         <p>{line.short_description}</p>
+        <div className="line-topics">
+          {line.purposes.slice(0, 3).map((purpose) => (
+            <span key={purpose}>{purpose}</span>
+          ))}
+        </div>
         <div className="row muted small">
           <span>
             {counted(

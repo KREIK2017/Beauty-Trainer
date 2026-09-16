@@ -17,14 +17,28 @@
  *   - milk_shake lists ingredients per line, so its products inherit them;
  *     Insight lists them per product and keeps them.
  */
-import { readFileSync, writeFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  mkdirSync,
+  rmSync,
+} from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
-import { catalogSchema, type Catalog, type Line, type Product } from "../shared/schema";
+import insightCopy from "../data/insight-copy.json";
+import {
+  catalogSchema,
+  type Catalog,
+  type Line,
+  type Product,
+} from "../shared/schema";
 
 const folder = process.argv[2];
-const write = process.argv.includes("--write");
-if (!folder) throw new Error("Вкажіть теку бренду, напр.: milk_shake або Insight");
+const writeImages = process.argv.includes("--write");
+const write = writeImages || process.argv.includes("--write-data");
+if (!folder)
+  throw new Error("Вкажіть теку бренду, напр.: milk_shake або Insight");
 
 interface Parsed {
   lines: Line[];
@@ -33,7 +47,10 @@ interface Parsed {
   artwork: [string, string][];
 }
 
-const brands: Record<string, { id: string; name: string; description: string }> = {
+const brands: Record<
+  string,
+  { id: string; name: string; description: string }
+> = {
   milk_shake: {
     id: "milk-shake",
     name: "milk_shake",
@@ -93,27 +110,87 @@ const hairTypes: Record<string, string[]> = {
 /** Short purposes, and memory keywords for exports that carry none. */
 const linePurposes: Record<string, [string[], string[]]> = {
   // milk_shake
-  Argan: [["Живлення", "Відновлення"], ["Арган", "Живлення", "Блиск"]],
-  "Cold Brunette": [["Нейтралізація теплих відтінків"], ["Брюнет", "Холодний тон", "Тонування"]],
+  Argan: [
+    ["Живлення", "Відновлення"],
+    ["Арган", "Живлення", "Блиск"],
+  ],
+  "Cold Brunette": [
+    ["Нейтралізація теплих відтінків"],
+    ["Брюнет", "Холодний тон", "Тонування"],
+  ],
   "Color Care": [["Збереження кольору"], ["Колір", "Захист", "Яскравість"]],
-  "Curl Passion": [["Догляд за кучерями", "Підкреслення завитків"], ["Кучері", "Пружність", "Чіткість"]],
-  "Deep detox": [["Глибоке очищення", "Детокс шкіри голови"], ["Детокс", "Очищення", "Метали"]],
-  "Energizin blend": [["Зміцнення волосся", "Здоров’я шкіри голови"], ["Енергія", "Зміцнення", "Ефірні олії"]],
-  "Flower power": [["Щоденний догляд", "Зволоження"], ["Веган", "Ніжність", "Колір"]],
-  "Icy Blond": [["Нейтралізація жовтизни", "Холодний тон"], ["Блонд", "Крижаний", "Антижовтизна"]],
-  Incredible: [["Живлення", "Захист"], ["12 ефектів", "Незмивний", "Блиск"]],
-  "Insta.light": [["Дзеркальний блиск", "Гладкість"], ["Скляне волосся", "Блиск", "Легкість"]],
-  "Integrity & strength": [["Відновлення", "Зміцнення"], ["Цілісність", "Сила", "Амарант"]],
-  "Leave in": [["Незмивне зволоження", "Захист"], ["Незмивний", "Спрей", "Розчісування"]],
-  Lifestyling: [["Стайлінг і фіксація", "Термозахист"], ["Стиль", "Фіксація", "Захист"]],
-  "Make my day": [["Зволоження", "М’якість"], ["Щодня", "Легкість", "Блиск"]],
-  "Moisture & more": [["Інтенсивне зволоження"], ["Зволоження", "Живлення", "Гіалурон"]],
-  "No frizz allowed": [["Контроль пухнастості", "Розгладження"], ["Антифриз", "Гладкість", "Какаду"]],
-  "Normalizing blend": [["Баланс шкіри голови"], ["Баланс", "Себорегуляція", "Коріандр"]],
-  "Pink Lemonade": [["Рожеве тонування", "Підтримка кольору"], ["Рожевий", "Тонування", "Грейпфрут"]],
-  "Purifying blend": [["Глибоке очищення", "Контроль лупи"], ["Лупа", "Очищення", "Водорості"]],
-  "Silver shine": [["Нейтралізація жовтизни", "Холодний тон"], ["Срібло", "Антижовтизна", "Сяйво"]],
-  "Sun & More": [["Захист після сонця", "Відновлення"], ["Сонце", "Після пляжу", "Гібіскус"]],
+  "Curl Passion": [
+    ["Догляд за кучерями", "Підкреслення завитків"],
+    ["Кучері", "Пружність", "Чіткість"],
+  ],
+  "Deep detox": [
+    ["Глибоке очищення", "Детокс шкіри голови"],
+    ["Детокс", "Очищення", "Метали"],
+  ],
+  "Energizin blend": [
+    ["Зміцнення волосся", "Здоров’я шкіри голови"],
+    ["Енергія", "Зміцнення", "Ефірні олії"],
+  ],
+  "Flower power": [
+    ["Щоденний догляд", "Зволоження"],
+    ["Веган", "Ніжність", "Колір"],
+  ],
+  "Icy Blond": [
+    ["Нейтралізація жовтизни", "Холодний тон"],
+    ["Блонд", "Крижаний", "Антижовтизна"],
+  ],
+  Incredible: [
+    ["Живлення", "Захист"],
+    ["12 ефектів", "Незмивний", "Блиск"],
+  ],
+  "Insta.light": [
+    ["Дзеркальний блиск", "Гладкість"],
+    ["Скляне волосся", "Блиск", "Легкість"],
+  ],
+  "Integrity & strength": [
+    ["Відновлення", "Зміцнення"],
+    ["Цілісність", "Сила", "Амарант"],
+  ],
+  "Leave in": [
+    ["Незмивне зволоження", "Захист"],
+    ["Незмивний", "Спрей", "Розчісування"],
+  ],
+  Lifestyling: [
+    ["Стайлінг і фіксація", "Термозахист"],
+    ["Стиль", "Фіксація", "Захист"],
+  ],
+  "Make my day": [
+    ["Зволоження", "М’якість"],
+    ["Щодня", "Легкість", "Блиск"],
+  ],
+  "Moisture & more": [
+    ["Інтенсивне зволоження"],
+    ["Зволоження", "Живлення", "Гіалурон"],
+  ],
+  "No frizz allowed": [
+    ["Контроль пухнастості", "Розгладження"],
+    ["Антифриз", "Гладкість", "Какаду"],
+  ],
+  "Normalizing blend": [
+    ["Баланс шкіри голови"],
+    ["Баланс", "Себорегуляція", "Коріандр"],
+  ],
+  "Pink Lemonade": [
+    ["Рожеве тонування", "Підтримка кольору"],
+    ["Рожевий", "Тонування", "Грейпфрут"],
+  ],
+  "Purifying blend": [
+    ["Глибоке очищення", "Контроль лупи"],
+    ["Лупа", "Очищення", "Водорості"],
+  ],
+  "Silver shine": [
+    ["Нейтралізація жовтизни", "Холодний тон"],
+    ["Срібло", "Антижовтизна", "Сяйво"],
+  ],
+  "Sun & More": [
+    ["Захист після сонця", "Відновлення"],
+    ["Сонце", "Після пляжу", "Гібіскус"],
+  ],
   "volume solution": [["Об’єм"], ["Об’єм", "Густота", "Цукрова тростина"]],
   // Insight — keywords come from the export's own «ключові слова» line.
   "Anti-frizz": [["Контроль пухнастості", "Розгладження"], []],
@@ -162,10 +239,39 @@ const categories: [RegExp, string][] = [
 ];
 
 const TRANSLIT: Record<string, string> = {
-  а: "a", б: "b", в: "v", г: "h", ґ: "g", д: "d", е: "e", є: "ie", ж: "zh",
-  з: "z", и: "y", і: "i", ї: "i", й: "i", к: "k", л: "l", м: "m", н: "n",
-  о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "kh", ц: "ts",
-  ч: "ch", ш: "sh", щ: "shch", ь: "", ю: "iu", я: "ia",
+  а: "a",
+  б: "b",
+  в: "v",
+  г: "h",
+  ґ: "g",
+  д: "d",
+  е: "e",
+  є: "ie",
+  ж: "zh",
+  з: "z",
+  и: "y",
+  і: "i",
+  ї: "i",
+  й: "i",
+  к: "k",
+  л: "l",
+  м: "m",
+  н: "n",
+  о: "o",
+  п: "p",
+  р: "r",
+  с: "s",
+  т: "t",
+  у: "u",
+  ф: "f",
+  х: "kh",
+  ц: "ts",
+  ч: "ch",
+  ш: "sh",
+  щ: "shch",
+  ь: "",
+  ю: "iu",
+  я: "ia",
 };
 
 function slug(value: string): string {
@@ -211,7 +317,13 @@ function splitList(raw: string): string[] {
   const segments = clean(raw).split(",");
   const last = segments.pop() ?? "";
   const all = [...segments, ...last.split(/\sта\s/)];
-  return [...new Set(all.map((s) => upper(clean(s).replace(/\.$/, ""))).filter((s) => s.length > 2))];
+  return [
+    ...new Set(
+      all
+        .map((s) => upper(clean(s).replace(/\.$/, "")))
+        .filter((s) => s.length > 2),
+    ),
+  ];
 }
 
 const categoryOf = (name: string) =>
@@ -221,11 +333,16 @@ function meta(name: string) {
   const hair = hairTypes[name];
   const purposes = linePurposes[name];
   if (!hair || !purposes)
-    throw new Error(`${name}: додайте типи волосся та призначення у таблиці скрипта`);
+    throw new Error(
+      `${name}: додайте типи волосся та призначення у таблиці скрипта`,
+    );
   return { hair, purposes: purposes[0], keywords: purposes[1] };
 }
 
-const files = (dir: string) => readdirSync(dir).filter((f) => f.endsWith(".md")).sort();
+const files = (dir: string) =>
+  readdirSync(dir)
+    .filter((f) => f.endsWith(".md"))
+    .sort();
 const heading = (raw: string) => raw.match(/^# (.+)$/m)?.[1].trim() ?? "";
 
 // ---------------------------------------------------------------- milk_shake
@@ -242,7 +359,9 @@ function parseMilkShake(dir: string, brandId: string): Parsed {
     const name = heading(raw);
     if (!name) throw new Error(`${file}: немає заголовка`);
 
-    const short = clean(raw.match(/^Опис:\s*([\s\S]*?)(?=\n(?:Підходить для|Фото):)/m)?.[1] ?? "");
+    const short = clean(
+      raw.match(/^Опис:\s*([\s\S]*?)(?=\n(?:Підходить для|Фото):)/m)?.[1] ?? "",
+    );
     const photo = clean(raw.match(/^Фото:\s*(.+)$/m)?.[1] ?? "");
     const [head, ingredientsRaw = ""] = raw.split(/^Ключові інгредієнти:/m);
     const body = head.split(/^Фото:.*$/m)[1] ?? "";
@@ -253,13 +372,18 @@ function parseMilkShake(dir: string, brandId: string): Parsed {
       .filter(Boolean)
       .filter((p) => !META.some((m) => p.startsWith(m + ":")));
     const prose = paragraphs.filter((p) => !/^[^:\n]{1,45}:/.test(p));
-    const entries = paragraphs.filter((p) => /^[^:\n]{1,45}:/.test(p)).flatMap(entriesOf);
+    const entries = paragraphs
+      .filter((p) => /^[^:\n]{1,45}:/.test(p))
+      .flatMap(entriesOf);
 
     const { hair, purposes, keywords } = meta(name);
     const lineId = slug(name);
     const ingredients = splitList(ingredientsRaw);
-    if (!ingredients.length) throw new Error(`${name}: не знайдено інгредієнтів`);
-    const lineBenefits = [...new Set(entries.flatMap((e) => benefitsOf(e.description)))].slice(0, 8);
+    if (!ingredients.length)
+      throw new Error(`${name}: не знайдено інгредієнтів`);
+    const lineBenefits = [
+      ...new Set(entries.flatMap((e) => benefitsOf(e.description))),
+    ].slice(0, 8);
 
     out.lines.push({
       id: lineId,
@@ -291,7 +415,11 @@ function parseMilkShake(dir: string, brandId: string): Parsed {
         ingredients,
       });
     }
-    if (photo) out.artwork.push([join(dir, decodeURIComponent(photo)), `${lineId}.webp`]);
+    if (photo)
+      out.artwork.push([
+        join(dir, decodeURIComponent(photo)),
+        `${lineId}.webp`,
+      ]);
   }
   return out;
 }
@@ -333,7 +461,8 @@ function parseInsight(dir: string, brandId: string): Parsed {
   // \w excludes Cyrillic, so the suffixes are spelled out explicitly.
   const INGREDIENTS =
     /^[ \t]*актив[а-яіїєґ]*[ \t]+(?:інгредієнт[а-яіїєґ]*|компонент[а-яіїєґ]*)[ \t]*:?[ \t]*$/im;
-  const USAGE = /^[ \t]*спосіб\s+використання[ \t]*:?[ \t]*$/im;
+  const USAGE =
+    /^[ \t]*спосіб\s+(?:використання|застосування)[ \t]*:?[ \t]*$/im;
   const PHOTO = /!\[[^\]]*\]\(([^)]+)\)/;
 
   for (const file of files(dir)) {
@@ -343,10 +472,20 @@ function parseInsight(dir: string, brandId: string): Parsed {
     if (!name || !blocks.length) continue; // brand overview, instructions, empty page
 
     const header = raw.split(/^1\. /m)[0];
-    const short = clean(header.match(/^Опис:\s*([\s\S]*?)(?=\n(?:Повний опис|Фото|ключові слова):)/mi)?.[1] ?? "");
-    const long = clean(header.match(/^Повний опис:\s*([\s\S]*?)(?=\n(?:Фото|ключові слова):)/mi)?.[1] ?? "");
-    const photo = clean(header.match(/^Фото:\s*(.+)$/mi)?.[1] ?? "");
-    const keywordLine = clean(header.match(/^ключові слова:\s*([\s\S]*?)$/mi)?.[1] ?? "");
+    const short = clean(
+      header.match(
+        /^Опис:\s*([\s\S]*?)(?=\n(?:Повний опис|Фото|ключові слова):)/im,
+      )?.[1] ?? "",
+    );
+    const long = clean(
+      header.match(
+        /^Повний опис:\s*([\s\S]*?)(?=\n(?:Фото|ключові слова):)/im,
+      )?.[1] ?? "",
+    );
+    const photo = clean(header.match(/^Фото:\s*(.+)$/im)?.[1] ?? "");
+    const keywordLine = clean(
+      header.match(/^ключові слова:\s*([\s\S]*?)$/im)?.[1] ?? "",
+    );
 
     const { hair, purposes, keywords } = meta(name);
     const lineId = slug(name);
@@ -365,10 +504,18 @@ function parseInsight(dir: string, brandId: string): Parsed {
       hair_types: hair,
       purposes,
       benefits: benefitsOf(short),
-      keywords: fromExport.length ? fromExport : keywords.length ? keywords : purposes,
+      keywords: fromExport.length
+        ? fromExport
+        : keywords.length
+          ? keywords
+          : purposes,
       ...(photo ? { image: `/images/${brandId}/${lineId}.webp` } : {}),
     });
-    if (photo) out.artwork.push([join(dir, decodeURIComponent(photo)), `${lineId}.webp`]);
+    if (photo)
+      out.artwork.push([
+        join(dir, decodeURIComponent(photo)),
+        `${lineId}.webp`,
+      ]);
 
     for (const block of blocks) {
       const [nameLine, ...bodyLines] = block.split("\n");
@@ -379,7 +526,9 @@ function parseInsight(dir: string, brandId: string): Parsed {
 
       const [beforeUsage, usageRaw = ""] = body.split(USAGE);
       const [descRaw, ingredientsRaw = ""] = beforeUsage.split(INGREDIENTS);
-      const description = clean(descRaw.replace(PHOTO, "").replace(/!\[[^\]]*\]\([^)]+\)/g, ""));
+      const description = clean(
+        descRaw.replace(PHOTO, "").replace(/!\[[^\]]*\]\([^)]+\)/g, ""),
+      );
       if (!description) continue;
 
       const ingredients = ingredientsRaw
@@ -388,6 +537,8 @@ function parseInsight(dir: string, brandId: string): Parsed {
         .filter((l) => l.length > 2);
       const productId = slug(`${lineId}-${productName}`);
       const usage = clean(usageRaw);
+      if (!ingredients.length)
+        throw new Error(`${productId}: у джерелі не знайдено складників`);
 
       out.products.push({
         id: productId,
@@ -399,13 +550,17 @@ function parseInsight(dir: string, brandId: string): Parsed {
         hair_types: hair,
         purpose: upper(description.split(/(?<=[.!?])\s/)[0].replace(/\.$/, "")),
         benefits: benefitsOf(description),
-        // Five lines list no ingredients per product; fall back to the line's own keywords.
-        ingredients: ingredients.length ? ingredients : fromExport.slice(-1),
-        ...(productPhoto ? { image: `/images/${brandId}/${productId}.webp` } : {}),
+        ingredients,
+        ...(productPhoto
+          ? { image: `/images/${brandId}/${productId}.webp` }
+          : {}),
         ...(usage ? { usage } : {}),
       });
       if (productPhoto)
-        out.artwork.push([join(dir, decodeURIComponent(productPhoto)), `${productId}.webp`]);
+        out.artwork.push([
+          join(dir, decodeURIComponent(productPhoto)),
+          `${productId}.webp`,
+        ]);
     }
   }
   return out;
@@ -416,36 +571,88 @@ const brand = brands[folder];
 if (!brand) throw new Error(`Немає опису бренду для теки «${folder}»`);
 const dir = join("notion-export", folder);
 const parsed =
-  folder === "Insight" ? parseInsight(dir, brand.id) : parseMilkShake(dir, brand.id);
+  folder === "Insight"
+    ? parseInsight(dir, brand.id)
+    : parseMilkShake(dir, brand.id);
+// Reviewed wording stays separate from the raw Notion export and survives re-import.
+if (folder === "Insight") {
+  const productCopy: Record<
+    string,
+    { benefits: string[]; name?: string; category?: string }
+  > = insightCopy.products;
+  const lineCopy: Record<string, { short_description: string }> =
+    insightCopy.lines;
+  for (const product of parsed.products) {
+    const copy = productCopy[product.id];
+    if (copy) {
+      product.benefits = copy.benefits;
+      if (copy.name) product.name = copy.name;
+      if (copy.category) product.category = copy.category;
+    }
+  }
+  for (const line of parsed.lines) {
+    const copy = lineCopy[line.id];
+    if (copy) line.short_description = copy.short_description;
+    line.benefits = [
+      ...new Set(
+        parsed.products
+          .filter((p) => p.line_id === line.id)
+          .flatMap((p) => p.benefits),
+      ),
+    ].slice(0, 5);
+  }
+}
 
-const existing = JSON.parse(readFileSync("data/products.json", "utf8")) as Catalog;
+const existing = JSON.parse(
+  readFileSync("data/products.json", "utf8"),
+) as Catalog;
 const merged = catalogSchema.parse({
   brands: [...existing.brands.filter((b) => b.id !== brand.id), brand],
-  lines: [...existing.lines.filter((l) => l.brand_id !== brand.id), ...parsed.lines],
-  products: [...existing.products.filter((p) => p.brand_id !== brand.id), ...parsed.products],
+  lines: [
+    ...existing.lines.filter((l) => l.brand_id !== brand.id),
+    ...parsed.lines,
+  ],
+  products: [
+    ...existing.products.filter((p) => p.brand_id !== brand.id),
+    ...parsed.products,
+  ],
 } satisfies Catalog);
 
-console.log(`${brand.name}: ${parsed.lines.length} лінійок, ${parsed.products.length} продуктів.`);
-console.log(`Каталог разом: ${merged.brands.length} брендів, ${merged.lines.length} лінійок, ${merged.products.length} продуктів.`);
-console.log(`Категорії: ${[...new Set(parsed.products.map((p) => p.category))].join(", ")}`);
-console.log(`Унікальних інгредієнтів: ${new Set(parsed.products.flatMap((p) => p.ingredients)).size}`);
-console.log(`Продуктів із фото: ${parsed.products.filter((p) => p.image).length}, зі способом застосування: ${parsed.products.filter((p) => p.usage).length}`);
+console.log(
+  `${brand.name}: ${parsed.lines.length} лінійок, ${parsed.products.length} продуктів.`,
+);
+console.log(
+  `Каталог разом: ${merged.brands.length} брендів, ${merged.lines.length} лінійок, ${merged.products.length} продуктів.`,
+);
+console.log(
+  `Категорії: ${[...new Set(parsed.products.map((p) => p.category))].join(", ")}`,
+);
+console.log(
+  `Унікальних інгредієнтів: ${new Set(parsed.products.flatMap((p) => p.ingredients)).size}`,
+);
+console.log(
+  `Продуктів із фото: ${parsed.products.filter((p) => p.image).length}, зі способом застосування: ${parsed.products.filter((p) => p.usage).length}`,
+);
 
 if (write) {
-  const target = join("public/images", brand.id);
-  rmSync(target, { recursive: true, force: true });
-  mkdirSync(target, { recursive: true });
-  let bytes = 0;
-  for (const [from, to] of parsed.artwork) {
-    const result = await sharp(from)
-      .resize({ width: 720, withoutEnlargement: true })
-      .webp({ quality: 82 })
-      .toFile(join(target, to));
-    bytes += result.size;
+  if (writeImages) {
+    const target = join("public/images", brand.id);
+    rmSync(target, { recursive: true, force: true });
+    mkdirSync(target, { recursive: true });
+    let bytes = 0;
+    for (const [from, to] of parsed.artwork) {
+      const result = await sharp(from)
+        .resize({ width: 720, withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toFile(join(target, to));
+      bytes += result.size;
+    }
+    console.log(
+      `Зображень: ${parsed.artwork.length}, разом ${Math.round(bytes / 1024)} КБ у WebP.`,
+    );
   }
   writeFileSync("data/products.json", JSON.stringify(merged, null, 2) + "\n");
-  console.log(`Зображень: ${parsed.artwork.length}, разом ${Math.round(bytes / 1024)} КБ у WebP.`);
-  console.log("Записано data/products.json та public/images/.");
+  console.log("Записано data/products.json.");
 } else {
   console.log("Пробний запуск. Додайте --write, щоб зберегти.");
 }

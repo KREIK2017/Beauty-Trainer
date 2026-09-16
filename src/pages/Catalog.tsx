@@ -139,7 +139,11 @@ export function CatalogPage() {
                         .filter((p) => p.line_id === l.id)
                         .map((p) => (
                           <Link key={p.id} to={`/products/${p.id}`}>
-                            {p.name}
+                            <span>
+                              {p.name.startsWith(`${l.name} `)
+                                ? p.name.slice(l.name.length + 1)
+                                : p.name}
+                            </span>
                             <ArrowRight size={13} />
                           </Link>
                         ))}

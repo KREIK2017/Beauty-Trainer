@@ -66,10 +66,19 @@ export function generateQuestions(
 ): Question[] {
   const products = c.products.filter((p) => !lineId || p.line_id === lineId);
   const pool: Question[] = [];
+  const hashCache = new Map<string, number>();
+  const cachedHash = (value: string) => {
+    let result = hashCache.get(value);
+    if (result === undefined) {
+      result = hash(value);
+      hashCache.set(value, result);
+    }
+    return result;
+  };
   // Hash each candidate once; recomputing inside a comparator dominates large catalogs.
   const shuffle = (values: string[], salt: string) =>
     values
-      .map((value) => ({ value, key: hash(salt + value) }))
+      .map((value) => ({ value, key: cachedHash(salt + value) }))
       .sort((a, b) => a.key - b.key)
       .map((entry) => entry.value);
   const add = (q: Omit<Question, "options">, distractors: string[]) => {

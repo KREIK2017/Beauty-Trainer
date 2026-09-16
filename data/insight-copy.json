@@ -1,0 +1,351 @@
+{
+  "lines": {
+    "anti-frizz": {
+      "short_description": "Зволоження та розгладження пухнастого, неслухняного волосся."
+    },
+    "antioxidant": {
+      "short_description": "Догляд для захисту волосся від вільних радикалів і впливу довкілля."
+    },
+    "blonde": {
+      "short_description": "Нейтралізація жовтизни та догляд за холодними відтінками блонду."
+    },
+    "clarifying": {
+      "short_description": "Очищення шкіри голови та догляд проти лупи."
+    },
+    "colored-hair": {
+      "short_description": "Догляд за фарбованим волоссям для збереження кольору та блиску."
+    },
+    "daily-use": {
+      "short_description": "Делікатне очищення та зволоження для щоденного догляду."
+    },
+    "damaged-hair": {
+      "short_description": "Відновлення та зміцнення пошкодженого волосся."
+    },
+    "densifying": {
+      "short_description": "Зміцнення ослабленого волосся та догляд проти випадіння."
+    },
+    "dry-hair": {
+      "short_description": "Живлення сухого волосся для м’якості, еластичності та блиску."
+    },
+    "elasti-curl": {
+      "short_description": "Зволоження, пружність і чітка форма кучерів та хвиль."
+    },
+    "lenitive": {
+      "short_description": "Заспокійливий догляд для комфорту чутливої шкіри голови."
+    },
+    "rebalancing": {
+      "short_description": "Очищення та відновлення балансу шкіри голови, схильної до жирності."
+    },
+    "sensitive": {
+      "short_description": "Делікатний догляд за волоссям і чутливою шкірою голови."
+    },
+    "volumizing": {
+      "short_description": "Об’єм і щільність тонкого волосся без обтяження."
+    }
+  },
+  "products": {
+    "anti-frizz-zvolozhuiuchyi-shampun": {
+      "benefits": [
+        "Полегшує розчісування",
+        "Зменшує пухнастість",
+        "Надає гладкості та блиску"
+      ]
+    },
+    "anti-frizz-zvolozhuiuchyi-kondytsioner": {
+      "benefits": ["Зволожує", "Полегшує розплутування", "Повертає блиск"]
+    },
+    "anti-frizz-zvolozhuiucha-maska-dlia-volossia": {
+      "benefits": ["Живить волосся по довжині", "Розгладжує волосся"]
+    },
+    "antioxidant-antyoksydantnyi-shampun": {
+      "benefits": [
+        "Захищає від вільних радикалів",
+        "Допомагає захистити від впливу довкілля"
+      ]
+    },
+    "antioxidant-antyoksydantnyi-kondytsioner": {
+      "benefits": [
+        "Відновлює зволоження",
+        "Полегшує розплутування без обтяження",
+        "Надає блиску"
+      ]
+    },
+    "antioxidant-antyoksydantna-maska-dlia-volossia": {
+      "benefits": [
+        "Відновлює блиск і щільність",
+        "Допомагає захистити від вільних радикалів"
+      ]
+    },
+    "antioxidant-sprei-dlia-zakhystu-volossia": {
+      "benefits": [
+        "Зволожує",
+        "Захищає від впливу довкілля",
+        "Полегшує розплутування",
+        "Надає м’якості та блиску"
+      ]
+    },
+    "blonde-shampun-dlia-kholodnykh-vidtinkiv-blond-ta-siaiva": {
+      "benefits": ["М’яко очищає", "Нейтралізує жовто-оранжеві відтінки"]
+    },
+    "blonde-maska-dlia-volossia-shcho-pidsyliuie-kholodni-vidtinky-blond": {
+      "benefits": [
+        "Живить і зволожує",
+        "Нейтралізує жовто-оранжеві відтінки",
+        "Надає гладкості та м’якості"
+      ]
+    },
+    "clarifying-ochyshchuiuchyi-dohliad": {
+      "benefits": [
+        "Делікатно очищає шкіру голови",
+        "Допомагає зменшити лупу",
+        "Видаляє забруднення"
+      ],
+      "name": "Clarifying Очищувальний шампунь",
+      "category": "Шампунь"
+    },
+    "clarifying-ochyshchuiuchyi-shampun": {
+      "benefits": ["Очищає шкіру голови", "Допомагає зменшити лупу"],
+      "name": "Clarifying Очищувальний лосьйон",
+      "category": "Лосьйон"
+    },
+    "colored-hair-zakhysnyi-shampun": {
+      "benefits": [
+        "Очищає фарбоване волосся",
+        "Зберігає яскравість кольору",
+        "Захищає колір від вимивання"
+      ]
+    },
+    "colored-hair-zakhysnyi-kondytsioner": {
+      "benefits": [
+        "Полегшує розплутування",
+        "Допомагає зберегти колір",
+        "Зволожує та надає блиску"
+      ]
+    },
+    "colored-hair-zakhysna-maska-dlia-volossia": {
+      "benefits": [
+        "Запечатує кутикулу",
+        "Допомагає зберегти колір від вимивання",
+        "Підтримує інтенсивність відтінку"
+      ]
+    },
+    "daily-use-enerhezuiuchyi-shampun": {
+      "benefits": ["Дбайливо очищає", "Відновлює зволоження", "Надає блиску"]
+    },
+    "daily-use-sukhyi-shampun-dlia-ob-iemu": {
+      "benefits": [
+        "Поглинає надлишок себуму між миттями",
+        "Освіжає шкіру голови",
+        "Надає об’єму без обтяження"
+      ]
+    },
+    "daily-use-enerhetychnyi-kondytsioner-dlia-volossia": {
+      "benefits": [
+        "Живить без обтяження",
+        "Підтримує зволоження",
+        "Полегшує розчісування",
+        "Надає м’якості та блиску"
+      ]
+    },
+    "daily-use-nezmyvnyi-kondytsioner-dlia-rozplutuvannia-volossia": {
+      "benefits": ["Зволожує без обтяження", "Полегшує розчісування"]
+    },
+    "daily-use-enerhetychna-maska-dlia-volossia": {
+      "benefits": [
+        "Зволожує без обтяження",
+        "Полегшує розчісування",
+        "Надає м’якості та блиску"
+      ]
+    },
+    "damaged-hair-vidnovliuvalnyi-shampun": {
+      "benefits": [
+        "Розгладжує волосся",
+        "Надає блиску",
+        "Підвищує еластичність",
+        "Зміцнює структуру волосся"
+      ]
+    },
+    "damaged-hair-vidnovliuvalnyi-kondytsioner": {
+      "benefits": [
+        "Допомагає відновити пошкоджене волосся",
+        "Захищає від зовнішніх впливів",
+        "Повертає щільність, м’якість і блиск"
+      ]
+    },
+    "damaged-hair-vidnovliuvalna-maska-dlia-volossia": {
+      "benefits": [
+        "Зміцнює волосся",
+        "Підвищує його стійкість",
+        "Повертає об’єм і блиск без обтяження"
+      ]
+    },
+    "damaged-hair-vidnovliuvalnyi-sprei-dlia-volossia": {
+      "benefits": [
+        "Відновлює структуру волосся",
+        "Живить без обтяження",
+        "Розгладжує волосся"
+      ]
+    },
+    "densifying-zmitsniuiuchyi-shampun": {
+      "benefits": [
+        "Зміцнює ослаблене волосся",
+        "Стимулює мікроциркуляцію шкіри голови",
+        "Освіжає"
+      ]
+    },
+    "densifying-zmitsniuiuchyi-dohliad": {
+      "benefits": [
+        "Зміцнює ослаблене волосся",
+        "Сприяє зменшенню випадіння",
+        "Повертає силу й щільність"
+      ]
+    },
+    "dry-hair-pozhyvnyi-shampun": {
+      "benefits": [
+        "Делікатно очищає",
+        "Відновлює еластичність і блиск",
+        "Надає м’якості та слухняності"
+      ]
+    },
+    "dry-hair-pozhyvnyi-kondytsioner": {
+      "benefits": [
+        "Живить сухе волосся",
+        "Полегшує розплутування",
+        "Розгладжує та додає об’єму",
+        "Надає блиску"
+      ]
+    },
+    "dry-hair-pozhyvna-maska-dlia-volossia": {
+      "benefits": [
+        "Інтенсивно живить",
+        "Відновлює структуру волосся",
+        "Надає м’якості та блиску"
+      ]
+    },
+    "elasti-curl-m-iakyi-ochyshchuiuchyi-shampun": {
+      "benefits": [
+        "Делікатно очищає кучеряве волосся",
+        "Кондиціонує",
+        "Зволожує та зберігає легкість"
+      ]
+    },
+    "elasti-curl-krem-dlia-pidkreslennia-kucheriv": {
+      "benefits": [
+        "Підкреслює форму завитків",
+        "Зменшує пухнастість",
+        "Надає м’якості та пружності",
+        "Зберігає чіткість кучерів у вологу погоду"
+      ]
+    },
+    "elasti-curl-oliia-dlia-pruzhnykh-kucheriv": {
+      "benefits": [
+        "Живить без обтяження",
+        "Надає блиску",
+        "Підтримує еластичність кучерів"
+      ]
+    },
+    "elasti-curl-nezmyvne-molochko-dlia-rozplutuvannia-volossia": {
+      "benefits": [
+        "Зволожує та розплутує",
+        "Підкреслює форму завитків",
+        "Полегшує укладання",
+        "Допомагає кучерям протистояти волозі"
+      ]
+    },
+    "elasti-curl-lak-dlia-volossia-z-lehkoiu-fiksatsiieiu": {
+      "benefits": [
+        "Забезпечує легку фіксацію",
+        "Зволожує",
+        "Захищає кучері від вологи",
+        "Відновлює форму кучерів між миттями"
+      ]
+    },
+    "elasti-curl-oliia-syvorotka-dlia-siaiva-volossia": {
+      "benefits": [
+        "Живить волосся",
+        "Відновлює блиск",
+        "Підтримує еластичність"
+      ]
+    },
+    "elasti-curl-maska-dlia-rozplutuvannia-kocheriavoho-volossia": {
+      "benefits": [
+        "Полегшує розплутування кучерів",
+        "Зменшує пухнастість",
+        "Інтенсивно кондиціонує"
+      ]
+    },
+    "lenitive-dermo-zaspokiilyvyi-shampun": {
+      "benefits": [
+        "Дбайливо доглядає за шкірою голови",
+        "Допомагає зняти подразнення",
+        "Зволожує та заспокоює",
+        "Відновлює природний баланс"
+      ]
+    },
+    "lenitive-krem-dlia-komfortu-shkiry-holovy": {
+      "benefits": [
+        "Відновлює баланс шкіри голови",
+        "Допомагає зняти подразнення й почервоніння",
+        "Надає відчуття комфорту"
+      ]
+    },
+    "rebalancing-rebalansin-shampun": {
+      "benefits": [
+        "Делікатно очищає",
+        "Заспокоює шкіру голови",
+        "Допомагає довше зберігати її чистою"
+      ]
+    },
+    "rebalancing-krem-eksfoliant-dlia-shkiry-holovy": {
+      "benefits": [
+        "Делікатно відлущує",
+        "Очищає шкіру голови",
+        "Допомагає усунути надлишок себуму"
+      ]
+    },
+    "sensitive-shampun-dlia-chutlyvoi-shkiry-holovy": {
+      "benefits": [
+        "Делікатно очищає при частому митті",
+        "Підтримує гідроліпідний баланс",
+        "Забезпечує комфорт шкіри голови"
+      ]
+    },
+    "sensitive-kondytsioner-dlia-chutlyvoi-shkiry-holovy": {
+      "benefits": [
+        "Полегшує розчісування",
+        "Розплутує та розгладжує",
+        "Зволожує",
+        "Надає природного блиску"
+      ]
+    },
+    "sensitive-maska-dlia-chutlyvoi-shkiry-holovy": {
+      "benefits": [
+        "Надає м’якості без обтяження",
+        "Відновлює блиск",
+        "Зволожує",
+        "Полегшує розчісування"
+      ]
+    },
+    "volumizing-volume-up-shampoo": {
+      "benefits": [
+        "Очищає тонке волосся",
+        "Зберігає м’якість і легкість",
+        "Відновлює щільність та об’єм"
+      ]
+    },
+    "volumizing-volume-up-root-lotion": {
+      "benefits": [
+        "Додає прикореневого об’єму",
+        "Підсилює щільність і фіксацію",
+        "Не обтяжує волосся"
+      ]
+    },
+    "volumizing-volume-up-hydrating-spray": {
+      "benefits": [
+        "Зволожує без змивання",
+        "Допомагає збільшити об’єм",
+        "Надає слухняності та щільності"
+      ]
+    }
+  }
+}
