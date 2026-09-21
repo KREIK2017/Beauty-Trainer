@@ -2,6 +2,44 @@ import { test, expect, ownerCredentials } from "./fixtures";
 import { generateQuestions } from "../../shared/learning";
 import type { Catalog, Stats } from "../../shared/schema";
 
+test("setup validates login patterns and distinguishes an incorrect key", async ({
+  page,
+  request,
+}) => {
+  const errors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  await page.context().clearCookies();
+  await page.goto("/setup");
+  const login = page.getByLabel("Логін", { exact: true });
+  await login.fill("bad!login");
+  expect(
+    await login.evaluate((el: HTMLInputElement) => el.validity.patternMismatch),
+  ).toBe(true);
+  await login.fill("Owner_test-21");
+  expect(
+    await login.evaluate((el: HTMLInputElement) => el.checkValidity()),
+  ).toBe(true);
+  expect(
+    errors.filter((message) => /pattern|regular expression/i.test(message)),
+  ).toEqual([]);
+  const wrong = await request.post("/api/auth/setup", {
+    data: { ...ownerCredentials, setupKey: "incorrect-key" },
+  });
+  expect(wrong.status()).toBe(403);
+  expect((await wrong.json()).code).toBe("OWNER_SETUP_KEY_MISMATCH");
+  const correct = await request.post("/api/auth/setup", {
+    data: {
+      ...ownerCredentials,
+      setupKey: "  local-e2e-owner-key-not-for-production-123456\r\n",
+    },
+  });
+  // The key passed validation; this isolated DB already has its owner.
+  expect(correct.status()).toBe(409);
+  expect((await correct.json()).error).toContain("вже створено");
+});
+
 test("mobile registration and expired sessions return to login", async ({
   page,
 }) => {

@@ -57,6 +57,30 @@ function equal(a: string, b: string) {
     difference |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   return difference === 0;
 }
+export async function ownerKeyError(
+  secret: string | undefined,
+  provided: string | undefined,
+) {
+  const expected = secret?.trim();
+  if (!expected)
+    return {
+      code: "OWNER_SETUP_NOT_CONFIGURED",
+      error:
+        "У цій версії сайту не налаштовано OWNER_SETUP_KEY. Додайте секрет до Worker beauty-trainer.",
+    };
+  if (expected.length < 32)
+    return {
+      code: "OWNER_SETUP_INVALID_CONFIG",
+      error:
+        "Ключ OWNER_SETUP_KEY у налаштуваннях Worker закороткий: потрібно щонайменше 32 символи.",
+    };
+  if (!equal(await digest(provided?.trim() ?? ""), await digest(expected)))
+    return {
+      code: "OWNER_SETUP_KEY_MISMATCH",
+      error:
+        "Введений ключ не збігається з OWNER_SETUP_KEY цієї версії сайту. Вставте значення секрету, а не його назву чи пароль акаунта.",
+    };
+}
 function cookieName(request: Request) {
   return new URL(request.url).protocol === "https:"
     ? "__Host-beauty_session"
@@ -194,13 +218,14 @@ export async function authRoute(
     });
   }
   const owner = path === "/api/auth/setup";
-  if (
-    owner &&
-    (!env.OWNER_SETUP_KEY ||
-      env.OWNER_SETUP_KEY.length < 32 ||
-      !equal(await digest(setupKey ?? ""), await digest(env.OWNER_SETUP_KEY)))
-  )
-    return json({ error: "Невірний ключ налаштування власника." }, 403);
+  if (owner) {
+    const keyError = await ownerKeyError(env.OWNER_SETUP_KEY, setupKey);
+    if (keyError)
+      return json(
+        keyError,
+        keyError.code === "OWNER_SETUP_KEY_MISMATCH" ? 403 : 503,
+      );
+  }
   if (
     owner &&
     (await env.DB.prepare("SELECT id FROM accounts WHERE id='owner'").first())

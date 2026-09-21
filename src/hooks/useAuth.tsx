@@ -168,7 +168,7 @@ function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
               required
               minLength={3}
               maxLength={40}
-              pattern="[A-Za-z0-9_-]{3,40}"
+              pattern={"[A-Za-z0-9_\\-]{3,40}"}
               aria-describedby="username-hint"
             />
           </label>
