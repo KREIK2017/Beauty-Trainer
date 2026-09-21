@@ -45,7 +45,7 @@ test("mobile registration and expired sessions return to login", async ({
 }) => {
   await page.context().clearCookies();
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/login");
   await page
     .getByRole("button", { name: "Немає акаунта? Зареєструватися" })
     .click();
@@ -179,6 +179,7 @@ test("registration, private progress, session ownership, logout and owner permis
     // Browser identity must be cleared together with its loaded learning state.
     await page.goto("/");
     await page.getByRole("button", { name: "Вийти з акаунта" }).click();
+    await page.getByRole("link", { name: "Увійти", exact: true }).click();
     await page.getByLabel("Логін", { exact: true }).fill(credentials.username);
     await page.getByLabel("Пароль", { exact: true }).fill(credentials.password);
     await page.getByRole("button", { name: "Увійти", exact: true }).click();

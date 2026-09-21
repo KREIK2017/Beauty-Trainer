@@ -144,6 +144,7 @@ code {
   color-scheme: dark;
 }
 .sidebar {
+  overflow-y: auto;
   width: 236px;
   position: fixed;
   inset: 0 auto 0 0;
@@ -2347,5 +2348,368 @@ footer {
   }
   .auth-card {
     padding: 22px;
+  }
+}
+
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.admin-nav a {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+}
+.admin-nav a.active {
+  color: var(--green);
+  background: var(--pale);
+  border-color: var(--green);
+}
+.admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.admin-metrics > div {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.admin-metrics strong {
+  font-size: 28px;
+}
+.admin-metrics span {
+  font-size: 14px;
+}
+.admin-search {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.admin-search label {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+.admin-user-card {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.admin-user-card h2 {
+  font-size: 23px;
+  color: var(--green);
+}
+.admin-user-card dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 20px;
+  margin: 18px 0;
+}
+.admin-user-card dd {
+  margin: 0;
+  font-weight: 600;
+}
+.admin-user-card .button {
+  margin-top: 16px;
+  white-space: normal;
+}
+.admin-pagination {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 28px 0;
+  flex-wrap: wrap;
+}
+.admin-progress-filter {
+  display: grid;
+  gap: 8px;
+  max-width: 280px;
+  margin: 18px 0;
+}
+.admin-progress-list {
+  display: grid;
+  gap: 24px;
+  margin-top: 24px;
+}
+.admin-progress-list .row {
+  gap: 12px;
+}
+.admin-progress-list small {
+  display: block;
+  margin-top: 8px;
+}
+.admin-history {
+  list-style: none;
+  padding: 0;
+}
+.admin-history li {
+  display: grid;
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.admin-history span {
+  font-size: 14px;
+}
+.admin-settings {
+  margin-bottom: 24px;
+}
+.admin-settings form {
+  max-width: 500px;
+  margin-top: 20px;
+}
+.admin-settings fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.admin-settings label {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+.admin-settings .admin-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.admin-check input {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  accent-color: var(--green);
+}
+.admin-settings button {
+  margin: 12px 0;
+}
+.app.welcome-page {
+  display: block;
+}
+.welcome-header,
+.welcome-main,
+.welcome-footer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px;
+}
+.welcome-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.welcome-logo {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 24px;
+  letter-spacing: -1px;
+}
+.welcome-logo svg {
+  color: var(--green);
+}
+.welcome-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 64px;
+  align-items: center;
+  padding: 44px 0 64px;
+}
+.welcome-hero h1 {
+  font-size: clamp(36px, 4.5vw, 60px);
+  line-height: 1.12;
+  letter-spacing: -2px;
+  margin: 24px 0;
+}
+.welcome-hero h1 em {
+  font-style: normal;
+  color: var(--green);
+}
+.welcome-lead {
+  font-size: 20px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.welcome-hero .actions {
+  margin: 28px 0 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.welcome-preview {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 30px;
+  box-shadow: 0 18px 50px #243b3209;
+}
+.welcome-preview h2 {
+  font-size: 26px;
+  line-height: 1.4;
+  margin: 24px 0;
+}
+.welcome-preview ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 24px;
+}
+.welcome-preview li {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.welcome-preview li > span {
+  color: var(--green);
+  background: var(--pale);
+  border-radius: 10px;
+  padding: 9px;
+  font-weight: 600;
+}
+.welcome-preview p {
+  font-size: 15px;
+  margin-top: 6px;
+}
+.welcome-session {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.welcome-session span {
+  background: var(--pale);
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.welcome-features {
+  padding: 44px 0;
+  scroll-margin-top: 20px;
+}
+.welcome-features > h2 {
+  font-size: 32px;
+  margin: 12px 0 28px;
+}
+.welcome-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+.welcome-feature-grid article {
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+.welcome-feature-grid svg {
+  color: var(--green);
+}
+.welcome-feature-grid h3 {
+  margin: 16px 0 12px;
+  font-size: 20px;
+}
+.welcome-feature-grid p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+.welcome-start {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  justify-content: space-between;
+  padding: 36px;
+  margin: 30px 0;
+  background: var(--pale);
+  border-radius: 18px;
+}
+.welcome-start h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+.welcome-start p {
+  max-width: 650px;
+}
+.welcome-start .button {
+  flex-shrink: 0;
+}
+.welcome-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 13px;
+  color: var(--muted);
+}
+@media (max-width: 1000px) {
+  .welcome-hero {
+    gap: 32px;
+  }
+  .welcome-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .admin-metrics,
+  .admin-user-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-user-card {
+    padding: 18px;
+  }
+  .admin-search label {
+    flex-basis: 100%;
+  }
+  .welcome-header,
+  .welcome-main,
+  .welcome-footer {
+    padding: 20px;
+  }
+  .welcome-logo {
+    font-size: 21px;
+  }
+  .welcome-hero {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px 0;
+    gap: 32px;
+  }
+  .welcome-hero h1 {
+    letter-spacing: -1px;
+  }
+  .welcome-lead {
+    font-size: 18px;
+  }
+  .welcome-preview {
+    padding: 24px;
+  }
+  .welcome-feature-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .welcome-start {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 24px;
+  }
+  .welcome-footer {
+    flex-direction: column;
   }
 }

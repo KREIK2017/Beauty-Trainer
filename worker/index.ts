@@ -17,6 +17,7 @@ import {
 import { getCatalog, catalogStatements } from "./db/catalog";
 import { errorMessage } from "../shared/uk";
 import { authRoute, currentUser } from "./auth";
+import { adminRoute } from "./admin";
 interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
@@ -85,6 +86,8 @@ export default {
           401,
         );
       const userId = user.id;
+      if (path.startsWith("/api/admin/"))
+        return await adminRoute(request, env.DB, user);
       if (
         (path === "/api/import" ||
           /^\/api\/(brands|lines|products)(\/|$)/.test(path)) &&

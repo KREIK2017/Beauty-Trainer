@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { User } from "../shared/auth";
+import { siteSettings } from "./settings";
 
 export interface AuthEnv {
   DB: D1Database;
@@ -122,16 +123,34 @@ export async function currentUser(
     .bind(await digest(value), Date.now())
     .first<User>();
 }
-async function signIn(request: Request, db: D1Database, user: User) {
+async function signIn(
+  request: Request,
+  db: D1Database,
+  user: User,
+  expectedHash: string,
+) {
   const value = random();
-  await db.batch([
+  const tokenHash = await digest(value);
+  const result = await db.batch([
     db
       .prepare("DELETE FROM auth_sessions WHERE expires_at<=?")
       .bind(Date.now()),
     db
-      .prepare("INSERT INTO auth_sessions VALUES (?,?,?)")
-      .bind(await digest(value), user.id, Date.now() + 7 * 86400000),
+      .prepare(
+        "INSERT INTO auth_sessions (token_hash,user_id,expires_at) SELECT ?,id,? FROM accounts WHERE id=? AND password_hash=?",
+      )
+      .bind(tokenHash, Date.now() + 7 * 86400000, user.id, expectedHash),
+    db
+      .prepare(
+        "UPDATE accounts SET last_login_at=? WHERE id=? AND EXISTS(SELECT 1 FROM auth_sessions WHERE token_hash=?)",
+      )
+      .bind(new Date().toISOString(), user.id, tokenHash),
   ]);
+  if (!result[1].meta.changes)
+    return json(
+      { error: "Дані входу змінилися. Увійдіть із поточним паролем." },
+      401,
+    );
   return json({ user }, 200, {
     "Set-Cookie": cookie(request, value, 7 * 86400),
   });
@@ -167,7 +186,10 @@ export async function authRoute(
 ): Promise<Response> {
   const path = new URL(request.url).pathname;
   if (path === "/api/auth/me" && request.method === "GET")
-    return json({ user: await currentUser(request, env.DB) });
+    return json({
+      user: await currentUser(request, env.DB),
+      registrationOpen: (await siteSettings(env.DB)).registrationOpen,
+    });
   if (path === "/api/auth/logout" && request.method === "POST") {
     await env.DB.prepare("DELETE FROM auth_sessions WHERE token_hash=?")
       .bind(await digest(token(request)))
@@ -175,6 +197,76 @@ export async function authRoute(
     return json({ success: true }, 200, {
       "Set-Cookie": cookie(request, "", 0),
     });
+  }
+  if (path === "/api/auth/password" && request.method === "POST") {
+    const user = await currentUser(request, env.DB);
+    if (!user)
+      return json(
+        { error: "Увійдіть у свій акаунт.", code: "AUTH_REQUIRED" },
+        401,
+      );
+    if (user.role !== "admin")
+      return json({ error: "Налаштування доступні лише власнику." }, 403);
+    if (await limited(request, env.DB, `password:${user.id}`))
+      return json(
+        { error: "Забагато спроб. Спробуйте через 15 хвилин." },
+        429,
+        { "Retry-After": "900" },
+      );
+    const raw = await request.text();
+    if (raw.length > 4096) return json({ error: "Завеликий запит" }, 400);
+    let data: unknown;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return json({ error: "Некоректний JSON" }, 400);
+    }
+    const parsed = z
+      .object({
+        currentPassword: z.string().min(1).max(128),
+        newPassword: credentials.shape.password,
+      })
+      .strict()
+      .safeParse(data);
+    if (!parsed.success)
+      return json(
+        {
+          error:
+            "Вкажіть поточний пароль і новий пароль від 12 до 128 символів.",
+        },
+        400,
+      );
+    const account = await env.DB.prepare(
+      "SELECT password_hash,salt FROM accounts WHERE id=?",
+    )
+      .bind(user.id)
+      .first<{ password_hash: string; salt: string }>();
+    if (
+      !account ||
+      !equal(
+        await passwordHash(parsed.data.currentPassword, account.salt),
+        account.password_hash,
+      )
+    )
+      return json({ error: "Поточний пароль неправильний." }, 400);
+    if (parsed.data.currentPassword === parsed.data.newPassword)
+      return json(
+        { error: "Новий пароль має відрізнятися від поточного." },
+        400,
+      );
+    const salt = random();
+    const hash = await passwordHash(parsed.data.newPassword, salt);
+    const changed = await env.DB.batch([
+      env.DB.prepare(
+        "UPDATE accounts SET password_hash=?,salt=? WHERE id=? AND password_hash=?",
+      ).bind(hash, salt, user.id, account.password_hash),
+      env.DB.prepare(
+        "DELETE FROM auth_sessions WHERE user_id=? AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND password_hash=?)",
+      ).bind(user.id, user.id, hash),
+    ]);
+    if (!changed[0].meta.changes)
+      return json({ error: "Пароль уже змінився. Спробуйте ще раз." }, 409);
+    return signIn(request, env.DB, user, hash);
   }
   if (
     !["/api/auth/login", "/api/auth/register", "/api/auth/setup"].includes(
@@ -211,13 +303,26 @@ export async function authRoute(
     );
     if (!account || !equal(hash, account.password_hash))
       return json({ error: "Неправильний логін або пароль." }, 401);
-    return signIn(request, env.DB, {
-      id: account.id,
-      username: account.username,
-      role: account.role,
-    });
+    return signIn(
+      request,
+      env.DB,
+      {
+        id: account.id,
+        username: account.username,
+        role: account.role,
+      },
+      account.password_hash,
+    );
   }
   const owner = path === "/api/auth/setup";
+  if (!owner && !(await siteSettings(env.DB)).registrationOpen)
+    return json(
+      {
+        error:
+          "Реєстрацію нових акаунтів тимчасово закрито. Якщо маєте акаунт, увійдіть.",
+      },
+      403,
+    );
   if (owner) {
     const keyError = await ownerKeyError(env.OWNER_SETUP_KEY, setupKey);
     if (keyError)
@@ -242,13 +347,16 @@ export async function authRoute(
   const salt = random();
   const hash = await passwordHash(password, salt);
   const statements = [
-    env.DB.prepare("INSERT INTO accounts VALUES (?,?,?,?,?,?)").bind(
+    env.DB.prepare(
+      "INSERT INTO accounts (id,username,password_hash,salt,role,created_at) SELECT ?,?,?,?,?,? WHERE ?=1 OR EXISTS(SELECT 1 FROM app_settings WHERE id=1 AND registration_open=1)",
+    ).bind(
       user.id,
       username,
       hash,
       salt,
       user.role,
       new Date().toISOString(),
+      Number(owner),
     ),
   ];
   if (owner)
@@ -259,7 +367,12 @@ export async function authRoute(
         ),
       );
   try {
-    await env.DB.batch(statements);
+    const inserted = await env.DB.batch(statements);
+    if (!inserted[0].meta.changes)
+      return json(
+        { error: "Реєстрацію нових акаунтів тимчасово закрито." },
+        403,
+      );
   } catch (error) {
     if (error instanceof Error && /UNIQUE constraint/i.test(error.message))
       return json(
@@ -268,5 +381,5 @@ export async function authRoute(
       );
     throw error;
   }
-  return signIn(request, env.DB, user);
+  return signIn(request, env.DB, user, hash);
 }

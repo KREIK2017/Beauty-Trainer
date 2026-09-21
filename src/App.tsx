@@ -23,6 +23,12 @@ import Training from "./pages/Training";
 import Flashcards from "./pages/Flashcards";
 import { WeakAreas, ProgressPage } from "./pages/Progress";
 import Admin from "./pages/Admin";
+import {
+  AdminLayout,
+  AdminUsers,
+  AdminUserDetail,
+  AdminSettings,
+} from "./pages/AdminPanel";
 const nav = [
   ["/", "Огляд", LayoutDashboard],
   ["/training", "Тренування", Brain],
@@ -85,14 +91,24 @@ export default function App() {
             </div>
           </div>
           {user.role === "admin" && (
-            <NavLink
-              className="manage-link"
-              to="/admin"
-              onClick={() => setMobile(false)}
-            >
-              <SlidersHorizontal size={18} />
-              Керування продуктами
-            </NavLink>
+            <>
+              <NavLink
+                className="manage-link"
+                to="/admin/users"
+                onClick={() => setMobile(false)}
+              >
+                <SlidersHorizontal size={18} />
+                Панель адміністратора
+              </NavLink>
+              <NavLink
+                className="manage-link"
+                to="/admin"
+                onClick={() => setMobile(false)}
+              >
+                <SlidersHorizontal size={18} />
+                Керування продуктами
+              </NavLink>
+            </>
           )}
           <div className="profile">
             <span className="avatar">{user.username[0].toUpperCase()}</span>
@@ -121,8 +137,8 @@ export default function App() {
             <ChevronRight size={13} />
             <span>
               {nav.find(([to]) => to === location.pathname)?.[1] ??
-                (location.pathname === "/admin"
-                  ? "Керування продуктами"
+                (location.pathname.startsWith("/admin")
+                  ? "Панель адміністратора"
                   : "Бібліотека продуктів")}
             </span>
           </div>
@@ -164,19 +180,12 @@ export default function App() {
             />
             <Route path="/weak" element={<WeakAreas />} />
             <Route path="/progress" element={<ProgressPage />} />
-            <Route
-              path="/admin"
-              element={
-                user.role === "admin" ? (
-                  <Admin />
-                ) : (
-                  <div className="empty">
-                    <h1>Керування доступне лише власнику</h1>
-                    <Link to="/catalog">До бібліотеки</Link>
-                  </div>
-                )
-              }
-            />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Admin />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="users/:id" element={<AdminUserDetail />} />
+              <Route path="settings" element={<AdminSettings />} />
+            </Route>
             <Route
               path="*"
               element={

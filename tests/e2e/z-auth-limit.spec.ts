@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures";
+import { test, expect } from "@playwright/test";
 
 test("authentication attempts are rate limited", async ({ request }) => {
   let status = 0;

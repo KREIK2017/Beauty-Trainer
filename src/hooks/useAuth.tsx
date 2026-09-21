@@ -5,24 +5,28 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import type { User } from "../../shared/auth";
 import { api } from "../services/api";
+import Welcome from "../pages/Welcome";
 
 const Context = createContext<{
   user: User;
   logout: () => Promise<void>;
 } | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const location = useLocation();
   const [user, setUser] = useState<User | null>();
+  const [registrationOpen, setRegistrationOpen] = useState(true);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
-    api<{ user: User | null }>("/auth/me")
+    api<{ user: User | null; registrationOpen: boolean }>("/auth/me")
       .then((result) => {
         if (active) {
           setUser(result.user);
+          setRegistrationOpen(result.registrationOpen);
           setError("");
         }
       })
@@ -53,7 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function logout() {
     try {
       await api("/auth/logout", { method: "POST" });
-      setUser(null);
+      setUser(undefined);
+      setRevision((r) => r + 1);
       setError("");
       localStorage.setItem("beauty-auth-change", crypto.randomUUID());
     } catch (e) {
@@ -73,9 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         )}
       </div>
     );
+  if (location.pathname === "/welcome" || (!user && location.pathname === "/"))
+    return <Welcome signedIn={!!user} registrationOpen={registrationOpen} />;
+  if (user && ["/login", "/register", "/setup"].includes(location.pathname))
+    return <Navigate to="/" replace />;
   if (!user)
     return (
       <AuthForm
+        key={location.pathname}
+        registrationOpen={registrationOpen}
         onSuccess={(value) => {
           setError("");
           setUser(value);
@@ -94,14 +105,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </Context.Provider>
   );
 }
-function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
+function AuthForm({
+  onSuccess,
+  registrationOpen,
+}: {
+  onSuccess: (user: User) => void;
+  registrationOpen: boolean;
+}) {
   const location = useLocation();
   const navigate = useNavigate();
   const setup = location.pathname === "/setup";
-  const [register, setRegister] = useState(false);
+  const register = location.pathname === "/register";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const creating = setup || register;
+  if (register && !registrationOpen)
+    return (
+      <div className="auth-page">
+        <section className="auth-card">
+          <h1>Реєстрацію тимчасово закрито</h1>
+          <p>Якщо ви вже маєте акаунт, можете увійти та продовжити навчання.</p>
+          <Link className="button primary" to="/login">
+            Увійти
+          </Link>
+          <Link className="back-link" to="/welcome">
+            Про Beauty Trainer
+          </Link>
+        </section>
+      </div>
+    );
   return (
     <div className="auth-page">
       <form
@@ -132,7 +164,8 @@ function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
                 }),
               },
             );
-            if (setup) navigate("/", { replace: true });
+            if (setup || location.pathname === "/login" || register)
+              navigate("/", { replace: true });
             onSuccess(result.user);
           } catch (e) {
             setError((e as Error).message);
@@ -218,13 +251,13 @@ function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
             {busy ? "Зачекайте…" : creating ? "Створити акаунт" : "Увійти"}
           </button>
         </fieldset>
-        {!setup && (
+        {!setup && registrationOpen && (
           <button
             type="button"
             className="text-link"
             disabled={busy}
             onClick={() => {
-              setRegister(!register);
+              navigate(register ? "/login" : "/register");
               setError("");
             }}
           >
@@ -233,6 +266,9 @@ function AuthForm({ onSuccess }: { onSuccess: (user: User) => void }) {
               : "Немає акаунта? Зареєструватися"}
           </button>
         )}
+        <Link className="back-link" to="/welcome">
+          Про Beauty Trainer
+        </Link>
       </form>
     </div>
   );
