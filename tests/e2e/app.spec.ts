@@ -1,7 +1,7 @@
 import { wrongAnswer, answerInBrowser } from "./quiz-helpers";
 import type { PublicQuestion } from "../../shared/learning";
 import { fieldLabels } from "../../shared/uk";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { generateQuestions, nextProgress } from "../../shared/learning";
 import type { Catalog, Stats } from "../../shared/schema";
 

@@ -1,5 +1,5 @@
 import { anyAnswer, answerInBrowser } from "./quiz-helpers";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import type { Catalog } from "../../shared/schema";
 
 test("line training creates a scoped session and saves an answer", async ({

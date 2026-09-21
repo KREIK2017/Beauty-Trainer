@@ -16,6 +16,7 @@ import {
   Target,
 } from "lucide-react";
 import { useData } from "./hooks/useData";
+import { useAuth } from "./hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import { CatalogPage, LinePage, ProductPage } from "./pages/Catalog";
 import Training from "./pages/Training";
@@ -31,6 +32,7 @@ const nav = [
 ] as const;
 export default function App() {
   const { stats } = useData();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(
@@ -82,22 +84,27 @@ export default function App() {
               <Leaf />
             </div>
           </div>
-          <NavLink
-            className="manage-link"
-            to="/admin"
-            onClick={() => setMobile(false)}
-          >
-            <SlidersHorizontal size={18} />
-            Керування продуктами
-          </NavLink>
+          {user.role === "admin" && (
+            <NavLink
+              className="manage-link"
+              to="/admin"
+              onClick={() => setMobile(false)}
+            >
+              <SlidersHorizontal size={18} />
+              Керування продуктами
+            </NavLink>
+          )}
           <div className="profile">
-            <span className="avatar">Y</span>
+            <span className="avatar">{user.username[0].toUpperCase()}</span>
             <div>
-              <strong>Ваш навчальний простір</strong>
+              <strong>{user.username}</strong>
               <small>Особистий профіль</small>
             </div>
             <span className="online-dot" />
           </div>
+          <button className="text-link" onClick={() => void logout()}>
+            Вийти з акаунта
+          </button>
         </div>
       </aside>
       <div className="main-shell">
@@ -139,7 +146,9 @@ export default function App() {
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <span className="avatar small-avatar">Y</span>
+            <span className="avatar small-avatar" title={user.username}>
+              {user.username[0].toUpperCase()}
+            </span>
           </div>
         </header>
         <main>
@@ -155,7 +164,19 @@ export default function App() {
             />
             <Route path="/weak" element={<WeakAreas />} />
             <Route path="/progress" element={<ProgressPage />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route
+              path="/admin"
+              element={
+                user.role === "admin" ? (
+                  <Admin />
+                ) : (
+                  <div className="empty">
+                    <h1>Керування доступне лише власнику</h1>
+                    <Link to="/catalog">До бібліотеки</Link>
+                  </div>
+                )
+              }
+            />
             <Route
               path="*"
               element={

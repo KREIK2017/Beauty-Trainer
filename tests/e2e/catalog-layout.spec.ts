@@ -1,14 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("catalog artwork and readable copy never overlap", async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/catalog");
-    const section = page
-      .locator("section")
-      .filter({
-        has: page.getByRole("heading", { name: "Insight", exact: true }),
-      });
+    const section = page.locator("section").filter({
+      has: page.getByRole("heading", { name: "Insight", exact: true }),
+    });
     await expect(section.locator(".line-card")).toHaveCount(14);
     await section.scrollIntoViewIfNeeded();
     for (const card of await section.locator(".line-card").all()) {

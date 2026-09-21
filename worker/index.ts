@@ -16,12 +16,14 @@ import {
 } from "../shared/learning";
 import { getCatalog, catalogStatements } from "./db/catalog";
 import { errorMessage } from "../shared/uk";
+import { authRoute, currentUser } from "./auth";
 interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
+  OWNER_SETUP_KEY?: string;
 }
-const userId = "local"; // Replace this resolver with an authenticated user ID when adding accounts.
-const json = (data: unknown, status = 200) => Response.json(data, { status });
+const json = (data: unknown, status = 200) =>
+  Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
 async function body(request: Request) {
   const raw = await request.text();
   if (new TextEncoder().encode(raw).byteLength > 2_000_000)
@@ -32,7 +34,7 @@ async function body(request: Request) {
     throw new Error("Запит має містити коректний JSON");
   }
 }
-async function stats(db: D1Database) {
+async function stats(db: D1Database, userId: string) {
   const [p, h] = await Promise.all([
     db
       .prepare("SELECT * FROM user_progress WHERE user_id=?")
@@ -73,10 +75,24 @@ export default {
     )
       return json({ error: "Зміни з іншого джерела не дозволені" }, 403);
     try {
+      if (path.startsWith("/api/auth/")) return await authRoute(request, env);
       if (path === "/api/catalog" && request.method === "GET")
         return json(await getCatalog(env.DB));
+      const user = await currentUser(request, env.DB);
+      if (!user)
+        return json(
+          { error: "Увійдіть у свій акаунт.", code: "AUTH_REQUIRED" },
+          401,
+        );
+      const userId = user.id;
+      if (
+        (path === "/api/import" ||
+          /^\/api\/(brands|lines|products)(\/|$)/.test(path)) &&
+        user.role !== "admin"
+      )
+        return json({ error: "Редагувати каталог може лише власник." }, 403);
       if (path === "/api/progress" && request.method === "GET")
-        return json(await stats(env.DB));
+        return json(await stats(env.DB, userId));
       if (path === "/api/import" && request.method === "POST") {
         const incoming = catalogSchema.parse(await body(request));
         const current = await getCatalog(env.DB);
@@ -177,7 +193,7 @@ export default {
         if (input.lineId && !catalog.lines.some((l) => l.id === input.lineId))
           return json({ error: "Лінійку не знайдено" }, 404);
         const id = crypto.randomUUID();
-        const s = await stats(env.DB);
+        const s = await stats(env.DB, userId);
         const questions = generateQuestions(
           catalog,
           s.progress,

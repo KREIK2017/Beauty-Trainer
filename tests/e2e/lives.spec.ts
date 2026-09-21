@@ -1,5 +1,5 @@
 import { anyAnswer, wrongAnswer, answerInBrowser } from "./quiz-helpers";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { generateQuestions, type Question } from "../../shared/learning";
 import type { Catalog, Stats } from "../../shared/schema";
 

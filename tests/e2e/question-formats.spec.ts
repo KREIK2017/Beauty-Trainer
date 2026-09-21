@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { generateQuestions, type PublicQuestion } from "../../shared/learning";
 import type { Catalog, Stats } from "../../shared/schema";
 import { answerInBrowser } from "./quiz-helpers";
@@ -51,6 +51,15 @@ test("compound questions validate on the server and remain usable on mobile", as
   page,
   request,
 }) => {
+  // A fresh learner avoids old review priorities excluding the line-level matching question.
+  const registered = await request.post("/api/auth/register", {
+    data: {
+      username: `formats-${Date.now()}`,
+      password: "Formats-password-12345",
+    },
+  });
+  expect(registered.ok()).toBe(true);
+  await page.context().addCookies((await request.storageState()).cookies);
   const catalog = (await (await request.get("/api/catalog")).json()) as Catalog;
   const before = (await (await request.get("/api/progress")).json()) as Stats;
   // A line offers more formats than the ten slots in a session, so the three

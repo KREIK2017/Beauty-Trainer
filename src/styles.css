@@ -2293,3 +2293,59 @@ footer {
     height: 180px;
   }
 }
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f7f8f4;
+}
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 32px;
+  border: 1px solid #e0e5dc;
+  border-radius: 16px;
+  background: white;
+  color: #243d35;
+}
+.auth-card h1 {
+  font-size: 28px;
+  margin: 16px 0;
+}
+.auth-card fieldset {
+  border: 0;
+  margin: 24px 0;
+  padding: 0;
+  min-width: 0;
+}
+.auth-card label {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.auth-card input {
+  background: white;
+  color: #243d35;
+  border: 1px solid #cdd6cc;
+}
+.auth-card small {
+  display: block;
+  margin-top: 6px;
+  color: #59675f;
+}
+.auth-card .button {
+  margin-top: 24px;
+  width: 100%;
+  background: #24694f;
+  color: white;
+}
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 16px;
+  }
+  .auth-card {
+    padding: 22px;
+  }
+}

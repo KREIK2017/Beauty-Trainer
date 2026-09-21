@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test("cards hide answers, repeat difficult products and lead to the line test", async ({
   page,

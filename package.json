@@ -14,7 +14,7 @@
     "db:seed": "tsx scripts/seed.ts && wrangler d1 execute beauty-trainer --local --file=data/seed.sql",
     "deploy": "npm run build && wrangler deploy",
     "test:e2e": "playwright test",
-    "db:e2e": "wrangler d1 migrations apply beauty-trainer --local --persist-to .wrangler/e2e && tsx scripts/seed.ts && wrangler d1 execute beauty-trainer --local --persist-to .wrangler/e2e --file=data/seed.sql",
+    "db:e2e": "wrangler d1 migrations apply beauty-trainer --local --persist-to .wrangler/e2e-accounts && tsx scripts/seed.ts && wrangler d1 execute beauty-trainer --local --persist-to .wrangler/e2e-accounts --file=data/seed.sql && wrangler d1 execute beauty-trainer --local --persist-to .wrangler/e2e-accounts --file=tests/e2e/legacy-account.sql",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "seed:generate": "tsx scripts/seed.ts"

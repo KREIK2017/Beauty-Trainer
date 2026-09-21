@@ -24,6 +24,8 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     const data = (await response.json().catch(() => ({
       error: "API недоступний. Запустіть Worker і застосуйте міграції.",
     }))) as { error: string; code?: string; answers?: unknown };
+    if (response.status === 401 && data.code === "AUTH_REQUIRED")
+      window.dispatchEvent(new Event("beauty-auth-expired"));
     throw new ApiError(data.error, data.code, data.answers);
   }
   return response.json() as Promise<T>;

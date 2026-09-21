@@ -26,7 +26,14 @@ export function CatalogPage() {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const options: Record<string, string[]> = {
     brand: catalog.brands.map((b) => b.name),
-    line: catalog.lines.map((l) => l.name),
+    line: catalog.lines
+      .filter(
+        (l) =>
+          !filters.brand ||
+          catalog.brands.find((b) => b.id === l.brand_id)?.name ===
+            filters.brand,
+      )
+      .map((l) => l.name),
     hair: catalog.products.flatMap((p) => p.hair_types),
     category: catalog.products.map((p) => p.category),
     purpose: catalog.products.map((p) => p.purpose),
@@ -48,6 +55,9 @@ export function CatalogPage() {
     );
   });
   const filtered = !!search || Object.values(filters).some(Boolean);
+  const showProducts =
+    !!search.trim() ||
+    Object.entries(filters).some(([key, value]) => key !== "brand" && !!value);
   return (
     <>
       <PageHeading
@@ -72,7 +82,11 @@ export function CatalogPage() {
               <select
                 value={filters[key] ?? ""}
                 onChange={(e) =>
-                  setFilters({ ...filters, [key]: e.target.value })
+                  setFilters(
+                    key === "brand"
+                      ? { brand: e.target.value }
+                      : { ...filters, [key]: e.target.value },
+                  )
                 }
               >
                 <option value="">Усі варіанти</option>
@@ -95,7 +109,7 @@ export function CatalogPage() {
           </button>
         )}
       </div>
-      {filtered ? (
+      {showProducts ? (
         <>
           <p className="muted">Знайдено продуктів: {products.length}</p>
           <div className="product-grid">
@@ -110,49 +124,52 @@ export function CatalogPage() {
           )}
         </>
       ) : (
-        catalog.brands.map((b) => (
-          <section className="brand-section" key={b.id}>
-            <div className="section-heading">
-              <div>
-                <h2 className="brand-title">{b.name}</h2>
-                <p>
-                  {counted(
-                    catalog.lines.filter((l) => l.brand_id === b.id).length,
-                    ["лінійка", "лінійки", "лінійок"],
-                  )}{" "}
-                  ·{" "}
-                  {counted(
-                    catalog.products.filter((p) => p.brand_id === b.id).length,
-                    ["продукт", "продукти", "продуктів"],
-                  )}
-                </p>
+        catalog.brands
+          .filter((b) => !filters.brand || b.name === filters.brand)
+          .map((b) => (
+            <section className="brand-section" key={b.id}>
+              <div className="section-heading">
+                <div>
+                  <h2 className="brand-title">{b.name}</h2>
+                  <p>
+                    {counted(
+                      catalog.lines.filter((l) => l.brand_id === b.id).length,
+                      ["лінійка", "лінійки", "лінійок"],
+                    )}{" "}
+                    ·{" "}
+                    {counted(
+                      catalog.products.filter((p) => p.brand_id === b.id)
+                        .length,
+                      ["продукт", "продукти", "продуктів"],
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="catalog-lines">
-              {catalog.lines
-                .filter((l) => l.brand_id === b.id)
-                .map((l, i) => (
-                  <div key={l.id}>
-                    <LineCard line={l} index={i} />
-                    <div className="nested-products">
-                      {catalog.products
-                        .filter((p) => p.line_id === l.id)
-                        .map((p) => (
-                          <Link key={p.id} to={`/products/${p.id}`}>
-                            <span>
-                              {p.name.startsWith(`${l.name} `)
-                                ? p.name.slice(l.name.length + 1)
-                                : p.name}
-                            </span>
-                            <ArrowRight size={13} />
-                          </Link>
-                        ))}
+              <div className="catalog-lines">
+                {catalog.lines
+                  .filter((l) => l.brand_id === b.id)
+                  .map((l, i) => (
+                    <div key={l.id}>
+                      <LineCard line={l} index={i} />
+                      <div className="nested-products">
+                        {catalog.products
+                          .filter((p) => p.line_id === l.id)
+                          .map((p) => (
+                            <Link key={p.id} to={`/products/${p.id}`}>
+                              <span>
+                                {p.name.startsWith(`${l.name} `)
+                                  ? p.name.slice(l.name.length + 1)
+                                  : p.name}
+                              </span>
+                              <ArrowRight size={13} />
+                            </Link>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-            </div>
-          </section>
-        ))
+                  ))}
+              </div>
+            </section>
+          ))
       )}
       {!catalog.brands.length && (
         <Empty title="Додайте знання до своєї бібліотеки">
