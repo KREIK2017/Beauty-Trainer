@@ -1,4 +1,5 @@
 import type { User } from "./auth";
+import type { LearningAccess } from "./access";
 import type { Progress } from "./schema";
 
 export interface SiteSettings {
@@ -24,6 +25,7 @@ export interface AdminAccounts {
   summary: { accounts: number; activeLearners: number; totalXp: number };
 }
 export interface AdminAccountDetail {
+  access: LearningAccess;
   account: AdminAccount;
   progress: (Progress & { name: string })[];
   recentAnswers: {

@@ -2,6 +2,9 @@ import { z } from "zod";
 import type { User } from "../shared/auth";
 import type { AdminAccount, AdminAccountDetail } from "../shared/admin";
 import { siteSettings } from "./settings";
+import { learningAccessSchema } from "../shared/access";
+import { learningAccess } from "./access";
+import { getCatalog } from "./db/catalog";
 
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
@@ -102,6 +105,83 @@ export async function adminRoute(
     });
   }
   const match = url.pathname.match(/^\/api\/admin\/users\/([a-z0-9-]+)$/);
+  const accessMatch = url.pathname.match(
+    /^\/api\/admin\/users\/([a-z0-9-]+)\/access$/,
+  );
+  if (
+    (match && request.method === "DELETE") ||
+    (accessMatch && request.method === "PUT")
+  ) {
+    const id = (accessMatch ?? match)![1];
+    const account = await db
+      .prepare("SELECT id,username,role FROM accounts WHERE id=?")
+      .bind(id)
+      .first<User>();
+    if (!account) return json({ error: "Акаунт не знайдено." }, 404);
+    if (account.role === "admin" || account.id === user.id)
+      return json(
+        { error: "Акаунт власника не можна видалити або обмежити." },
+        403,
+      );
+    const raw = await request.text();
+    if (raw.length > 100000) return json({ error: "Завеликий запит" }, 400);
+    let data: unknown;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return json({ error: "Некоректний JSON" }, 400);
+    }
+    if (request.method === "DELETE") {
+      const parsed = z
+        .object({ username: z.literal(account.username) })
+        .strict()
+        .safeParse(data);
+      if (!parsed.success)
+        return json(
+          { error: "Для підтвердження введіть логін користувача." },
+          400,
+        );
+      await db.batch([
+        ...["user_progress", "quiz_history", "quiz_sessions"].map((table) =>
+          db.prepare(`DELETE FROM ${table} WHERE user_id=?`).bind(id),
+        ),
+        db
+          .prepare("DELETE FROM accounts WHERE id=? AND role='learner'")
+          .bind(id),
+      ]);
+      return json({ success: true });
+    }
+    const parsed = learningAccessSchema.safeParse(data);
+    if (!parsed.success)
+      return json({ error: "Некоректний список навчальних матеріалів." }, 400);
+    const catalog = await getCatalog(db);
+    const { allMaterials, brandIds, lineIds } = parsed.data;
+    if (
+      brandIds.some((id) => !catalog.brands.some((b) => b.id === id)) ||
+      lineIds.some((id) => !catalog.lines.some((l) => l.id === id))
+    )
+      return json(
+        { error: "Деякі матеріали більше не існують. Оновіть сторінку." },
+        400,
+      );
+    await db.batch([
+      db
+        .prepare(
+          "INSERT INTO account_learning_access (user_id,all_materials,brand_ids,line_ids,revision) VALUES (?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET all_materials=excluded.all_materials,brand_ids=excluded.brand_ids,line_ids=excluded.line_ids,revision=excluded.revision",
+        )
+        .bind(
+          id,
+          Number(allMaterials),
+          JSON.stringify([...new Set(brandIds)]),
+          JSON.stringify([...new Set(lineIds)]),
+          crypto.randomUUID(),
+        ),
+      db
+        .prepare("UPDATE quiz_sessions SET questions='[]' WHERE user_id=?")
+        .bind(id),
+    ]);
+    return json({ success: true });
+  }
   if (match && request.method === "GET") {
     const account = await db
       .prepare(`${accountQuery} WHERE a.id=?`)
@@ -129,8 +209,14 @@ export async function adminRoute(
         .bind(account.id)
         .all<AdminAccountDetail["recentAnswers"][number]>(),
     ]);
+    const access = await learningAccess(db, account);
     return json({
       account,
+      access: {
+        allMaterials: access.allMaterials,
+        brandIds: access.brandIds,
+        lineIds: access.lineIds,
+      },
       progress: progress.results,
       recentAnswers: recentAnswers.results,
     });

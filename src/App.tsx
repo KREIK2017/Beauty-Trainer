@@ -5,7 +5,6 @@ import {
   BookOpen,
   Brain,
   ChartNoAxesCombined,
-  SlidersHorizontal,
   Leaf,
   Flame,
   Zap,
@@ -16,19 +15,15 @@ import {
   Target,
 } from "lucide-react";
 import { useData } from "./hooks/useData";
-import { useAuth } from "./hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import { CatalogPage, LinePage, ProductPage } from "./pages/Catalog";
 import Training from "./pages/Training";
 import Flashcards from "./pages/Flashcards";
 import { WeakAreas, ProgressPage } from "./pages/Progress";
 import Admin from "./pages/Admin";
-import {
-  AdminLayout,
-  AdminUsers,
-  AdminUserDetail,
-  AdminSettings,
-} from "./pages/AdminPanel";
+import AccountMenu from "./components/AccountMenu";
+import AccountSettings from "./pages/AccountSettings";
+import { AdminLayout, AdminUsers, AdminUserDetail } from "./pages/AdminPanel";
 const nav = [
   ["/", "Огляд", LayoutDashboard],
   ["/training", "Тренування", Brain],
@@ -37,8 +32,7 @@ const nav = [
   ["/progress", "Мій прогрес", ChartNoAxesCombined],
 ] as const;
 export default function App() {
-  const { stats } = useData();
-  const { user, logout } = useAuth();
+  const { stats, catalog } = useData();
   const location = useLocation();
   const [mobile, setMobile] = useState(false);
   const [dark, setDark] = useState(
@@ -90,37 +84,6 @@ export default function App() {
               <Leaf />
             </div>
           </div>
-          {user.role === "admin" && (
-            <>
-              <NavLink
-                className="manage-link"
-                to="/admin/users"
-                onClick={() => setMobile(false)}
-              >
-                <SlidersHorizontal size={18} />
-                Панель адміністратора
-              </NavLink>
-              <NavLink
-                className="manage-link"
-                to="/admin"
-                onClick={() => setMobile(false)}
-              >
-                <SlidersHorizontal size={18} />
-                Керування продуктами
-              </NavLink>
-            </>
-          )}
-          <div className="profile">
-            <span className="avatar">{user.username[0].toUpperCase()}</span>
-            <div>
-              <strong>{user.username}</strong>
-              <small>Особистий профіль</small>
-            </div>
-            <span className="online-dot" />
-          </div>
-          <button className="text-link" onClick={() => void logout()}>
-            Вийти з акаунта
-          </button>
         </div>
       </aside>
       <div className="main-shell">
@@ -137,9 +100,11 @@ export default function App() {
             <ChevronRight size={13} />
             <span>
               {nav.find(([to]) => to === location.pathname)?.[1] ??
-                (location.pathname.startsWith("/admin")
-                  ? "Панель адміністратора"
-                  : "Бібліотека продуктів")}
+                (location.pathname === "/settings"
+                  ? "Налаштування"
+                  : location.pathname.startsWith("/admin")
+                    ? "Панель адміністратора"
+                    : "Бібліотека продуктів")}
             </span>
           </div>
           <div className="top-actions">
@@ -162,12 +127,16 @@ export default function App() {
             >
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <span className="avatar small-avatar" title={user.username}>
-              {user.username[0].toUpperCase()}
-            </span>
+            <AccountMenu key={location.key} onOpen={() => setMobile(false)} />
           </div>
         </header>
         <main>
+          {!catalog.products.length && (
+            <p className="detail-panel" role="status">
+              Для вашого акаунта ще немає доступних продуктів. Зверніться до
+              власника сайту, щоб отримати доступ до навчання.
+            </p>
+          )}
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/catalog" element={<CatalogPage />} />
@@ -180,11 +149,11 @@ export default function App() {
             />
             <Route path="/weak" element={<WeakAreas />} />
             <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/settings" element={<AccountSettings />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Admin />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/:id" element={<AdminUserDetail />} />
-              <Route path="settings" element={<AdminSettings />} />
             </Route>
             <Route
               path="*"

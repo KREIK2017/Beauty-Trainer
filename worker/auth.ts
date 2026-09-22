@@ -180,6 +180,12 @@ async function limited(request: Request, db: D1Database, username: string) {
       (i === 0 ? 60 : 30),
   );
 }
+async function clearUserAttempts(db: D1Database, username: string) {
+  await db
+    .prepare("DELETE FROM auth_attempts WHERE key=?")
+    .bind(await digest(`user:${username}`))
+    .run();
+}
 export async function authRoute(
   request: Request,
   env: AuthEnv,
@@ -205,8 +211,6 @@ export async function authRoute(
         { error: "Увійдіть у свій акаунт.", code: "AUTH_REQUIRED" },
         401,
       );
-    if (user.role !== "admin")
-      return json({ error: "Налаштування доступні лише власнику." }, 403);
     if (await limited(request, env.DB, `password:${user.id}`))
       return json(
         { error: "Забагато спроб. Спробуйте через 15 хвилин." },
@@ -303,6 +307,7 @@ export async function authRoute(
     );
     if (!account || !equal(hash, account.password_hash))
       return json({ error: "Неправильний логін або пароль." }, 401);
+    await clearUserAttempts(env.DB, username);
     return signIn(
       request,
       env.DB,

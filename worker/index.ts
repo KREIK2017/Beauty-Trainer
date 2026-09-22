@@ -18,6 +18,7 @@ import { getCatalog, catalogStatements } from "./db/catalog";
 import { errorMessage } from "../shared/uk";
 import { authRoute, currentUser } from "./auth";
 import { adminRoute } from "./admin";
+import { learningCatalog } from "./access";
 interface Env {
   DB: D1Database;
   ASSETS: Fetcher;
@@ -77,8 +78,6 @@ export default {
       return json({ error: "Зміни з іншого джерела не дозволені" }, 403);
     try {
       if (path.startsWith("/api/auth/")) return await authRoute(request, env);
-      if (path === "/api/catalog" && request.method === "GET")
-        return json(await getCatalog(env.DB));
       const user = await currentUser(request, env.DB);
       if (!user)
         return json(
@@ -86,6 +85,8 @@ export default {
           401,
         );
       const userId = user.id;
+      if (path === "/api/catalog" && request.method === "GET")
+        return json((await learningCatalog(env.DB, user)).catalog);
       if (path.startsWith("/api/admin/"))
         return await adminRoute(request, env.DB, user);
       if (
@@ -94,8 +95,27 @@ export default {
         user.role !== "admin"
       )
         return json({ error: "Редагувати каталог може лише власник." }, 403);
-      if (path === "/api/progress" && request.method === "GET")
-        return json(await stats(env.DB, userId));
+      if (path === "/api/progress" && request.method === "GET") {
+        const saved = await stats(env.DB, userId);
+        const { catalog, access } = await learningCatalog(env.DB, user);
+        if (access.allMaterials) return json(saved);
+        const ids = {
+          brand: new Set(catalog.brands.map((b) => b.id)),
+          line: new Set(catalog.lines.map((l) => l.id)),
+          product: new Set(catalog.products.map((p) => p.id)),
+        };
+        return json({
+          ...saved,
+          progress: saved.progress.filter((p) =>
+            ids[p.entity_type].has(p.entity_id),
+          ),
+          history: saved.history.filter(
+            (h) =>
+              ids.line.has(h.line_id) &&
+              (!h.product_id || ids.product.has(h.product_id)),
+          ),
+        });
+      }
       if (path === "/api/import" && request.method === "POST") {
         const incoming = catalogSchema.parse(await body(request));
         const current = await getCatalog(env.DB);
@@ -192,7 +212,7 @@ export default {
             lineId: lineSchema.shape.id.optional(),
           })
           .parse(await body(request));
-        const catalog = await getCatalog(env.DB);
+        const { catalog, access } = await learningCatalog(env.DB, user);
         if (input.lineId && !catalog.lines.some((l) => l.id === input.lineId))
           return json({ error: "Лінійку не знайдено" }, 404);
         const id = crypto.randomUUID();
@@ -206,9 +226,35 @@ export default {
           input.lineId,
           input.difficulty,
         );
-        await env.DB.prepare("INSERT INTO quiz_sessions VALUES (?,?,?,?)")
-          .bind(id, userId, JSON.stringify(questions), new Date().toISOString())
+        if (!catalog.products.length)
+          return json(
+            {
+              error:
+                "Для вашого акаунта ще немає доступних продуктів. Зверніться до власника сайту.",
+            },
+            403,
+          );
+        const created = await env.DB.prepare(
+          "INSERT INTO quiz_sessions (id,user_id,questions,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM accounts WHERE id=?) AND COALESCE((SELECT revision FROM account_learning_access WHERE user_id=?),'')=?",
+        )
+          .bind(
+            id,
+            userId,
+            JSON.stringify(questions),
+            new Date().toISOString(),
+            userId,
+            userId,
+            access.revision,
+          )
           .run();
+        if (!created.meta.changes)
+          return json(
+            {
+              error:
+                "Доступ змінився. Оновіть сторінку та почніть нове тренування.",
+            },
+            409,
+          );
         return json({
           id,
           questions: questions.map((q) => ({
@@ -236,6 +282,14 @@ export default {
           .bind(answerMatch[1], userId)
           .first<{ questions: string }>();
         if (!session) return json({ error: "Тренування не знайдено" }, 404);
+        if (session.questions === "[]")
+          return json(
+            {
+              error:
+                "Доступ до навчання змінився. Оновіть сторінку та почніть новий тест.",
+            },
+            409,
+          );
         const q = (JSON.parse(session.questions) as Question[]).find(
           (q) => q.id === input.questionId,
         );
@@ -270,7 +324,7 @@ export default {
         const historyId = crypto.randomUUID();
         const statements = [
           env.DB.prepare(
-            "INSERT OR IGNORE INTO quiz_history SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM quiz_history WHERE session_id=? AND correct=0) < ?",
+            "INSERT OR IGNORE INTO quiz_history SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM quiz_history WHERE session_id=? AND correct=0) < ? AND EXISTS(SELECT 1 FROM quiz_sessions WHERE id=? AND user_id=? AND questions=?)",
           ).bind(
             historyId,
             userId,
@@ -285,6 +339,9 @@ export default {
             now,
             answerMatch[1],
             SESSION_LIVES,
+            answerMatch[1],
+            userId,
+            session.questions,
           ),
         ];
         // Conditional writes make retries and simultaneous submissions award progress only once.
@@ -322,6 +379,20 @@ export default {
           .bind(answerMatch[1], q.id)
           .first<History>();
         if (!saved) {
+          if (
+            !(await env.DB.prepare(
+              "SELECT id FROM quiz_sessions WHERE id=? AND user_id=? AND questions=?",
+            )
+              .bind(answerMatch[1], userId, session.questions)
+              .first())
+          )
+            return json(
+              {
+                error:
+                  "Доступ змінився. Оновіть сторінку та почніть нове тренування.",
+              },
+              409,
+            );
           const history = await env.DB.prepare(
             "SELECT * FROM quiz_history WHERE session_id=? ORDER BY created_at",
           )

@@ -13,7 +13,7 @@ export default defineConfig({
   webServer: {
     command:
       "npm run build && npm run db:e2e && wrangler dev --port 8788 --persist-to .wrangler/e2e-accounts --var OWNER_SETUP_KEY:local-e2e-owner-key-not-for-production-123456",
-    url: "http://127.0.0.1:8788/api/catalog",
+    url: "http://127.0.0.1:8788/api/auth/me",
     timeout: 180000,
     reuseExistingServer: !process.env.CI,
   },

@@ -178,6 +178,7 @@ test("registration, private progress, session ownership, logout and owner permis
     expect(await (await request.get("/api/progress")).json()).toEqual(before);
     // Browser identity must be cleared together with its loaded learning state.
     await page.goto("/");
+    await page.getByRole("button", { name: /Меню акаунта/ }).click();
     await page.getByRole("button", { name: "Вийти з акаунта" }).click();
     await page.getByRole("link", { name: "Увійти", exact: true }).click();
     await page.getByLabel("Логін", { exact: true }).fill(credentials.username);

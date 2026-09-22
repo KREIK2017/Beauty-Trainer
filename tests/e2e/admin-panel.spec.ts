@@ -128,7 +128,7 @@ test("registration settings affect new accounts but preserve existing access", a
       (await visitor.post("/api/auth/register", { data: credentials })).ok(),
     ).toBe(true);
     await visitor.post("/api/auth/logout");
-    await page.goto("/admin/settings");
+    await page.goto("/settings");
     await page
       .getByRole("checkbox", { name: "Дозволити самостійну реєстрацію" })
       .uncheck();
@@ -205,7 +205,7 @@ test("owner changes their password and old sessions are revoked", async ({
         })
       ).status(),
     ).toBe(400);
-    await page.goto("/admin/settings");
+    await page.goto("/settings");
     await page
       .getByLabel("Поточний пароль", { exact: true })
       .fill(ownerCredentials.password);

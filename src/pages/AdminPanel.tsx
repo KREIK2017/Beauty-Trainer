@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
-import type {
-  AdminAccounts,
-  AdminAccountDetail,
-  SiteSettings,
-} from "../../shared/admin";
+import type { AdminAccounts, AdminAccountDetail } from "../../shared/admin";
+import AccountAccess from "../components/AccountAccess";
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
 import { PageHeading, ProgressBar } from "../components/ui";
@@ -65,7 +62,6 @@ export function AdminLayout() {
         <NavLink to="/admin" end>
           Матеріали
         </NavLink>
-        <NavLink to="/admin/settings">Налаштування</NavLink>
       </nav>
       <Outlet />
     </>
@@ -220,6 +216,7 @@ export function AdminUserDetail() {
     `/admin/users/${encodeURIComponent(id ?? "")}`,
   );
   const [kind, setKind] = useState("product");
+  const [accessNotice, setAccessNotice] = useState("");
   if (!data)
     return (
       <>
@@ -260,6 +257,16 @@ export function AdminUserDetail() {
           <span>Тестів із хоча б однією відповіддю</span>
         </div>
       </div>
+      {accessNotice && <p role="status">{accessNotice}</p>}
+      <AccountAccess
+        key={JSON.stringify(data.access)}
+        account={account}
+        initial={data.access}
+        onSaved={() => {
+          setAccessNotice("Доступ до навчання збережено.");
+          reload();
+        }}
+      />
       <section className="detail-panel">
         <h2>Засвоєння матеріалів</h2>
         <p>
@@ -307,164 +314,6 @@ export function AdminUserDetail() {
             </li>
           ))}
         </ul>
-      </section>
-    </>
-  );
-}
-export function AdminSettings() {
-  const { data, error, reload } =
-    useAdminResource<SiteSettings>("/admin/settings");
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [saveError, setSaveError] = useState("");
-  const [passwordBusy, setPasswordBusy] = useState(false);
-  const [passwordNotice, setPasswordNotice] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  return (
-    <>
-      <PageHeading
-        eyebrow="НАЛАШТУВАННЯ"
-        title="Доступ і безпека"
-        description="Керуйте реєстрацією нових учасників та паролем власного акаунта."
-      />
-      <section className="detail-panel admin-settings">
-        <h2>Реєстрація учасників</h2>
-        <p>
-          Закриття реєстрації не впливає на вхід та прогрес наявних
-          користувачів.
-        </p>
-        {notice && <p role="status">{notice}</p>}
-        {saveError && (
-          <p className="error" role="alert">
-            {saveError}
-          </p>
-        )}
-        {!data ? (
-          <LoadState error={error} reload={reload} />
-        ) : (
-          <form
-            key={data.updatedAt}
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (busy) return;
-              const registrationOpen =
-                new FormData(event.currentTarget).get("registrationOpen") ===
-                "on";
-              setBusy(true);
-              setNotice("");
-              setSaveError("");
-              try {
-                await api("/admin/settings", {
-                  method: "PATCH",
-                  body: JSON.stringify({ registrationOpen }),
-                });
-                setNotice("Налаштування реєстрації збережено.");
-                reload();
-              } catch (e) {
-                setSaveError((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <label className="admin-check">
-              <input
-                type="checkbox"
-                name="registrationOpen"
-                defaultChecked={data.registrationOpen}
-                disabled={busy}
-              />
-              Дозволити самостійну реєстрацію
-            </label>
-            <button className="button primary" disabled={busy}>
-              {busy ? "Зберігаємо…" : "Зберегти налаштування"}
-            </button>
-            <p className="small muted">Оновлено: {date(data.updatedAt)}</p>
-          </form>
-        )}
-      </section>
-      <section className="detail-panel admin-settings">
-        <h2>Змінити мій пароль</h2>
-        <p>
-          Після зміни попередні сесії буде завершено. У цьому браузері ви
-          залишитеся в акаунті.
-        </p>
-        {passwordNotice && <p role="status">{passwordNotice}</p>}
-        {passwordError && (
-          <p className="error" role="alert">
-            {passwordError}
-          </p>
-        )}
-        <form
-          onSubmit={async (event) => {
-            event.preventDefault();
-            if (passwordBusy) return;
-            const form = event.currentTarget;
-            const values = new FormData(form);
-            setPasswordNotice("");
-            setPasswordError("");
-            if (values.get("newPassword") !== values.get("confirmation")) {
-              setPasswordError("Нові паролі не збігаються.");
-              return;
-            }
-            setPasswordBusy(true);
-            try {
-              await api("/auth/password", {
-                method: "POST",
-                body: JSON.stringify({
-                  currentPassword: values.get("currentPassword"),
-                  newPassword: values.get("newPassword"),
-                }),
-              });
-              form.reset();
-              setPasswordNotice("Пароль змінено. Попередні сесії завершено.");
-              localStorage.setItem("beauty-auth-change", crypto.randomUUID());
-            } catch (e) {
-              setPasswordError((e as Error).message);
-            } finally {
-              setPasswordBusy(false);
-            }
-          }}
-        >
-          <fieldset disabled={passwordBusy}>
-            <label>
-              Поточний пароль
-              <input
-                type="password"
-                name="currentPassword"
-                autoComplete="current-password"
-                required
-                maxLength={128}
-              />
-            </label>
-            <label>
-              Новий пароль
-              <input
-                type="password"
-                name="newPassword"
-                autoComplete="new-password"
-                required
-                minLength={12}
-                maxLength={128}
-              />
-            </label>
-            <small>Від 12 до 128 символів.</small>
-            <label>
-              Повторіть новий пароль
-              <input
-                type="password"
-                name="confirmation"
-                autoComplete="new-password"
-                required
-                minLength={12}
-                maxLength={128}
-              />
-            </label>
-            <button className="button primary">
-              {passwordBusy ? "Змінюємо…" : "Змінити пароль"}
-            </button>
-          </fieldset>
-        </form>
       </section>
     </>
   );
