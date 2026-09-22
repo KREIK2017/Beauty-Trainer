@@ -23,6 +23,7 @@ import { WeakAreas, ProgressPage } from "./pages/Progress";
 import Admin from "./pages/Admin";
 import AccountMenu from "./components/AccountMenu";
 import AccountSettings from "./pages/AccountSettings";
+import QualityReport from "./pages/QualityReport";
 import { AdminLayout, AdminUsers, AdminUserDetail } from "./pages/AdminPanel";
 const nav = [
   ["/", "Огляд", LayoutDashboard],
@@ -152,6 +153,7 @@ export default function App() {
             <Route path="/settings" element={<AccountSettings />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Admin />} />
+              <Route path="quality" element={<QualityReport />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="users/:id" element={<AdminUserDetail />} />
             </Route>

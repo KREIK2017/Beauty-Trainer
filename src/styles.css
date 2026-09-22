@@ -2841,3 +2841,111 @@ footer {
   margin: 16px 0;
   overflow-wrap: anywhere;
 }
+.quality-metrics {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.quality-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+.quality-source > div:first-child {
+  max-width: 760px;
+}
+.quality-source p,
+.detail-panel > .muted {
+  margin-top: 10px;
+}
+.quality-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0 16px;
+}
+.quality-filters label {
+  display: grid;
+  gap: 8px;
+}
+.quality-search > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.quality-search input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  padding-left: 0;
+  background: transparent;
+}
+.quality-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+.quality-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  overflow-wrap: anywhere;
+}
+.quality-row h3 {
+  margin: 5px 0 10px;
+  font-size: 18px;
+}
+.quality-row .actions {
+  flex-shrink: 0;
+}
+.quality-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.quality-badges span {
+  padding: 5px 8px;
+  border-radius: 5px;
+  background: #fff0e9;
+  color: #9a4525;
+  font-size: 12px;
+}
+.dark .quality-badges span {
+  background: #513528;
+  color: #ffd5c4;
+}
+.quality-list.compact .quality-row {
+  padding: 15px 18px;
+}
+@media (max-width: 1100px) {
+  .quality-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .quality-metrics,
+  .quality-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quality-source,
+  .quality-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .quality-row .actions {
+    display: grid;
+    width: 100%;
+  }
+  .quality-row .button {
+    white-space: normal;
+  }
+}

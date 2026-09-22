@@ -62,6 +62,7 @@ export function AdminLayout() {
         <NavLink to="/admin" end>
           Матеріали
         </NavLink>
+        <NavLink to="/admin/quality">Якість матеріалів</NavLink>
       </nav>
       <Outlet />
     </>

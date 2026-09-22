@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Download, Plus, Upload, Pencil, Trash2, X } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { api } from "../services/api";
@@ -50,6 +51,7 @@ const arrays = [
 ];
 export default function Admin() {
   const { catalog, refresh } = useData();
+  const [params, setParams] = useSearchParams();
   const [kind, setKind] = useState<Kind>("products");
   const [draft, setDraft] = useState<Record<string, string> | null>(null);
   const [editing, setEditing] = useState(false);
@@ -63,6 +65,29 @@ export default function Admin() {
   const [importText, setImportText] = useState("");
   const [preview, setPreview] =
     useState<ReturnType<typeof catalogSchema.parse>>();
+  const requestedProduct = params.get("edit");
+  useEffect(() => {
+    if (!requestedProduct) return;
+    const product = catalog.products.find(
+      (item) => item.id === requestedProduct,
+    );
+    setParams({}, { replace: true });
+    if (!product) {
+      setError("Продукт для редагування не знайдено.");
+      return;
+    }
+    setKind("products");
+    setEditing(true);
+    setError("");
+    setDraft(
+      Object.fromEntries(
+        Object.entries(product).map(([key, value]) => [
+          key,
+          Array.isArray(value) ? value.join("\n") : String(value ?? ""),
+        ]),
+      ),
+    );
+  }, [catalog.products, requestedProduct, setParams]);
   function edit(item?: object) {
     setEditing(!!item);
     setError("");
@@ -309,7 +334,11 @@ export default function Admin() {
               {error}
             </pre>
           )}
-          <form noValidate onSubmit={(e) => void save(e)} className="admin-form">
+          <form
+            noValidate
+            onSubmit={(e) => void save(e)}
+            className="admin-form"
+          >
             {fields[kind].map((key) => (
               <label key={key}>
                 <span>
