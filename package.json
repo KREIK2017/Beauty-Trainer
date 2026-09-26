@@ -17,6 +17,8 @@
     "db:e2e": "wrangler d1 migrations apply beauty-trainer --local --persist-to .wrangler/e2e-accounts && tsx scripts/seed.ts && wrangler d1 execute beauty-trainer --local --persist-to .wrangler/e2e-accounts --file=data/seed.sql && wrangler d1 execute beauty-trainer --local --persist-to .wrangler/e2e-accounts --file=tests/e2e/legacy-account.sql",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "images:audit": "tsx scripts/optimize-product-images.ts",
+    "images:optimize": "tsx scripts/optimize-product-images.ts --write",
     "seed:generate": "tsx scripts/seed.ts"
   },
   "dependencies": {

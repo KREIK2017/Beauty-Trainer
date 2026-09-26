@@ -651,9 +651,20 @@ if (write) {
     mkdirSync(target, { recursive: true });
     let bytes = 0;
     for (const [from, to] of parsed.artwork) {
+      const metadata = await sharp(from).metadata();
+      const longEdge = Math.max(metadata.width ?? 0, metadata.height ?? 0);
+      const scale =
+        longEdge > 0 && longEdge < 500 ? Math.min(2, 560 / longEdge) : 1;
       const result = await sharp(from)
-        .resize({ width: 720, withoutEnlargement: true })
-        .webp({ quality: 82 })
+        .resize({
+          width: metadata.width
+            ? Math.min(720, Math.round(metadata.width * scale))
+            : 720,
+          withoutEnlargement: scale === 1,
+          kernel: sharp.kernel.lanczos3,
+        })
+        .sharpen({ sigma: 0.7, m1: 0.5, m2: 0.2 })
+        .webp({ quality: 90, alphaQuality: 100, smartSubsample: true })
         .toFile(join(target, to));
       bytes += result.size;
     }
