@@ -6,6 +6,7 @@ import { api } from "../services/api";
 import { PageHeading } from "../components/ui";
 import { Modal } from "../components/Modal";
 import { fieldLabels, errorMessage } from "../../shared/uk";
+import { productCopyWarnings } from "../../shared/copy";
 import {
   catalogSchema,
   brandSchema,
@@ -66,6 +67,17 @@ export default function Admin() {
   const [preview, setPreview] =
     useState<ReturnType<typeof catalogSchema.parse>>();
   const requestedProduct = params.get("edit");
+  const copyWarnings =
+    kind === "products" && draft
+      ? productCopyWarnings(
+          draft.description ?? "",
+          draft.purpose ?? "",
+          (draft.benefits ?? "")
+            .split("\n")
+            .map((value) => value.trim())
+            .filter(Boolean),
+        )
+      : [];
   useEffect(() => {
     if (!requestedProduct) return;
     const product = catalog.products.find(
@@ -333,6 +345,14 @@ export default function Admin() {
             <pre className="error" role="alert">
               {error}
             </pre>
+          )}
+          {copyWarnings.length > 0 && (
+            <div className="copy-guidance" role="status">
+              <strong>Текст варто розділити</strong>
+              {copyWarnings.map((warning) => (
+                <p key={warning}>{warning}</p>
+              ))}
+            </div>
           )}
           <form
             noValidate

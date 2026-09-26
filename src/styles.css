@@ -1133,6 +1133,75 @@ footer {
 .product-detail .detail-panel > p {
   color: var(--muted);
 }
+.product-learning-panel {
+  padding: 34px;
+}
+.product-learning-panel > .eyebrow {
+  display: block;
+  margin-bottom: 10px;
+}
+.product-learning-panel .lead {
+  margin-bottom: 24px;
+  color: var(--text);
+}
+.product-memory-card {
+  margin: 8px 0 26px;
+  padding: 22px;
+  border: 1px solid color-mix(in srgb, var(--green) 22%, var(--border));
+  border-radius: 12px;
+  background: var(--pale);
+}
+.product-memory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 14px;
+}
+.product-memory-grid h3,
+.product-section h3,
+.product-mastery h3 {
+  margin: 0 0 8px;
+}
+.product-section {
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+}
+.product-section p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+.ingredients-details {
+  padding: 17px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ingredients-details summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.product-mastery {
+  margin-top: 24px;
+}
+.product-mastery strong {
+  font-size: 24px;
+}
+.copy-guidance {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid #e7c887;
+  border-radius: 9px;
+  background: #fff8e8;
+  color: #6f5012;
+}
+.copy-guidance p {
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.dark .copy-guidance {
+  border-color: #725c31;
+  background: #3f351f;
+  color: #ffe3a0;
+}
 .empty {
   text-align: center;
   padding: 50px 20px;
@@ -1750,6 +1819,13 @@ footer {
   }
   .product-image {
     min-height: 250px;
+  }
+  .product-learning-panel {
+    padding: 24px;
+  }
+  .product-memory-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
   .top-actions {
     gap: 12px;

@@ -578,7 +578,14 @@ const parsed =
 if (folder === "Insight") {
   const productCopy: Record<
     string,
-    { benefits: string[]; name?: string; category?: string }
+    {
+      benefits: string[];
+      name?: string;
+      category?: string;
+      purpose?: string;
+      description?: string;
+      usage?: string;
+    }
   > = insightCopy.products;
   const lineCopy: Record<string, { short_description: string }> =
     insightCopy.lines;
@@ -588,6 +595,9 @@ if (folder === "Insight") {
       product.benefits = copy.benefits;
       if (copy.name) product.name = copy.name;
       if (copy.category) product.category = copy.category;
+      if (copy.purpose) product.purpose = copy.purpose;
+      if (copy.description) product.description = copy.description;
+      if (copy.usage) product.usage = copy.usage;
     }
   }
   for (const line of parsed.lines) {

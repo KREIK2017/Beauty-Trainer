@@ -12,10 +12,13 @@ describe("reviewed Insight content", () => {
       expect(p.benefits).toEqual(
         copy.products[p.id as keyof typeof copy.products].benefits,
       );
+      expect(p.purpose).toBe(
+        copy.products[p.id as keyof typeof copy.products].purpose,
+      );
       expect(p.ingredients.join(" ")).not.toMatch(
         /СПОСІБ|Нанесіть|Не змивати|тижнів/i,
       );
     }
-    expect(products.filter((p) => "usage" in p && p.usage)).toHaveLength(9);
+    expect(products.filter((p) => "usage" in p && p.usage)).toHaveLength(12);
   });
 });

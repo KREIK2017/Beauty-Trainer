@@ -1,6 +1,17 @@
 import type { Catalog, Progress, EntityType } from "./schema";
+import { repeatsMeaningfully } from "./copy";
 export const SESSION_LIVES = 3;
 export type Difficulty = "normal" | "hard";
+
+function productExplanation(
+  product: Catalog["products"][number],
+  lineName: string,
+) {
+  const purpose = repeatsMeaningfully(product.description, product.purpose)
+    ? ""
+    : ` Коли рекомендувати: ${product.purpose}.`;
+  return `${product.name} належить до лінійки ${lineName}. ${product.description}${purpose}`;
+}
 export interface Question {
   id: string;
   type: string;
@@ -146,6 +157,11 @@ export function generateQuestions(
       .map((value) => ({ value, key: cachedHash(salt + value) }))
       .sort((a, b) => a.key - b.key)
       .map((entry) => entry.value);
+  const rotate = (values: string[], salt: string) => {
+    if (values.length < 2) return values;
+    const offset = cachedHash(salt) % values.length;
+    return [...values.slice(offset), ...values.slice(0, offset)];
+  };
   // `ordered` keeps the caller's ranking of distractors instead of reshuffling it.
   const add = (
     q: Omit<Question, "options">,
@@ -235,13 +251,35 @@ export function generateQuestions(
         ["Правда", "Неправда"],
       );
   });
+  const productsByLine = new Map(
+    c.lines.map((line) => [
+      line.id,
+      products.filter((product) => product.line_id === line.id),
+    ]),
+  );
+  const productsOutsideLine = new Map(
+    c.lines.map((line) => [
+      line.id,
+      products.filter((product) => product.line_id !== line.id),
+    ]),
+  );
   products.forEach((p) => {
     const line = c.lines.find((l) => l.id === p.line_id)!;
+    const prioritizeLine = (values: (product: typeof p) => string[]) => [
+      ...rotate(
+        (productsByLine.get(p.line_id) ?? []).flatMap(values),
+        `${seed}${p.id}:same-line`,
+      ),
+      ...rotate(
+        (productsOutsideLine.get(p.line_id) ?? []).flatMap(values),
+        `${seed}${p.id}:other-lines`,
+      ),
+    ];
     const base = {
       brandId: p.brand_id,
       lineId: p.line_id,
       productId: p.id,
-      explanation: `${p.name} належить до лінійки ${line.name}. ${p.description} Основне призначення: ${p.purpose}.`,
+      explanation: productExplanation(p, line.name),
     };
     if (difficulty === "hard") {
       if (p.image) {
@@ -356,7 +394,12 @@ export function generateQuestions(
         prompt: `Який продукт лінійки ${line.name} відповідає потребі «${p.purpose.toLowerCase()}»?`,
         answer: p.name,
       },
-      products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
+      prioritizeLine((product) =>
+        product.id !== p.id && product.purpose !== p.purpose
+          ? [product.name]
+          : [],
+      ),
+      true,
     );
     add(
       {
@@ -366,9 +409,12 @@ export function generateQuestions(
         prompt: `Яка перевага характерна для ${p.name}?`,
         answer: p.benefits[0],
       },
-      products
-        .flatMap((x) => x.benefits)
-        .filter((x) => !p.benefits.includes(x)),
+      prioritizeLine((product) =>
+        product.id === p.id
+          ? []
+          : product.benefits.filter((benefit) => !p.benefits.includes(benefit)),
+      ),
+      true,
     );
     add(
       {
@@ -378,7 +424,12 @@ export function generateQuestions(
         prompt: `Яке основне призначення ${p.name}?`,
         answer: p.purpose,
       },
-      products.map((x) => x.purpose),
+      prioritizeLine((product) =>
+        product.id !== p.id && product.purpose !== p.purpose
+          ? [product.purpose]
+          : [],
+      ),
+      true,
     );
     add(
       {
@@ -388,7 +439,12 @@ export function generateQuestions(
         prompt: `Клієнт шукає засіб для потреби «${p.purpose.toLowerCase()}». Тип волосся: ${p.hair_types.join(" / ").toLowerCase()}. Який продукт ви порекомендуєте?`,
         answer: p.name,
       },
-      products.filter((x) => x.purpose !== p.purpose).map((x) => x.name),
+      prioritizeLine((product) =>
+        product.id !== p.id && product.purpose !== p.purpose
+          ? [product.name]
+          : [],
+      ),
+      true,
     );
   });
   const rank = (q: Question) => {

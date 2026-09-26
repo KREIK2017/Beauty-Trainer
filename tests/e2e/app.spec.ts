@@ -30,8 +30,12 @@ test("dashboard, catalog, details, mobile layout, and persistent theme", async (
     .getByRole("link")
     .filter({ has: page.getByRole("heading", { name: "Thermo Protector" }) })
     .click();
+  await expect(page.getByText("ЗАПАМ’ЯТАЙТЕ", { exact: true })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Ключові складники" }),
+    page.getByRole("heading", { name: "Кому підходить" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Ключові складники", { exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Lifestyling", exact: true }).click();
   await expect(

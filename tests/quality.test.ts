@@ -90,4 +90,36 @@ describe("catalog quality report", () => {
       linesNeedWork: 2,
     });
   });
+
+  it("flags repeated fields inside a product card", () => {
+    const product = {
+      ...complete("repeated", "line-a"),
+      description:
+        "Інтенсивний догляд для пухнастого, неслухняного волосся під час стайлінгу. Живить волосся по довжині.",
+      purpose:
+        "Інтенсивний догляд для пухнастого, неслухняного волосся під час стайлінгу",
+      benefits: ["Інтенсивний догляд"],
+    };
+    const catalog: Catalog = {
+      brands: [{ id: "brand", name: "Brand", description: "Опис бренду" }],
+      lines: [
+        {
+          id: "line-a",
+          brand_id: "brand",
+          name: "Line A",
+          short_description: "Коротко",
+          description: "Опис",
+          hair_types: ["Усі типи"],
+          purposes: ["Догляд"],
+          benefits: ["Перевага"],
+          keywords: ["догляд"],
+        },
+      ],
+      products: [product],
+    };
+
+    expect(catalogQuality(catalog).products[0].issues).toContain(
+      "repeated-purpose",
+    );
+  });
 });

@@ -66,7 +66,7 @@ export default function QualityReport() {
         </div>
         <div>
           <strong>{report.summary.weakDescription}</strong>
-          <span>З коротким або однаковим описом</span>
+          <span>Зі слабким або повторюваним текстом</span>
         </div>
         <div>
           <strong>{report.summary.linesNeedWork}</strong>
@@ -107,9 +107,9 @@ export default function QualityReport() {
       <section className="detail-panel">
         <h2>Проблеми продуктів</h2>
         <p className="muted">
-          Коротким вважається опис до {DESCRIPTION_MIN_LENGTH} символів.
-          Однакові описи порівнюються без урахування регістру та розділових
-          знаків.
+          Коротким вважається опис до {DESCRIPTION_MIN_LENGTH} символів. Звіт
+          також знаходить однакові описи та випадки, коли опис, призначення або
+          перевага повторюють одне одного.
         </p>
         <div className="quality-filters">
           <label>

@@ -1,4 +1,5 @@
 import type { Catalog, Product } from "./schema";
+import { repeatsMeaningfully } from "./copy";
 
 export const DESCRIPTION_MIN_LENGTH = 80;
 
@@ -6,7 +7,9 @@ export type ProductQualityIssue =
   | "missing-image"
   | "missing-usage"
   | "short-description"
-  | "duplicate-description";
+  | "duplicate-description"
+  | "repeated-purpose"
+  | "repeated-benefit";
 
 export type LineQualityIssue = "too-few-products" | "too-few-distinct-purposes";
 
@@ -15,6 +18,8 @@ export const productIssueLabels: Record<ProductQualityIssue, string> = {
   "missing-usage": "Немає застосування",
   "short-description": "Короткий опис",
   "duplicate-description": "Однаковий опис",
+  "repeated-purpose": "Опис повторює призначення",
+  "repeated-benefit": "Призначення повторює перевагу",
 };
 
 export const lineIssueLabels: Record<LineQualityIssue, string> = {
@@ -64,6 +69,14 @@ export function catalogQuality(catalog: Catalog) {
       issues.push("short-description");
     if ((descriptionCounts.get(normalized(product.description)) ?? 0) > 1)
       issues.push("duplicate-description");
+    if (repeatsMeaningfully(product.description, product.purpose))
+      issues.push("repeated-purpose");
+    if (
+      product.benefits.some((benefit) =>
+        repeatsMeaningfully(product.purpose, benefit),
+      )
+    )
+      issues.push("repeated-benefit");
     return {
       product,
       brandName:
@@ -113,7 +126,12 @@ export function catalogQuality(catalog: Catalog) {
       ).length,
       weakDescription: products.filter((row) =>
         row.issues.some((issue) =>
-          ["short-description", "duplicate-description"].includes(issue),
+          [
+            "short-description",
+            "duplicate-description",
+            "repeated-purpose",
+            "repeated-benefit",
+          ].includes(issue),
         ),
       ).length,
       linesNeedWork: lines.filter((row) => row.issues.length).length,

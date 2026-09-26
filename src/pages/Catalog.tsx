@@ -12,6 +12,7 @@ import {
 } from "../components/ui";
 import { mastery } from "../../shared/learning";
 import { counted } from "../../shared/uk";
+import { repeatsMeaningfully } from "../../shared/copy";
 const filterLabels: Record<string, string> = {
   brand: "Бренд",
   line: "Лінійка",
@@ -252,6 +253,11 @@ export function ProductPage() {
   const p = catalog.products.find((p) => p.id === id);
   if (!p) return <Empty title="Продукт не знайдено" />;
   const line = catalog.lines.find((l) => l.id === p.line_id)!;
+  const score = mastery(stats.progress, "product", p.id);
+  const purposeRepeatsDescription = repeatsMeaningfully(
+    p.description,
+    p.purpose,
+  );
   return (
     <>
       <Link className="back-link" to={`/lines/${line.id}`}>
@@ -262,6 +268,16 @@ export function ProductPage() {
         eyebrow={`${catalog.brands.find((b) => b.id === p.brand_id)!.name} / ${line.name}`}
         title={p.name}
         description={p.category}
+        action={
+          <div className="actions">
+            <Link className="button secondary" to={`/lines/${line.id}/cards`}>
+              Вивчити картки
+            </Link>
+            <Link className="button primary" to={`/training?line=${line.id}`}>
+              Пройти тест <ArrowRight size={16} />
+            </Link>
+          </div>
+        }
       />
       <div className="product-detail">
         <div className="product-image">
@@ -275,27 +291,48 @@ export function ProductPage() {
             </>
           )}
         </div>
-        <div className="detail-panel">
+        <div className="detail-panel product-learning-panel">
+          <span className="eyebrow">ЩО РОБИТЬ ПРОДУКТ</span>
           <p className="lead">{p.description}</p>
-          <h3>Основне призначення</h3>
-          <p>{p.purpose}</p>
-          <h3>Для яких типів волосся</h3>
-          <Tags values={p.hair_types} />
-          <h3>Ключові переваги</h3>
-          <Tags values={p.benefits} />
-          <h3>Ключові складники</h3>
-          <Tags values={p.ingredients} />
+          <div className="product-memory-card">
+            <span className="eyebrow">ЗАПАМ’ЯТАЙТЕ</span>
+            <div className="product-memory-grid">
+              <section>
+                <h3>Кому підходить</h3>
+                <Tags values={p.hair_types} />
+              </section>
+              <section>
+                <h3>Головний результат</h3>
+                <Tags values={p.benefits.slice(0, 3)} />
+              </section>
+            </div>
+          </div>
+          {!purposeRepeatsDescription && (
+            <section className="product-section">
+              <h3>Коли рекомендувати</h3>
+              <p>{p.purpose}</p>
+            </section>
+          )}
           {p.usage && (
-            <>
+            <section className="product-section">
               <h3>Спосіб застосування</h3>
               <p>{p.usage}</p>
-            </>
+            </section>
           )}
-          <div className="row">
-            <h3>Ваш рівень засвоєння</h3>
-            <strong>{mastery(stats.progress, "product", p.id)}%</strong>
+          <details className="ingredients-details">
+            <summary>Ключові складники</summary>
+            <Tags values={p.ingredients} />
+          </details>
+          <div className="product-mastery">
+            <div className="row">
+              <div>
+                <span className="eyebrow">ВАШ ПРОГРЕС</span>
+                <h3>Рівень засвоєння</h3>
+              </div>
+              <strong>{score}%</strong>
+            </div>
+            <ProgressBar value={score} />
           </div>
-          <ProgressBar value={mastery(stats.progress, "product", p.id)} />
         </div>
       </div>
     </>
