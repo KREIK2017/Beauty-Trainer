@@ -18,7 +18,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "images:audit": "tsx scripts/optimize-product-images.ts",
-    "images:optimize": "tsx scripts/optimize-product-images.ts --write",
     "seed:generate": "tsx scripts/seed.ts"
   },
   "dependencies": {

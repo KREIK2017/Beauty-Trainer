@@ -1,26 +1,18 @@
 /**
- * Audit and gently optimize catalog artwork.
+ * Audit product artwork without changing it.
  *
  * Usage:
  *   npm run images:audit
- *   npm run images:optimize
- *
- * Optimization enlarges only small images and never beyond 2x. This improves
- * browser scaling and edge clarity, but cannot restore detail absent from the
- * source file. Replacing a small source with a larger original remains the best
- * way to improve labels and fine print.
+ * Small source files must be replaced with larger originals. Artificially
+ * enlarging them does not restore label detail and makes blur more visible.
  */
-import { readFileSync, statSync } from "node:fs";
-import { writeFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import sharp from "sharp";
 import { catalogSchema } from "../shared/schema";
 
 const imageRoot = join(process.cwd(), "public", "images");
-const shouldWrite = process.argv.includes("--write");
-const targetLongEdge = 560;
-const minimumLongEdge = 500;
-const maximumScale = 2;
+const recommendedLongEdge = 800;
 
 const catalog = catalogSchema.parse(
   JSON.parse(
@@ -35,48 +27,22 @@ const files = [
       .map((image) => join(imageRoot, image.replace(/^\/images\//, ""))),
   ),
 ];
-let smallCount = 0;
-let optimizedCount = 0;
+let lowResolutionCount = 0;
 
 for (const file of files) {
-  const source = readFileSync(file);
-  const metadata = await sharp(source).metadata();
+  const metadata = await sharp(file).metadata();
   if (!metadata.width || !metadata.height) continue;
-
-  const longEdge = Math.max(metadata.width, metadata.height);
-  if (longEdge >= minimumLongEdge) continue;
-
-  smallCount += 1;
-  const scale = Math.min(maximumScale, targetLongEdge / longEdge);
-  const width = Math.round(metadata.width * scale);
-  const height = Math.round(metadata.height * scale);
-  const label = relative(process.cwd(), file);
-
-  if (!shouldWrite) {
-    console.log(
-      `${label}: ${metadata.width}x${metadata.height} → ${width}x${height}`,
-    );
+  if (Math.max(metadata.width, metadata.height) >= recommendedLongEdge)
     continue;
-  }
 
-  const optimized = await sharp(source)
-    .resize({ width, height, fit: "fill", kernel: sharp.kernel.lanczos3 })
-    .sharpen({ sigma: 0.7, m1: 0.5, m2: 0.2 })
-    .webp({ quality: 90, alphaQuality: 100, smartSubsample: true })
-    .toBuffer();
-
-  await writeFile(file, optimized);
-  optimizedCount += 1;
+  lowResolutionCount += 1;
   console.log(
-    `${label}: ${metadata.width}x${metadata.height} → ${width}x${height}`,
+    `${relative(process.cwd(), file)}: ${metadata.width}x${metadata.height} — потрібен більший оригінал`,
   );
 }
 
-const totalBytes = files.reduce((sum, file) => sum + statSync(file).size, 0);
 console.log(
-  shouldWrite
-    ? `Оптимізовано ${optimizedCount} зображень. Загальний розмір: ${Math.round(totalBytes / 1024)} КБ.`
-    : smallCount > 0
-      ? `Знайдено ${smallCount} малих зображень із ${files.length}. Запустіть npm run images:optimize для обробки.`
-      : `Усі ${files.length} фото продуктів мають достатній розмір.`,
+  lowResolutionCount > 0
+    ? `${lowResolutionCount} із ${files.length} фото мають низьку роздільність. Скрипт їх не збільшує.`
+    : `Усі ${files.length} фото продуктів мають достатню роздільність.`,
 );

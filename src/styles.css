@@ -1118,13 +1118,14 @@ footer {
   flex-direction: column;
   gap: 20px;
   width: 100%;
-  height: clamp(460px, 43vw, 640px);
+  min-height: 460px;
   padding: 30px;
   color: var(--green);
 }
 .product-image img {
-  width: min(82%, 390px);
-  height: 100%;
+  width: auto;
+  height: auto;
+  max-width: min(82%, 390px);
   max-height: 560px;
   object-fit: contain;
 }
@@ -1822,11 +1823,12 @@ footer {
     grid-template-columns: 1fr;
   }
   .product-image {
-    height: clamp(330px, 92vw, 440px);
+    min-height: 330px;
     padding: 22px;
   }
   .product-image img {
-    width: min(78%, 330px);
+    max-width: min(78%, 330px);
+    max-height: 430px;
   }
   .product-learning-panel {
     padding: 24px;
