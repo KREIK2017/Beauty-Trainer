@@ -12,7 +12,7 @@ import sharp from "sharp";
 import { catalogSchema } from "../shared/schema";
 
 const imageRoot = join(process.cwd(), "public", "images");
-const recommendedLongEdge = 800;
+const recommendedLongEdge = 600;
 const recommendedShortEdge = 450;
 
 const catalog = catalogSchema.parse(

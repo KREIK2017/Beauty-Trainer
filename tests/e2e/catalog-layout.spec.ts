@@ -1,4 +1,5 @@
 import { test, expect } from "./fixtures";
+import type { Catalog } from "../../shared/schema";
 
 test("catalog artwork and readable copy never overlap", async ({ page }) => {
   for (const width of [1440, 390]) {
@@ -79,21 +80,62 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
 
 test("product thumbnails stay inside line cards for every source ratio", async ({
   page,
+  request,
 }) => {
-  await page.goto("/lines/anti-frizz");
-  await expect(page.locator(".product-card")).toHaveCount(3);
+  const catalog = (await (await request.get("/api/catalog")).json()) as Catalog;
+  const lines = [
+    catalog.lines.find((line) => line.id === "anti-frizz")!,
+    ...catalog.lines.filter((line) => line.brand_id === "milk-shake"),
+  ];
 
-  for (const thumb of await page.locator(".product-thumb").all()) {
-    const frame = await thumb.boundingBox();
-    const image = await thumb.locator("img").boundingBox();
-    expect(image).not.toBeNull();
-    expect(image!.x).toBeGreaterThanOrEqual(frame!.x);
-    expect(image!.y).toBeGreaterThanOrEqual(frame!.y);
-    expect(image!.x + image!.width).toBeLessThanOrEqual(
-      frame!.x + frame!.width,
+  for (const line of lines) {
+    const expectedProducts = catalog.products.filter(
+      (product) => product.line_id === line.id,
     );
-    expect(image!.y + image!.height).toBeLessThanOrEqual(
-      frame!.y + frame!.height,
+    await page.goto(`/lines/${line.id}`);
+    await expect(page.locator(".product-card")).toHaveCount(
+      expectedProducts.length,
     );
+    await expect(page.locator(".product-thumb img")).toHaveCount(
+      expectedProducts.length,
+    );
+
+    for (const thumb of await page.locator(".product-thumb").all()) {
+      const imageLocator = thumb.locator("img");
+      await expect(imageLocator).toHaveJSProperty("complete", true);
+      expect(
+        await imageLocator.evaluate(
+          (image: HTMLImageElement) => image.naturalWidth,
+        ),
+      ).toBeGreaterThan(0);
+      const frame = await thumb.boundingBox();
+      const image = await imageLocator.boundingBox();
+      expect(image).not.toBeNull();
+      expect(image!.x).toBeGreaterThanOrEqual(frame!.x);
+      expect(image!.y).toBeGreaterThanOrEqual(frame!.y);
+      expect(image!.x + image!.width).toBeLessThanOrEqual(
+        frame!.x + frame!.width,
+      );
+      expect(image!.y + image!.height).toBeLessThanOrEqual(
+        frame!.y + frame!.height,
+      );
+    }
   }
+
+  await page.goto("/lines/argan");
+  await expect(
+    page.getByRole("heading", { name: "Argan", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/milkshake-product-cards.png",
+    fullPage: true,
+  });
+  await page.goto("/products/argan-shampoo");
+  await expect(
+    page.getByRole("heading", { name: "Argan Shampoo", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/milkshake-product-detail.png",
+    fullPage: true,
+  });
 });

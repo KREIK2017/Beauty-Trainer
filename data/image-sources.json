@@ -363,6 +363,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "make-my-day",
       "page": "28.04.26_МШ нова з складом.pdf, page 2",
       "image": "X7.png, X9.png, X11.png",
@@ -371,6 +372,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "incredible",
       "page": "28.04.26_МШ нова з складом.pdf, page 3",
       "image": "X15.png, X17.png, X19.png",
@@ -379,6 +381,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "leave-in",
       "page": "28.04.26_МШ нова з складом.pdf, page 4",
       "image": "X15.png",
@@ -387,6 +390,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "color-care",
       "page": "28.04.26_МШ нова з складом.pdf, page 5",
       "image": "X15.png, X17.png, X19.png",
@@ -395,6 +399,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "flower-power",
       "page": "28.04.26_МШ нова з складом.pdf, page 6",
       "image": "X16.png, X18.png, X20.png, X22.png, X24.png",
@@ -403,6 +408,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "moisture-and-more",
       "page": "28.04.26_МШ нова з складом.pdf, page 7",
       "image": "X18.png, X20.png, X22.png, X24.png, X26.png",
@@ -411,6 +417,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "integrity-and-strength",
       "page": "28.04.26_МШ нова з складом.pdf, page 8",
       "image": "X17.png, X19.png, X21.png, X23.png",
@@ -419,6 +426,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "silver-shine",
       "page": "28.04.26_МШ нова з складом.pdf, page 9",
       "image": "X17.png, X19.png, X21.png, X23.png, X25.png",
@@ -427,6 +435,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "icy-blond",
       "page": "28.04.26_МШ нова з складом.pdf, page 10",
       "image": "X17.png, X19.png, X21.png",
@@ -435,6 +444,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "cold-brunette",
       "page": "28.04.26_МШ нова з складом.pdf, page 11",
       "image": "X15.png, X17.png, X20.png",
@@ -443,6 +453,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "pink-lemonade",
       "page": "28.04.26_МШ нова з складом.pdf, page 12",
       "image": "X15.png, X17.png",
@@ -451,6 +462,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "curl-passion",
       "page": "28.04.26_МШ нова з складом.pdf, page 13",
       "image": "X14.png, X16.png, X18.png, X20.png, X22.png",
@@ -459,6 +471,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "volume-solution",
       "page": "28.04.26_МШ нова з складом.pdf, page 15",
       "image": "X17.png, X19.png, X21.png",
@@ -467,6 +480,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "energizin-blend",
       "page": "28.04.26_МШ нова з складом.pdf, page 16",
       "image": "X17.png, X19.png, X21.png",
@@ -475,6 +489,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "purifying-blend",
       "page": "28.04.26_МШ нова з складом.pdf, page 17",
       "image": "X15.png",
@@ -483,6 +498,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "normalizing-blend",
       "page": "28.04.26_МШ нова з складом.pdf, page 18",
       "image": "X17.png",
@@ -491,6 +507,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "deep-detox",
       "page": "28.04.26_МШ нова з складом.pdf, page 19",
       "image": "X16.png",
@@ -499,6 +516,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "argan",
       "page": "28.04.26_МШ нова з складом.pdf, page 20",
       "image": "X16.png, X18.png, X20.png",
@@ -507,6 +525,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "no-frizz-allowed",
       "page": "28.04.26_МШ нова з складом.pdf, page 21",
       "image": "X18.png, X20.png, X22.png, X24.png",
@@ -515,6 +534,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "sun-and-more",
       "page": "28.04.26_МШ нова з складом.pdf, page 22",
       "image": "X17.png, X19.png, X21.png, X23.png",
@@ -523,6 +543,7 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "insta-light",
       "page": "28.04.26_МШ нова з складом.pdf, page 23",
       "image": "X19.png, X21.png, X23.png",
@@ -531,11 +552,678 @@
     },
     {
       "brand": "milk_shake",
+      "type": "line",
       "id": "lifestyling",
       "page": "28.04.26_МШ нова з складом.pdf, page 24",
       "image": "X16.png, X18.png, X20.png, X22.png",
       "width": 1200,
       "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "argan-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 20",
+      "image": "X16.png",
+      "width": 159,
+      "height": 692
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "argan-zasib-dlia-zhyvlennia-volossia",
+      "page": "28.04.26_МШ нова з складом.pdf, page 20",
+      "image": "X20.png",
+      "width": 232,
+      "height": 691
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "argan-oliia",
+      "page": "28.04.26_МШ нова з складом.pdf, page 20",
+      "image": "X18.png",
+      "width": 169,
+      "height": 531
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "cold-brunette-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 11",
+      "image": "X15.png",
+      "width": 202,
+      "height": 723
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "cold-brunette-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 11",
+      "image": "X17.png",
+      "width": 261,
+      "height": 705
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "cold-brunette-sprei",
+      "page": "28.04.26_МШ нова з складом.pdf, page 11",
+      "image": "X20.png",
+      "width": 173,
+      "height": 677
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "color-care-color-care-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 5",
+      "image": "X15.png",
+      "width": 134,
+      "height": 600
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "color-care-color-care-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 5",
+      "image": "X17.png",
+      "width": 146,
+      "height": 647
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "color-care-color-care-mask",
+      "page": "28.04.26_МШ нова з складом.pdf, page 5",
+      "image": "X19.png",
+      "width": 252,
+      "height": 590
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 13",
+      "image": "X20.png",
+      "width": 168,
+      "height": 720
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 13",
+      "image": "X14.png",
+      "width": 164,
+      "height": 707
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-mask",
+      "page": "28.04.26_МШ нова з складом.pdf, page 13",
+      "image": "X22.png",
+      "width": 252,
+      "height": 677
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-shaper",
+      "page": "28.04.26_МШ нова з складом.pdf, page 13",
+      "image": "X16.png",
+      "width": 230,
+      "height": 692
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-defining-gel",
+      "page": "28.04.26_МШ нова з складом.pdf, page 13",
+      "image": "X18.png",
+      "width": 185,
+      "height": 679
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-perfectionist",
+      "page": "28.04.26_МШ нова з складом.pdf, page 14",
+      "image": "X20.png",
+      "width": 278,
+      "height": 650
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-fluid",
+      "page": "28.04.26_МШ нова з складом.pdf, page 14",
+      "image": "X14.png",
+      "width": 223,
+      "height": 683
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-primer",
+      "page": "28.04.26_МШ нова з складом.pdf, page 14",
+      "image": "X18.png",
+      "width": 209,
+      "height": 747
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "curl-passion-leave-in",
+      "page": "28.04.26_МШ нова з складом.pdf, page 14",
+      "image": "X16.png",
+      "width": 154,
+      "height": 691
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "deep-detox-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 19",
+      "image": "X16.png",
+      "width": 174,
+      "height": 754
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "energizin-blend-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 16",
+      "image": "X17.png",
+      "width": 165,
+      "height": 723
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "energizin-blend-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 16",
+      "image": "X19.png",
+      "width": 165,
+      "height": 723
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "energizin-blend-sprei-dlia-koreniv",
+      "page": "28.04.26_МШ нова з складом.pdf, page 16",
+      "image": "X21.png",
+      "width": 223,
+      "height": 461
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "flower-power-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 6",
+      "image": "X20.png",
+      "width": 150,
+      "height": 619
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "flower-power-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 6",
+      "image": "X24.png",
+      "width": 142,
+      "height": 612
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "flower-power-leave-in-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 6",
+      "image": "X22.png",
+      "width": 147,
+      "height": 635
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "flower-power-incredible-milk-12-effects",
+      "page": "28.04.26_МШ нова з складом.pdf, page 6",
+      "image": "X16.png",
+      "width": 111,
+      "height": 535
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "flower-power-whipped-cream",
+      "page": "28.04.26_МШ нова з складом.pdf, page 6",
+      "image": "X18.png",
+      "width": 154,
+      "height": 777
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "icy-blond-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 10",
+      "image": "X17.png",
+      "width": 202,
+      "height": 722
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "icy-blond-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 10",
+      "image": "X19.png",
+      "width": 261,
+      "height": 705
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "icy-blond-sprei",
+      "page": "28.04.26_МШ нова з складом.pdf, page 10",
+      "image": "X21.png",
+      "width": 156,
+      "height": 599
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "incredible-incredible-milk-12-effects",
+      "page": "28.04.26_МШ нова з складом.pdf, page 3",
+      "image": "X15.png",
+      "width": 154,
+      "height": 751
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "incredible-syrovatka-skalp-koreni",
+      "page": "28.04.26_МШ нова з складом.pdf, page 3",
+      "image": "X17.png",
+      "width": 327,
+      "height": 673
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "incredible-incredible-oil",
+      "page": "28.04.26_МШ нова з складом.pdf, page 3",
+      "image": "X19.png",
+      "width": 156,
+      "height": 735
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "insta-light-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 23",
+      "image": "X19.png",
+      "width": 194,
+      "height": 480
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "insta-light-lotion",
+      "page": "28.04.26_МШ нова з складом.pdf, page 23",
+      "image": "X21.png",
+      "width": 241,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "insta-light-potion",
+      "page": "28.04.26_МШ нова з складом.pdf, page 23",
+      "image": "X23.png",
+      "width": 178,
+      "height": 764
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "integrity-and-strength-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 8",
+      "image": "X17.png",
+      "width": 179,
+      "height": 768
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "integrity-and-strength-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 8",
+      "image": "X19.png",
+      "width": 177,
+      "height": 757
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "integrity-and-strength-mask",
+      "page": "28.04.26_МШ нова з складом.pdf, page 8",
+      "image": "X21.png",
+      "width": 323,
+      "height": 755
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "integrity-and-strength-zasib-dlia-vidnovlennia-kinchykiv",
+      "page": "28.04.26_МШ нова з складом.pdf, page 8",
+      "image": "X16.jpg",
+      "width": 134,
+      "height": 430
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "integrity-and-strength-ampuly",
+      "page": "28.04.26_МШ нова з складом.pdf, page 8",
+      "image": "X23.png",
+      "width": 99,
+      "height": 454
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "leave-in-leave-in-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 4",
+      "image": "X15.png",
+      "width": 159,
+      "height": 733
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "lifestyling-thermo-protector",
+      "page": "28.04.26_МШ нова з складом.pdf, page 24",
+      "image": "X22.png",
+      "width": 163,
+      "height": 772
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "lifestyling-eco-strong-hairspray",
+      "page": "28.04.26_МШ нова з складом.pdf, page 24",
+      "image": "X18.png",
+      "width": 206,
+      "height": 772
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "lifestyling-shaping-foam",
+      "page": "28.04.26_МШ нова з складом.pdf, page 24",
+      "image": "X20.png",
+      "width": 152,
+      "height": 775
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "lifestyling-volumizing-foam",
+      "page": "28.04.26_МШ нова з складом.pdf, page 24",
+      "image": "X16.png",
+      "width": 159,
+      "height": 767
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "make-my-day-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 2",
+      "image": "X7.png",
+      "width": 181,
+      "height": 768
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "make-my-day-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 2",
+      "image": "X9.png",
+      "width": 285,
+      "height": 772
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "make-my-day-whipped-cream-leave-in",
+      "page": "28.04.26_МШ нова з складом.pdf, page 2",
+      "image": "X11.png",
+      "width": 157,
+      "height": 779
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "moisture-and-more-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 7",
+      "image": "X18.png",
+      "width": 174,
+      "height": 736
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "moisture-and-more-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 7",
+      "image": "X24.png",
+      "width": 267,
+      "height": 725
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "moisture-and-more-zvolozhuiucha-syrovatka",
+      "page": "28.04.26_МШ нова з складом.pdf, page 7",
+      "image": "X20.png",
+      "width": 184,
+      "height": 596
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "moisture-and-more-whipped-cream",
+      "page": "28.04.26_МШ нова з складом.pdf, page 7",
+      "image": "X26.png",
+      "width": 151,
+      "height": 769
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "moisture-and-more-losion",
+      "page": "28.04.26_МШ нова з складом.pdf, page 7",
+      "image": "X22.png",
+      "width": 203,
+      "height": 616
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "no-frizz-allowed-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 21",
+      "image": "X20.png",
+      "width": 176,
+      "height": 751
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "no-frizz-allowed-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 21",
+      "image": "X22.png",
+      "width": 179,
+      "height": 767
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "no-frizz-allowed-syrovatka",
+      "page": "28.04.26_МШ нова з складом.pdf, page 21",
+      "image": "X18.png",
+      "width": 200,
+      "height": 651
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "no-frizz-allowed-molochko",
+      "page": "28.04.26_МШ нова з складом.pdf, page 21",
+      "image": "X24.png",
+      "width": 182,
+      "height": 668
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "normalizing-blend-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 18",
+      "image": "X17.png",
+      "width": 166,
+      "height": 719
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "pink-lemonade-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 12",
+      "image": "X15.png",
+      "width": 175,
+      "height": 757
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "pink-lemonade-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 12",
+      "image": "X17.png",
+      "width": 270,
+      "height": 749
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "purifying-blend-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 17",
+      "image": "X15.png",
+      "width": 166,
+      "height": 711
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "silver-shine-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 9",
+      "image": "X25.png",
+      "width": 168,
+      "height": 722
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "silver-shine-light-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 9",
+      "image": "X19.png",
+      "width": 168,
+      "height": 722
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "silver-shine-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 9",
+      "image": "X23.png",
+      "width": 260,
+      "height": 705
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "silver-shine-pinka",
+      "page": "28.04.26_МШ нова з складом.pdf, page 9",
+      "image": "X21.png",
+      "width": 144,
+      "height": 762
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "silver-shine-sprei",
+      "page": "28.04.26_МШ нова з складом.pdf, page 9",
+      "image": "X17.png",
+      "width": 176,
+      "height": 682
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "sun-and-more-all-over-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 22",
+      "image": "X23.png",
+      "width": 195,
+      "height": 800
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "sun-and-more-intensive-mask",
+      "page": "28.04.26_МШ нова з складом.pdf, page 22",
+      "image": "X17.png",
+      "width": 299,
+      "height": 720
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "sun-and-more-leave-in-milk-12-effects",
+      "page": "28.04.26_МШ нова з складом.pdf, page 22",
+      "image": "X21.png",
+      "width": 264,
+      "height": 800
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "sun-and-more-after-sun-mousse",
+      "page": "28.04.26_МШ нова з складом.pdf, page 22",
+      "image": "X19.png",
+      "width": 188,
+      "height": 741
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "volume-solution-shampoo",
+      "page": "28.04.26_МШ нова з складом.pdf, page 15",
+      "image": "X17.png",
+      "width": 146,
+      "height": 642
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "volume-solution-conditioner",
+      "page": "28.04.26_МШ нова з складом.pdf, page 15",
+      "image": "X19.png",
+      "width": 146,
+      "height": 647
+    },
+    {
+      "brand": "milk_shake",
+      "type": "product",
+      "id": "volume-solution-sprei",
+      "page": "28.04.26_МШ нова з складом.pdf, page 15",
+      "image": "X21.png",
+      "width": 143,
+      "height": 703
     }
   ]
 }
