@@ -1,0 +1,541 @@
+{
+  "checked_on": "2026-09-27",
+  "sources": [
+    {
+      "brand": "Insight",
+      "id": "anti-frizz-zvolozhuiuchyi-shampun",
+      "page": "https://insightprofessional.it/en/product/hydrating-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2025/03/ET-IAF310-INSIGHT-ANTI-FRIZZ-SHAMPOO-IDRATANTE-350ml.png",
+      "width": 540,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "anti-frizz-zvolozhuiuchyi-kondytsioner",
+      "page": "https://insightprofessional.it/en/product/hydrating-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IAF311-INSIGHT-ANTI-FRIZZ-CONDIZIONANTE-CAPELLI-IDRATANTE-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "anti-frizz-zvolozhuiucha-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/hydrating-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IAF412-INSIGHT-ANTI-FRIZZ-MASCHERA-CAPELLI-IDRATANTE-75ml.png",
+      "width": 261,
+      "height": 926
+    },
+    {
+      "brand": "Insight",
+      "id": "antioxidant-antyoksydantnyi-shampun",
+      "page": "https://insightprofessional.it/en/product/antioxidant-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IAO310-INSIGHT-ANTIOXIDANT-SHAMPOO-ANTIOSSIDANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "antioxidant-antyoksydantnyi-kondytsioner",
+      "page": "https://insightprofessional.it/en/product/antioxidant-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IAO311-INSIGHT-ANTIOXIDANT-CONDIZIONANTE-CAPELLI-ANTIOSSIDANTE-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "antioxidant-antyoksydantna-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/antioxidant-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IAO412-INSIGHT-ANTIOXIDANT-MASCHERA-CAPELLI-ANTIOSSIDANTE-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "antioxidant-sprei-dlia-zakhystu-volossia",
+      "page": "https://insightprofessional.it/en/product/protective-hair-spray/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IAO511-INSIGHT-ANTIOXIDANT-SPRAY-PROTETTIVO-CAPELLI-100ml.png",
+      "width": 517,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "blonde-shampun-dlia-kholodnykh-vidtinkiv-blond-ta-siaiva",
+      "page": "https://insightprofessional.it/en/product/cold-reflections-brightening-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IBL310-INSIGHT-BLONDE-SHAMPOO-ILLUMINANTE-PER-RIFLESSI-FREDDI-350ml.png",
+      "width": 503,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "blonde-maska-dlia-volossia-shcho-pidsyliuie-kholodni-vidtinky-blond",
+      "page": "https://insightprofessional.it/en/product/cold-reflections-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IBL312-A-INSIGHT-BLONDE-MASCHERA-CAPELLI-PER-RIFLESSI-FREDDI-200ml.png",
+      "width": 422,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "clarifying-ochyshchuiuchyi-dohliad",
+      "page": "https://insightprofessional.it/en/product/purifying-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ICL310-INSIGHT-CLARIFYING-SHAMPOO-PURIFICANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "clarifying-ochyshchuiuchyi-shampun",
+      "page": "https://insightprofessional.it/en/product/purifying-scalp-treatment/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ICL510-INSIGHT-CLARIFYING-TRATTAMENTO-PURIFICANTE-100ml_0.png",
+      "width": 483,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "colored-hair-zakhysnyi-shampun",
+      "page": "https://insightprofessional.it/en/product/protective-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ICO310INSIGHT-COLORED-HAIR-SHAMPOO-PROTETTIVO-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "colored-hair-zakhysnyi-kondytsioner",
+      "page": "https://insightprofessional.it/en/product/protective-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ICO311-INSIGHT-COLORED-HAIR-CONDIZIONANTE-CAPELLI-PROTETTIVO-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "colored-hair-zakhysna-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/protective-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-ICO412-INSIGHT-COLORED-HAIR-MASCHERA-CAPELLI-PROTETTIVA-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "daily-use-enerhezuiuchyi-shampun",
+      "page": "https://insightprofessional.it/en/product/energizing-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDU310-INSIGHT-DAILY-USE-SHAMPOO-ENERGIZZANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "daily-use-sukhyi-shampun-dlia-ob-iemu",
+      "page": "https://insightprofessional.it/en/product/bodifying-dry-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDU314-INSIGHT-DAILY-USE-SHAMPOO-SECCO-RAVVIVANTE-40gr.png",
+      "width": 490,
+      "height": 896
+    },
+    {
+      "brand": "Insight",
+      "id": "daily-use-enerhetychnyi-kondytsioner-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/energizing-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDU421-INSIGHT-DAILY-USE-CONDIZIONANTE-CAPELLI-FONDENTE-ENERGIZZANTE-80ml.png",
+      "width": 617,
+      "height": 499
+    },
+    {
+      "brand": "Insight",
+      "id": "daily-use-nezmyvnyi-kondytsioner-dlia-rozplutuvannia-volossia",
+      "page": "https://insightprofessional.it/en/product/leave-in-hair-detangler/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDU313-INSIGHT-DAILY-USE-CONDIZIONANTE-CAPELLI-SENZA-RISCIACQUO-150ml.png",
+      "width": 500,
+      "height": 963
+    },
+    {
+      "brand": "Insight",
+      "id": "daily-use-enerhetychna-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/energizing-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IDU412-INSIGHT-DAILY-USE-MASCHERA-CAPELLI-ENERGIZZANTE-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "damaged-hair-vidnovliuvalnyi-shampun",
+      "page": "https://insightprofessional.it/en/product/restructurizing-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDA310-INSIGHT-DAMAGED-HAIR-SHAMPOO-RISTRUTTURANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "damaged-hair-vidnovliuvalnyi-kondytsioner",
+      "page": "https://insightprofessional.it/en/product/restructurizing-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDA311-INSIGHT-DAMAGED-HAIR-CONDIZIONANTE-CAPELLI-RISTRUTTURANTE-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "damaged-hair-vidnovliuvalna-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/restructurizing-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IDA412-INSIGHT-DAMAGED-HAIR-MASCHERA-CAPELLI-RISTRUTTURANTE-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "damaged-hair-vidnovliuvalnyi-sprei-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/restructurizing-hair-spray/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDA511-INSIGHT-DAMAGED-HAIR-SPRAY-RISTRUTTURANTE-100ml.png",
+      "width": 517,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "densifying-zmitsniuiuchyi-shampun",
+      "page": "https://insightprofessional.it/en/product/fortifying-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDE310-INSIGHT-DENSIFYING-SHAMPOO-FORTIFICANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "densifying-zmitsniuiuchyi-dohliad",
+      "page": "https://insightprofessional.it/en/product/fortifying-hair-treatment/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDE510-INSIGHT-DENSIFYING-TRATTAMENTO-FORTIFICANTE-100ml.png",
+      "width": 476,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "dry-hair-pozhyvnyi-shampun",
+      "page": "https://insightprofessional.it/en/product/nourishing-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDR310-INSIGHT-DRY-HAIR-SHAMPOO-NUTRIENTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "dry-hair-pozhyvnyi-kondytsioner",
+      "page": "https://insightprofessional.it/en/product/nourishing-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IDR311-INSIGHT-DRY-HAIR-CONDIZIONANTE-CAPELLI-NUTRIENTE-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "dry-hair-pozhyvna-maska-dlia-volossia",
+      "page": "https://insightprofessional.it/en/product/nourishing-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IDR412-INSIGHT-DRY-HAIR-MASCHERA-CAPELLI-NUTRIENTE-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-m-iakyi-ochyshchuiuchyi-shampun",
+      "page": "https://insightprofessional.it/en/product/pure-mild-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC420-INSIGHT-ELASTI-CURL-SHAMPOO-PURO-DELICATO-100ml.png",
+      "width": 617,
+      "height": 499
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-krem-dlia-pidkreslennia-kucheriv",
+      "page": "https://insightprofessional.it/en/product/curls-defining-hair-cream/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC488-INSIGHT-ELASTI-CURL-CREMA-DEFINIZIONE-CAPELLI-RICCI-250ml.png",
+      "width": 511,
+      "height": 999
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-oliia-dlia-pruzhnykh-kucheriv",
+      "page": "https://insightprofessional.it/en/product/bouncy-curls-hair-oil/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC489-INSIGHT-ELASTI-CURL-OLIO-ELASTICIZZANTE-CAPELLI-RICCI-50ml.png",
+      "width": 429,
+      "height": 926
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-nezmyvne-molochko-dlia-rozplutuvannia-volossia",
+      "page": "https://insightprofessional.it/en/product/leave-in-detangling-hair-milk/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC613-INSIGHT-ELASTI-CURL-LATTE-DISTRICANTE-CAPELLI-SENZA-RISCIACQUO-250ml.png",
+      "width": 509,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-lak-dlia-volossia-z-lehkoiu-fiksatsiieiu",
+      "page": "https://insightprofessional.it/en/product/light-hold-fixative-hair-spray/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC677-INSIGHT-ELASTI-CURL-SPRAY-FISSATIVO-CAPELLI-TENUTA-LEGGERA-150ml.png",
+      "width": 479,
+      "height": 961
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-oliia-syvorotka-dlia-siaiva-volossia",
+      "page": "https://insightprofessional.it/en/product/illuminating-hair-oil-serum/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IEC689-INSIGHT-ELASTI-CURL-OLIO-SIERO-ILLUMINANTE-CAPELLI-100ml.png",
+      "width": 459,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "elasti-curl-maska-dlia-rozplutuvannia-kocheriavoho-volossia",
+      "page": "https://insightprofessional.it/en/product/curly-hair-detangling-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IEC612-A-INSIGHT-ELASTI-CURL-MASCHERA-DISTRICANTE-CAPELLI-RICCI-200ml.png",
+      "width": 422,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "lenitive-dermo-zaspokiilyvyi-shampun",
+      "page": "https://insightprofessional.it/en/product/dermo-calming-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ILE310-INSIGHT-LENITIVE-SHAMPOO-DERMO-LENITIVO-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "lenitive-krem-dlia-komfortu-shkiry-holovy",
+      "page": "https://insightprofessional.it/en/product/scalp-comfort-cream/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-ILE510-INSIGHT-LENITIVE-CREMA-LENITIVA-CUOIO-CAPELLUTO-75ml.png",
+      "width": 262,
+      "height": 927
+    },
+    {
+      "brand": "Insight",
+      "id": "rebalancing-rebalansin-shampun",
+      "page": "https://insightprofessional.it/en/product/rebalancing-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IRE310-INSIGHT-REBALANCING-SHAMPOO-RIEQUILIBRANTE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "rebalancing-krem-eksfoliant-dlia-shkiry-holovy",
+      "page": "https://insightprofessional.it/en/product/scalp-exfoliating-cream/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/TU-IRE510-A-INSIGHT-REBALANCING-CREMA-ESFOLIANTE-CUOIO-CAPELLUTO-180ml.png",
+      "width": 489,
+      "height": 996
+    },
+    {
+      "brand": "Insight",
+      "id": "sensitive-shampun-dlia-chutlyvoi-shkiry-holovy",
+      "page": "https://insightprofessional.it/en/product/sensitive-scalp-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ISE310-INSIGHT-SENSITIVE-SHAMPOO-CUTE-SENSIBILE-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "sensitive-kondytsioner-dlia-chutlyvoi-shkiry-holovy",
+      "page": "https://insightprofessional.it/en/product/sensitive-scalp-hair-conditioner/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-ISE311_01-INSIGHT-SENSITIVE-CONDIZIONANTE-CUTE-SENSIBILE-350ml.png",
+      "width": 508,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "sensitive-maska-dlia-chutlyvoi-shkiry-holovy",
+      "page": "https://insightprofessional.it/en/product/sensitive-scalp-hair-mask/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/V2_TU-ISE312-INSIGHT-SENSITIVE-MASCHERA-CAPELLI-CUTE-SENSIBILE-200ml.png",
+      "width": 422,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "volumizing-volume-up-shampoo",
+      "page": "https://insightprofessional.it/en/product/volume-up-shampoo/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IVO310-INSIGHT-VOLUMIZING-SHAMPOO-SOSTEGNO-VOLUME-350ml.png",
+      "width": 535,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "volumizing-volume-up-root-lotion",
+      "page": "https://insightprofessional.it/en/product/volume-up-root-lotion/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IVO510-INSIGHT-VOLUMIZING-LOZIONE-VOLUMIZZANTE-RADICI-100ml.png",
+      "width": 493,
+      "height": 1000
+    },
+    {
+      "brand": "Insight",
+      "id": "volumizing-volume-up-hydrating-spray",
+      "page": "https://insightprofessional.it/en/product/volume-up-hydrating-hair-spray/",
+      "image": "https://insightprofessional.it/wp-content/uploads/2024/10/ET-IVO511-INSIGHT-VOLUMIZING-SPRAY-IDRATANTE-VOLUMIZZANTE-CAPELLI-100ml.png",
+      "width": 517,
+      "height": 1000
+    },
+    {
+      "brand": "milk_shake",
+      "id": "argan",
+      "page": "https://us.milkshakehair.com/products/milk_shake-argan-oil",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-argan-oil-50-ml.jpg?v=1713342369",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "cold-brunette",
+      "page": "https://us.milkshakehair.com/collections/cold-brunette",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/cold-brunette-collection-banner.jpg?v=1784130825",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "color-care",
+      "page": "https://us.milkshakehair.com/collections/colour-care",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/color-care-collection-banner.jpg?v=1784130794",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "curl-passion",
+      "page": "https://us.milkshakehair.com/collections/curl-passion",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/curl-passion-collection-banner.jpg?v=1784131470",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "deep-detox",
+      "page": "https://cdn.shopify.com/s/files/1/0607/5865/5194/files/milk-shake-deep-detox-shampoo-300-ml.jpg?v=1713331180",
+      "image": "https://cdn.shopify.com/s/files/1/0607/5865/5194/files/milk-shake-deep-detox-shampoo-300-ml.jpg?v=1713331180",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "energizin-blend",
+      "page": "https://us.milkshakehair.com/collections/scalp-care-collection",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/energizing-blend-collection-banner.jpg?v=1784131108",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "flower-power",
+      "page": "https://us.milkshakehair.com/products/colour-care-flower-shine-trio",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/color-care-flower-value-set.jpg?v=1787231328",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "icy-blond",
+      "page": "https://us.milkshakehair.com/collections/icy-blond",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/icy-blond-collection-banner.jpg?v=1789548628",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "incredible",
+      "page": "https://us.milkshakehair.com/products/milk-shake-incredible-milk",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-incredible-milk-150-ml_17ac9741-a4d7-4c60-bd1e-a953d0fd587c.jpg?v=1735399879",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "insta-light",
+      "page": "https://us.milkshakehair.com/products/milk_shake-insta-light-shampoo",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-insta-light-shampoo-300-ml.jpg?v=1713330683",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "integrity-and-strength",
+      "page": "https://us.milkshakehair.com/collections/integrity-strength",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/04-hair-routines-D_damaged_desktop_MG_5671.jpg?v=1784130911",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "leave-in",
+      "page": "https://us.milkshakehair.com/products/milk-shake-leave-in-conditioner",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-leave-in-conditioner-350-ml-new.jpg?v=1724218105",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "lifestyling",
+      "page": "https://us.milkshakehair.com/products/milk_shake-lifestyling-thermo-protector",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-lifestyling-thermo-protector-200-ml.jpg?v=1713350069",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "make-my-day",
+      "page": "https://us.milkshakehair.com/products/milk_shake-make-my-day-shampoo",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-make-my-day-shampoo-300-ml.jpg?v=1713290339",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "moisture-and-more",
+      "page": "https://us.milkshakehair.com/collections/dry-1",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/moisture-more-collection_a2850f89-8e72-4b07-be24-7b5ebc049a0b.jpg?v=1784182399",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "no-frizz-allowed",
+      "page": "https://us.milkshakehair.com/products/no-frizz-allowed-perfecting-shampoo-300ml",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-no-frizz-allowed-perfecting-shampoo-300-ml.jpg?v=1773386553",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "normalizing-blend",
+      "page": "https://us.milkshakehair.com/products/milk_shake-normalizing-blend-shampoo",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-normalizing-blend-shampoo-300-ml.jpg?v=1713205348",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "pink-lemonade",
+      "page": "https://www.z-oneconcept.com/en/milk-shake/pink-lemonade-summer-colour/",
+      "image": "https://www.z-oneconcept.com/wp-content/uploads/2023/06/pink-lemonade-hero-dk.jpg",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "purifying-blend",
+      "page": "https://us.milkshakehair.com/products/milk_shake-purifying-blend-shampoo",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-purifying-blend-shampoo-300-ml.jpg?v=1713205314",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "silver-shine",
+      "page": "https://us.milkshakehair.com/collections/silver-shine-collection",
+      "image": "http://us.milkshakehair.com/cdn/shop/collections/09-extras-F_silver-shine-family_desktop_MG_5619.jpg?v=1784130922",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "sun-and-more",
+      "page": "https://cdn.shopify.com/s/files/1/0912/9020/6474/files/IMG_5551_collection_sun_moreV2.jpg?v=1782979305",
+      "image": "https://cdn.shopify.com/s/files/1/0912/9020/6474/files/IMG_5551_collection_sun_moreV2.jpg?v=1782979305",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "milk_shake",
+      "id": "volume-solution",
+      "page": "https://us.milkshakehair.com/products/volume-solution-volumizing-shampoo",
+      "image": "http://us.milkshakehair.com/cdn/shop/files/milk-shake-volumizing-shampoo-300-ml.jpg?v=1737540087",
+      "width": 1200,
+      "height": 675
+    }
+  ]
+}

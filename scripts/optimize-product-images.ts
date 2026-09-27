@@ -13,6 +13,7 @@ import { catalogSchema } from "../shared/schema";
 
 const imageRoot = join(process.cwd(), "public", "images");
 const recommendedLongEdge = 800;
+const recommendedShortEdge = 450;
 
 const catalog = catalogSchema.parse(
   JSON.parse(
@@ -32,7 +33,12 @@ let lowResolutionCount = 0;
 for (const file of files) {
   const metadata = await sharp(file).metadata();
   if (!metadata.width || !metadata.height) continue;
-  if (Math.max(metadata.width, metadata.height) >= recommendedLongEdge)
+  // Tall packshots need height; wide or square packshots need enough pixels on
+  // their shorter side for the largest UI slot. Either condition is adequate.
+  if (
+    Math.max(metadata.width, metadata.height) >= recommendedLongEdge ||
+    Math.min(metadata.width, metadata.height) >= recommendedShortEdge
+  )
     continue;
 
   lowResolutionCount += 1;
