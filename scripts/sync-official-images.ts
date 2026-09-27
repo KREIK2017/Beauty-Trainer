@@ -4,7 +4,7 @@
  * Usage: npx tsx scripts/sync-official-images.ts --write
  * Without --write the script prints the planned updates without using network.
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import sharp from "sharp";
@@ -12,6 +12,7 @@ import sharp from "sharp";
 const insightBase = "https://insightprofessional.it/en/product";
 const milkBase = "https://us.milkshakehair.com";
 const write = process.argv.includes("--write");
+const insightOnly = process.argv.includes("--insight-only");
 
 const insightPages: Record<string, string> = {
   "anti-frizz-zvolozhuiuchyi-shampun": "hydrating-shampoo",
@@ -75,27 +76,27 @@ const insightPages: Record<string, string> = {
 
 const milkPages: Record<string, string> = {
   argan: `${milkBase}/products/milk_shake-argan-oil`,
-  "cold-brunette": `${milkBase}/collections/cold-brunette`,
-  "color-care": `${milkBase}/collections/colour-care`,
-  "curl-passion": `${milkBase}/collections/curl-passion`,
+  "cold-brunette": `${milkBase}/products/milk_shake-cold-brunette-shampoo`,
+  "color-care": `${milkBase}/products/colour-care-color-maintainer-shampoo`,
+  "curl-passion": `${milkBase}/products/milk_shake-curl-passion-shampoo-1`,
   "deep-detox":
     "https://cdn.shopify.com/s/files/1/0607/5865/5194/files/milk-shake-deep-detox-shampoo-300-ml.jpg?v=1713331180",
-  "energizin-blend": `${milkBase}/collections/scalp-care-collection`,
+  "energizin-blend": `${milkBase}/products/milk_shake-energizing-blend-shampoo`,
   "flower-power": `${milkBase}/products/colour-care-flower-shine-trio`,
-  "icy-blond": `${milkBase}/collections/icy-blond`,
+  "icy-blond": `${milkBase}/products/milk-shake-icy-blond-shampoo`,
   incredible: `${milkBase}/products/milk-shake-incredible-milk`,
   "insta-light": `${milkBase}/products/milk_shake-insta-light-shampoo`,
-  "integrity-and-strength": `${milkBase}/collections/integrity-strength`,
+  "integrity-and-strength": `${milkBase}/products/milk_shake-integrity-strength-nourishing-shampoo-300ml`,
   "leave-in": `${milkBase}/products/milk-shake-leave-in-conditioner`,
   lifestyling: `${milkBase}/products/milk_shake-lifestyling-thermo-protector`,
   "make-my-day": `${milkBase}/products/milk_shake-make-my-day-shampoo`,
-  "moisture-and-more": `${milkBase}/collections/dry-1`,
+  "moisture-and-more": `${milkBase}/products/milk-shake-moisture-more-shampoo`,
   "no-frizz-allowed": `${milkBase}/products/no-frizz-allowed-perfecting-shampoo-300ml`,
   "normalizing-blend": `${milkBase}/products/milk_shake-normalizing-blend-shampoo`,
   "pink-lemonade":
-    "https://www.z-oneconcept.com/en/milk-shake/pink-lemonade-summer-colour/",
+    "https://www.z-oneconcept.com/en/products/pink-lemonade-shampoo/",
   "purifying-blend": `${milkBase}/products/milk_shake-purifying-blend-shampoo`,
-  "silver-shine": `${milkBase}/collections/silver-shine-collection`,
+  "silver-shine": `${milkBase}/products/milk-shake-silver-shine-shampoo`,
   "sun-and-more":
     "https://cdn.shopify.com/s/files/1/0912/9020/6474/files/IMG_5551_collection_sun_moreV2.jpg?v=1782979305",
   "volume-solution": `${milkBase}/products/volume-solution-volumizing-shampoo`,
@@ -112,11 +113,12 @@ async function officialImage(pageUrl: string) {
   });
   if (!response.ok) throw new Error(`${pageUrl}: HTTP ${response.status}`);
   const html = await response.text();
-  const match = html.match(
-    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)/i,
-  );
-  if (!match) throw new Error(`${pageUrl}: og:image не знайдено`);
-  return decodeHtml(match[1]);
+  const imageMeta = html
+    .match(/<meta\b[^>]*>/gi)
+    ?.find((tag) => /(?:property|name)=["']og:image["']/i.test(tag));
+  const content = imageMeta?.match(/content=["']([^"']+)/i)?.[1];
+  if (!content) throw new Error(`${pageUrl}: og:image не знайдено`);
+  return decodeHtml(content);
 }
 
 async function download(url: string) {
@@ -167,33 +169,21 @@ async function writeInsight(id: string, pageUrl: string, imageUrl: string) {
 async function writeMilkLine(id: string, pageUrl: string, imageUrl: string) {
   const target = join("public", "images", "milk-shake", `${id}.webp`);
   const source = await download(imageUrl);
-  const metadata = await sharp(source).metadata();
-  const ratio = (metadata.width ?? 1) / (metadata.height ?? 1);
-  let prepared: Buffer;
-
-  if (ratio >= 1.35) {
-    prepared = await sharp(source)
-      .rotate()
-      .resize({ width: 1200, height: 675, fit: "cover", position: "centre" })
-      .webp({ quality: 92, smartSubsample: true })
-      .toBuffer();
-  } else {
-    const foreground = await sharp(source)
-      .rotate()
-      .resize({
-        width: 920,
-        height: 575,
-        fit: "inside",
-        withoutEnlargement: true,
-      })
-      .toBuffer();
-    prepared = await sharp({
-      create: { width: 1200, height: 675, channels: 3, background: "#f6f4ef" },
+  const foreground = await sharp(source)
+    .rotate()
+    .resize({
+      width: 1080,
+      height: 615,
+      fit: "inside",
+      withoutEnlargement: true,
     })
-      .composite([{ input: foreground, gravity: "centre" }])
-      .webp({ quality: 92, smartSubsample: true })
-      .toBuffer();
-  }
+    .toBuffer();
+  const prepared = await sharp({
+    create: { width: 1200, height: 675, channels: 3, background: "#ffffff" },
+  })
+    .composite([{ input: foreground, gravity: "centre" }])
+    .webp({ quality: 92, smartSubsample: true })
+    .toBuffer();
 
   mkdirSync(dirname(target), { recursive: true });
   await writeWithRetry(target, prepared);
@@ -201,7 +191,8 @@ async function writeMilkLine(id: string, pageUrl: string, imageUrl: string) {
 }
 
 const planned =
-  Object.keys(insightPages).length + Object.keys(milkPages).length;
+  Object.keys(insightPages).length +
+  (insightOnly ? 0 : Object.keys(milkPages).length);
 if (!write) {
   console.log(
     `Буде оновлено ${planned} зображень. Додайте --write для завантаження.`,
@@ -209,7 +200,14 @@ if (!write) {
   process.exit(0);
 }
 
-const sources: Array<Record<string, string | number>> = [];
+const manifestPath = join("data", "image-sources.json");
+const previousSources: Array<Record<string, string | number>> =
+  insightOnly && existsSync(manifestPath)
+    ? JSON.parse(readFileSync(manifestPath, "utf8")).sources
+    : [];
+const sources: Array<Record<string, string | number>> = previousSources.filter(
+  (source) => source.brand === "milk_shake",
+);
 for (const [id, slug] of Object.entries(insightPages)) {
   const pageUrl = `${insightBase}/${slug}/`;
   const imageUrl = await officialImage(pageUrl);
@@ -217,15 +215,17 @@ for (const [id, slug] of Object.entries(insightPages)) {
   sources.push({ brand: "Insight", ...result });
   console.log(`Insight: ${id} — ${result.width}x${result.height}`);
 }
-for (const [id, pageUrl] of Object.entries(milkPages)) {
-  const imageUrl = await officialImage(pageUrl);
-  const result = await writeMilkLine(id, pageUrl, imageUrl);
-  sources.push({ brand: "milk_shake", ...result });
-  console.log(`milk_shake: ${id} — ${result.width}x${result.height}`);
+if (!insightOnly) {
+  for (const [id, pageUrl] of Object.entries(milkPages)) {
+    const imageUrl = await officialImage(pageUrl);
+    const result = await writeMilkLine(id, pageUrl, imageUrl);
+    sources.push({ brand: "milk_shake", ...result });
+    console.log(`milk_shake: ${id} — ${result.width}x${result.height}`);
+  }
 }
 
 writeFileSync(
-  join("data", "image-sources.json"),
+  manifestPath,
   `${JSON.stringify({ checked_on: "2026-09-27", sources }, null, 2)}\n`,
 );
 console.log(`Оновлено ${sources.length} з ${planned} зображень.`);

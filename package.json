@@ -18,7 +18,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "images:audit": "tsx scripts/optimize-product-images.ts",
-    "images:sync": "tsx scripts/sync-official-images.ts --write",
+    "images:sync": "tsx scripts/sync-official-images.ts --write --insight-only",
+    "images:milkshake": "py -3 scripts/import-milkshake-pdf.py",
     "seed:generate": "tsx scripts/seed.ts"
   },
   "dependencies": {
