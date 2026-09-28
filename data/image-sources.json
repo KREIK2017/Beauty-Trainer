@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-09-27",
+  "checked_on": "2026-09-28",
   "sources": [
     {
       "brand": "Insight",
@@ -1224,6 +1224,114 @@
       "image": "X21.png",
       "width": 143,
       "height": 703
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-101-normalizing-daily-shampoo",
+      "page": "Depot_описание_продукции.pptx, slide 17",
+      "image": "depot-101-normalizing-daily-shampoo.png",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-102-anti-dandruff-sebum-control-shampoo",
+      "page": "Depot_описание_продукции.pptx, slide 18",
+      "image": "depot-102-anti-dandruff-sebum-control-shampoo.png",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-103-hydrating-shampoo",
+      "page": "Depot_описание_продукции.pptx, slide 19",
+      "image": "depot-103-hydrating-shampoo.png",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-104-silver-shampoo",
+      "page": "Depot_описание_продукции.pptx, slide 53",
+      "image": "depot-104-silver-shampoo.png",
+      "width": 611,
+      "height": 917
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-201-refreshing-conditioner",
+      "page": "Depot_описание_продукции.pptx, slide 23",
+      "image": "depot-201-refreshing-conditioner.png",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-202-complete-leave-in-conditioner",
+      "page": "Depot_описание_продукции.pptx, slide 24",
+      "image": "depot-202-complete-leave-in-conditioner.png",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-301-matt-paste",
+      "page": "Depot_описание_продукции.pptx, slide 28",
+      "image": "depot-301-matt-paste.png",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-302-clay-pomade",
+      "page": "Depot_описание_продукции.pptx, slide 29",
+      "image": "depot-302-clay-pomade.png",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-303-modelling-wax",
+      "page": "Depot_описание_продукции.pptx, slide 30",
+      "image": "depot-303-modelling-wax.png",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-304-hold-strong-gel",
+      "page": "Depot_описание_продукции.pptx, slide 31",
+      "image": "depot-304-hold-strong-gel.png",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-305-volumizer",
+      "page": "Depot_описание_продукции.pptx, slide 54",
+      "image": "depot-305-volumizer.png",
+      "width": 667,
+      "height": 1000
+    },
+    {
+      "brand": "DEPOT",
+      "type": "product",
+      "id": "depot-306-strong-hairspray",
+      "page": "Depot_описание_продукции.pptx, slide 55",
+      "image": "depot-306-strong-hairspray.png",
+      "width": 667,
+      "height": 1000
     }
   ]
 }

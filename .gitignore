@@ -6,3 +6,4 @@ dist/
 data/seed.sql
 playwright-report/
 test-results/
+deliverables/

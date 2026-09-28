@@ -6,6 +6,7 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/catalog");
     const sections = [
+      { name: "DEPOT", count: 3 },
       { name: "Insight", count: 14 },
       { name: "milk_shake", count: 22 },
     ].map(({ name, count }) => ({
@@ -24,6 +25,10 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
         const content = await card.locator(".line-content").boundingBox();
         expect(art!.y + art!.height).toBeLessThanOrEqual(content!.y + 1);
         const photoLocator = card.locator(".line-photo");
+        if ((await photoLocator.count()) === 0) {
+          await expect(card.locator(".line-art svg")).toBeVisible();
+          continue;
+        }
         await expect(photoLocator).toHaveJSProperty("complete", true);
         expect(
           await photoLocator.evaluate(
@@ -86,6 +91,7 @@ test("product thumbnails stay inside line cards for every source ratio", async (
   const lines = [
     catalog.lines.find((line) => line.id === "anti-frizz")!,
     ...catalog.lines.filter((line) => line.brand_id === "milk-shake"),
+    ...catalog.lines.filter((line) => line.brand_id === "depot"),
   ];
 
   for (const line of lines) {
