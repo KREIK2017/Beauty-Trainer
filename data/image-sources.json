@@ -1332,6 +1332,195 @@
       "image": "depot-306-strong-hairspray.png",
       "width": 667,
       "height": 1000
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "line",
+      "id": "hq-beauty-daily-care",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 21",
+      "image": "hq-beauty-daily-care.png",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-daily-care-shampoo",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 23",
+      "image": "hq-beauty-daily-care-shampoo.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-daily-care-conditioner",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 24",
+      "image": "hq-beauty-daily-care-conditioner.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-daily-care-mask",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 25",
+      "image": "hq-beauty-daily-care-mask.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "line",
+      "id": "hq-beauty-nourish-dry-and-brittle-hair",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 26",
+      "image": "hq-beauty-nourish-dry-and-brittle-hair.png",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-nourish-shampoo",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 28",
+      "image": "hq-beauty-nourish-shampoo.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-nourish-conditioner",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 29",
+      "image": "hq-beauty-nourish-conditioner.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-nourish-mask",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 30",
+      "image": "hq-beauty-nourish-mask.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-nourish-shine-solution",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 31",
+      "image": "hq-beauty-nourish-shine-solution.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "line",
+      "id": "hq-beauty-keep-hair-color",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 32",
+      "image": "hq-beauty-keep-hair-color.png",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-keep-hair-color-shampoo",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 34",
+      "image": "hq-beauty-keep-hair-color-shampoo.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-keep-hair-color-conditioner",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 35",
+      "image": "hq-beauty-keep-hair-color-conditioner.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-keep-hair-color-mask",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 36",
+      "image": "hq-beauty-keep-hair-color-mask.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-keep-hair-color-thermal-protector",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 37",
+      "image": "hq-beauty-keep-hair-color-thermal-protector.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "line",
+      "id": "hq-beauty-restore-damaged-hair",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 38",
+      "image": "hq-beauty-restore-damaged-hair.png",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-restore-damaged-hair-shampoo",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 40",
+      "image": "hq-beauty-restore-damaged-hair-shampoo.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-restore-damaged-hair-conditioner",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 41",
+      "image": "hq-beauty-restore-damaged-hair-conditioner.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-restore-damaged-hair-mask",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 42",
+      "image": "hq-beauty-restore-damaged-hair-mask.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "line",
+      "id": "hq-beauty-hair-loss-control",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 43",
+      "image": "hq-beauty-hair-loss-control.png",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-hair-loss-control-shampoo",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 46",
+      "image": "hq-beauty-hair-loss-control-shampoo.png",
+      "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "H.Q.Beauty",
+      "type": "product",
+      "id": "hq-beauty-hair-loss-control-strengthening-complex",
+      "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 47",
+      "image": "hq-beauty-hair-loss-control-strengthening-complex.png",
+      "width": 1400,
+      "height": 1400
     }
   ]
 }

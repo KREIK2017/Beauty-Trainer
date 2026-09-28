@@ -2,11 +2,13 @@ import { test, expect } from "./fixtures";
 import type { Catalog } from "../../shared/schema";
 
 test("catalog artwork and readable copy never overlap", async ({ page }) => {
+  test.setTimeout(120_000);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/catalog");
     const sections = [
       { name: "DEPOT", count: 3 },
+      { name: "H.Q.Beauty", count: 5 },
       { name: "Insight", count: 14 },
       { name: "milk_shake", count: 22 },
     ].map(({ name, count }) => ({
@@ -92,6 +94,7 @@ test("product thumbnails stay inside line cards for every source ratio", async (
     catalog.lines.find((line) => line.id === "anti-frizz")!,
     ...catalog.lines.filter((line) => line.brand_id === "milk-shake"),
     ...catalog.lines.filter((line) => line.brand_id === "depot"),
+    ...catalog.lines.filter((line) => line.brand_id === "hq-beauty"),
   ];
 
   for (const line of lines) {
