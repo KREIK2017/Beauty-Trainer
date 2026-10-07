@@ -2,6 +2,15 @@ import type { Catalog, Progress, EntityType } from "./schema";
 import { repeatsMeaningfully } from "./copy";
 export const SESSION_LIVES = 3;
 export type Difficulty = "normal" | "hard";
+export type TrainingMode = "all" | "weak" | "daily";
+export type FlashcardRating = "again" | "hard" | "good" | "easy";
+export type LearningStatus = "new" | "learning" | "review" | "mastered";
+export const LEARNING_STATUS_LABELS: Record<LearningStatus, string> = {
+  new: "Нове",
+  learning: "Вивчається",
+  review: "Час повторити",
+  mastered: "Засвоєно",
+};
 
 function productExplanation(
   product: Catalog["products"][number],
@@ -117,11 +126,53 @@ export function nextProgress(
     ).toISOString(),
   };
 }
+export function rateFlashcard(
+  previous: Progress | undefined,
+  rating: FlashcardRating,
+  now = new Date(),
+) {
+  const change = { again: -10, hard: 3, good: 10, easy: 15 }[rating];
+  const mastery = Math.max(
+    0,
+    Math.min(100, (previous?.mastery_score ?? 0) + change),
+  );
+  const delay =
+    rating === "again"
+      ? 10 * 60_000
+      : rating === "hard"
+        ? 24 * 60 * 60_000
+        : rating === "good"
+          ? (mastery <= 60 ? 3 : 7) * 24 * 60 * 60_000
+          : (mastery < 100 ? 14 : 30) * 24 * 60 * 60_000;
+  return {
+    correct_answers:
+      (previous?.correct_answers ?? 0) +
+      Number(rating === "good" || rating === "easy"),
+    incorrect_answers:
+      (previous?.incorrect_answers ?? 0) + Number(rating === "again"),
+    mastery_score: mastery,
+    last_reviewed_at: now.toISOString(),
+    next_review_at: new Date(now.getTime() + delay).toISOString(),
+  };
+}
 export function mastery(progress: Progress[], type: EntityType, id: string) {
   return (
     progress.find((p) => p.entity_type === type && p.entity_id === id)
       ?.mastery_score ?? 0
   );
+}
+export function learningStatus(
+  progress: Progress[],
+  type: EntityType,
+  id: string,
+  now = new Date(),
+): LearningStatus {
+  const saved = progress.find(
+    (item) => item.entity_type === type && item.entity_id === id,
+  );
+  if (!saved) return "new";
+  if (saved.next_review_at <= now.toISOString()) return "review";
+  return saved.mastery_score >= 80 ? "mastered" : "learning";
 }
 function hash(s: string) {
   let value = 2166136261;
@@ -134,7 +185,7 @@ function hash(s: string) {
 export function generateQuestions(
   c: Catalog,
   progress: Progress[],
-  mode = "all",
+  mode: TrainingMode = "all",
   seed = "daily",
   now = new Date(),
   lineId?: string,
@@ -477,7 +528,8 @@ export function generateQuestions(
   const typeCounts = new Map<string, number>();
   const entityCounts = new Map<string, number>();
   // Preserve review priority, then balance formats and topics within each tier.
-  while (eligible.length && selected.length < 10) {
+  const limit = mode === "daily" ? 7 : 10;
+  while (eligible.length && selected.length < limit) {
     eligible.sort(
       (a, b) =>
         ranks.get(a)! - ranks.get(b)! ||

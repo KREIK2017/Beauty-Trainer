@@ -11,6 +11,7 @@ import {
   generateQuestions,
   normalizeAnswer,
   formatAnswer,
+  rateFlashcard,
   SESSION_LIVES,
   type Question,
 } from "../shared/learning";
@@ -116,6 +117,44 @@ export default {
           ),
         });
       }
+      if (path === "/api/flashcards/rate" && request.method === "POST") {
+        const input = z
+          .object({
+            productId: productSchema.shape.id,
+            rating: z.enum(["again", "hard", "good", "easy"]),
+          })
+          .parse(await body(request));
+        const { catalog } = await learningCatalog(env.DB, user);
+        if (!catalog.products.some((product) => product.id === input.productId))
+          return json(
+            { error: "Продукт не знайдено або він недоступний." },
+            404,
+          );
+        const previous = await env.DB.prepare(
+          "SELECT entity_type,entity_id,correct_answers,incorrect_answers,mastery_score,last_reviewed_at,next_review_at FROM user_progress WHERE user_id=? AND entity_type='product' AND entity_id=?",
+        )
+          .bind(userId, input.productId)
+          .first<Progress>();
+        const next = rateFlashcard(previous ?? undefined, input.rating);
+        await env.DB.prepare(
+          "INSERT INTO user_progress (user_id,entity_type,entity_id,correct_answers,incorrect_answers,mastery_score,last_reviewed_at,next_review_at) VALUES (?,'product',?,?,?,?,?,?) ON CONFLICT(user_id,entity_type,entity_id) DO UPDATE SET correct_answers=excluded.correct_answers,incorrect_answers=excluded.incorrect_answers,mastery_score=excluded.mastery_score,last_reviewed_at=excluded.last_reviewed_at,next_review_at=excluded.next_review_at",
+        )
+          .bind(
+            userId,
+            input.productId,
+            next.correct_answers,
+            next.incorrect_answers,
+            next.mastery_score,
+            next.last_reviewed_at,
+            next.next_review_at,
+          )
+          .run();
+        return json({
+          entity_type: "product",
+          entity_id: input.productId,
+          ...next,
+        });
+      }
       if (path === "/api/import" && request.method === "POST") {
         const incoming = catalogSchema.parse(await body(request));
         const current = await getCatalog(env.DB);
@@ -207,7 +246,7 @@ export default {
       if (path === "/api/sessions" && request.method === "POST") {
         const input = z
           .object({
-            mode: z.enum(["all", "weak"]).default("all"),
+            mode: z.enum(["all", "weak", "daily"]).default("all"),
             difficulty: z.enum(["normal", "hard"]).default("normal"),
             lineId: lineSchema.shape.id.optional(),
           })

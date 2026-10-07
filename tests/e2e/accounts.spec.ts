@@ -200,6 +200,8 @@ test("brand selection keeps line folders and narrows the line filter", async ({
   page,
 }) => {
   await page.goto("/catalog");
+  await expect(page.locator(".brand-section").first()).toBeVisible();
+  const brandCount = await page.locator(".brand-section").count();
   await page
     .getByRole("combobox", { name: "Бренд", exact: true })
     .selectOption({ label: "milk_shake" });
@@ -225,5 +227,5 @@ test("brand selection keeps line folders and narrows the line filter", async ({
       .filter({ hasText: /^Argan$/ }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Скинути фільтри" }).click();
-  await expect(page.locator(".brand-section")).toHaveCount(2);
+  await expect(page.locator(".brand-section")).toHaveCount(brandCount);
 });

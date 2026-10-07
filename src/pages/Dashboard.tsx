@@ -13,13 +13,14 @@ import {
 } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { LineCard, PageHeading, ProgressBar } from "../components/ui";
-import { mastery } from "../../shared/learning";
+import { learningStatus, mastery } from "../../shared/learning";
 import { counted } from "../../shared/uk";
 export default function Dashboard() {
   const { catalog, stats } = useData();
   const due = stats.progress.filter(
     (p) =>
-      p.entity_type !== "brand" && p.next_review_at <= new Date().toISOString(),
+      p.entity_type === "product" &&
+      p.next_review_at <= new Date().toISOString(),
   ).length;
   const weak = stats.progress
     .filter((p) => p.mastery_score < 60 && p.entity_type !== "brand")
@@ -31,6 +32,17 @@ export default function Dashboard() {
   const today = stats.history.filter(
     (h) => h.created_at.slice(0, 10) === new Date().toISOString().slice(0, 10),
   ).length;
+  const statusPriority = { review: 0, learning: 1, new: 2, mastered: 3 };
+  const suggestedLines = [...catalog.lines]
+    .sort(
+      (a, b) =>
+        statusPriority[learningStatus(stats.progress, "line", a.id)] -
+          statusPriority[learningStatus(stats.progress, "line", b.id)] ||
+        mastery(stats.progress, "line", a.id) -
+          mastery(stats.progress, "line", b.id),
+    )
+    .slice(0, 3);
+  const dailyGoal = 7;
   return (
     <>
       <PageHeading
@@ -64,11 +76,11 @@ export default function Dashboard() {
             Наступне тренування чекає на вас.
           </p>
           <div className="hero-buttons">
-            <Link className="button light-button" to="/training">
-              Почати тренування <ArrowRight size={17} />
+            <Link className="button light-button" to="/training?mode=daily">
+              Тренування на сьогодні <ArrowRight size={17} />
             </Link>
             <span>
-              <Clock3 size={15} /> 10 запитань · близько 5 хв
+              <Clock3 size={15} /> до 7 запитань · 3–5 хв
             </span>
           </div>
         </div>
@@ -159,7 +171,7 @@ export default function Dashboard() {
             </Link>
           </div>
           <div className="line-grid">
-            {catalog.lines.slice(0, 3).map((l, i) => (
+            {suggestedLines.map((l, i) => (
               <LineCard key={l.id} line={l} index={i} />
             ))}
           </div>
@@ -199,8 +211,8 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <Link className="button primary full" to="/training">
-            {due ? "Повторити зараз" : "Почати навчання"}
+          <Link className="button primary full" to="/training?mode=daily">
+            {due ? "Почати повторення" : "Вивчити нове"}
             <ArrowRight size={16} />
           </Link>
           <div className="panel-divider" />
@@ -248,10 +260,16 @@ export default function Dashboard() {
             </span>
           </div>
           <div className="row small">
-            <span>{Math.min(today, 10)} відповідей із 10</span>
-            <strong>{Math.min(today * 10, 100)}%</strong>
+            <span>
+              {Math.min(today, dailyGoal)} відповідей із {dailyGoal}
+            </span>
+            <strong>
+              {Math.min(Math.round((today / dailyGoal) * 100), 100)}%
+            </strong>
           </div>
-          <ProgressBar value={Math.min(today * 10, 100)} />
+          <ProgressBar
+            value={Math.min(Math.round((today / dailyGoal) * 100), 100)}
+          />
           <p>Кілька хвилин уваги сьогодні — відчутний результат завтра.</p>
         </div>
         <div className="library-overview">

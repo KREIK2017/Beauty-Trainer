@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, Tags } from "../components/ui";
 import type { Line, Product } from "../../shared/schema";
+import type { FlashcardRating } from "../../shared/learning";
+import { api } from "../services/api";
 
 export default function Flashcards() {
   const { id } = useParams();
@@ -19,23 +21,48 @@ export default function Flashcards() {
 }
 
 function Deck({ line, products }: { line: Line; products: Product[] }) {
+  const { refresh } = useData();
   const [queue, setQueue] = useState(products.map((p) => p.id));
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [repeat, setRepeat] = useState<string[]>([]);
+  const [ratings, setRatings] = useState<Record<FlashcardRating, number>>({
+    again: 0,
+    hard: 0,
+    good: 0,
+    easy: 0,
+  });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const product = products.find((p) => p.id === queue[index]);
   const finished = index >= queue.length;
   function restart(ids: string[]) {
     setQueue(ids);
     setIndex(0);
     setRepeat([]);
+    setRatings({ again: 0, hard: 0, good: 0, easy: 0 });
     setRevealed(false);
   }
-  function rate(remembered: boolean) {
-    if (!revealed || !product) return;
-    if (!remembered) setRepeat((ids) => [...ids, product.id]);
-    setIndex((value) => value + 1);
-    setRevealed(false);
+  async function rate(rating: FlashcardRating) {
+    if (!revealed || !product || busy) return;
+    setBusy(true);
+    setError("");
+    try {
+      await api("/flashcards/rate", {
+        method: "POST",
+        body: JSON.stringify({ productId: product.id, rating }),
+      });
+      if (rating === "again" || rating === "hard")
+        setRepeat((ids) => [...ids, product.id]);
+      setRatings((values) => ({ ...values, [rating]: values[rating] + 1 }));
+      setIndex((value) => value + 1);
+      setRevealed(false);
+      await refresh();
+    } catch (cause) {
+      setError((cause as Error).message);
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <>
@@ -56,8 +83,8 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
         >
           <h2>Коло завершено</h2>
           <p>
-            Пам’ятаю: {queue.length - repeat.length} · Ще повторити:{" "}
-            {repeat.length}
+            Не пам’ятаю: {ratings.again} · Важко: {ratings.hard} · Знаю:{" "}
+            {ratings.good} · Легко: {ratings.easy}
           </p>
           <div className="actions">
             {repeat.length > 0 && (
@@ -120,14 +147,39 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
               <div className="actions">
                 <button
                   className="button secondary"
-                  onClick={() => rate(false)}
+                  disabled={busy}
+                  onClick={() => void rate("again")}
                 >
-                  Ще повторити
+                  Не пам’ятаю
                 </button>
-                <button className="button primary" onClick={() => rate(true)}>
-                  Пам’ятаю
+                <button
+                  className="button secondary"
+                  disabled={busy}
+                  onClick={() => void rate("hard")}
+                >
+                  Важко
+                </button>
+                <button
+                  className="button primary"
+                  disabled={busy}
+                  onClick={() => void rate("good")}
+                >
+                  Знаю
+                </button>
+                <button
+                  className="button primary"
+                  disabled={busy}
+                  onClick={() => void rate("easy")}
+                >
+                  Легко
                 </button>
               </div>
+              {busy && <p role="status">Зберігаємо оцінку…</p>}
+              {error && (
+                <p className="error" role="alert">
+                  {error}
+                </p>
+              )}
             </>
           )}
         </section>
@@ -137,8 +189,8 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
         </Empty>
       )}
       <p className="quiz-note">
-        Позначки діють у цьому перегляді карток. XP та прогрес засвоєння
-        оновлюються після відповідей у тесті.
+        Оцінка визначає, коли картка з’явиться для повторення. XP нараховується
+        лише за перевірені відповіді у тестах.
       </p>
     </>
   );

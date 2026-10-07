@@ -11,26 +11,28 @@ test("cards hide answers, repeat difficult products and lead to the line test", 
     page.getByRole("region", { name: "Відповідь", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("button", { name: "Пам’ятаю", exact: true }),
+    page.getByRole("button", { name: "Знаю", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Відкрити відповідь" }).click();
   await expect(
     page.getByRole("region", { name: "Відповідь", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Ще повторити", exact: true }).click();
+  await page.getByRole("button", { name: "Не пам’ятаю", exact: true }).click();
   for (let i = 0; i < 3; i++) {
     await expect(
       page.getByRole("region", { name: "Відповідь", exact: true }),
     ).toHaveCount(0);
     await page.getByRole("button", { name: "Відкрити відповідь" }).click();
-    await page.getByRole("button", { name: "Пам’ятаю", exact: true }).click();
+    await page.getByRole("button", { name: "Знаю", exact: true }).click();
   }
-  await expect(page.getByText("Пам’ятаю: 3 · Ще повторити: 1")).toBeVisible();
+  await expect(
+    page.getByText("Не пам’ятаю: 1 · Важко: 0 · Знаю: 3 · Легко: 0"),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Повторити складні картки" }).click();
   await expect(card.getByRole("heading", { level: 2 })).toHaveText(firstName);
   await expect(page.getByText("Картка 1 із 1")).toBeVisible();
   await page.getByRole("button", { name: "Відкрити відповідь" }).click();
-  await page.getByRole("button", { name: "Пам’ятаю", exact: true }).click();
+  await page.getByRole("button", { name: "Знаю", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Повторити складні картки" }),
   ).toHaveCount(0);

@@ -13,6 +13,7 @@ import {
   SESSION_LIVES,
   type PublicQuestion,
   type Difficulty,
+  type TrainingMode,
 } from "../../shared/learning";
 import { QuestionChoices } from "../components/QuestionChoices";
 import { api, ApiError } from "../services/api";
@@ -35,6 +36,13 @@ export default function Training() {
   const { catalog, refresh } = useData();
   const lineId = params.get("line");
   const line = catalog.lines.find((l) => l.id === lineId);
+  const mode: TrainingMode = line
+    ? "all"
+    : params.get("mode") === "weak"
+      ? "weak"
+      : params.get("mode") === "daily"
+        ? "daily"
+        : "all";
   const [session, setSession] = useState<Session>();
   const [difficulty, setDifficulty] = useState<Difficulty>("normal");
   const [index, setIndex] = useState(0);
@@ -55,7 +63,7 @@ export default function Training() {
       const s = await api<Session>("/sessions", {
         method: "POST",
         body: JSON.stringify({
-          mode: params.get("mode") === "weak" ? "weak" : "all",
+          mode,
           lineId: lineId ?? undefined,
           difficulty,
         }),
@@ -146,9 +154,11 @@ export default function Training() {
         title={
           line
             ? `Тест лінійки ${line.name}`
-            : params.get("mode") === "weak"
+            : mode === "weak"
               ? "Приділіть увагу слабким темам."
-              : "Кожне тренування — крок уперед."
+              : mode === "daily"
+                ? "Ваше тренування на сьогодні"
+                : "Кожне тренування — крок уперед."
         }
         description="Спочатку пригадайте. Прочитайте пояснення. Закріпіть знання."
       />
@@ -162,14 +172,22 @@ export default function Training() {
           <span className="intro-icon">
             <Brain size={44} strokeWidth={1.3} />
           </span>
-          <span className="eyebrow">ВАШЕ ПЕРСОНАЛЬНЕ ТРЕНУВАННЯ</span>
-          <h2>Від «здається» до «я знаю».</h2>
+          <span className="eyebrow">
+            {mode === "daily"
+              ? "ПЕРСОНАЛЬНИЙ ПЛАН НА СЬОГОДНІ"
+              : "ВАШЕ ПЕРСОНАЛЬНЕ ТРЕНУВАННЯ"}
+          </span>
+          <h2>
+            {mode === "daily"
+              ? "Повторіть важливе й вивчіть нове."
+              : "Від «здається» до «я знаю»."}
+          </h2>
           <p>
             Пригадуйте властивості продуктів, визначайте потреби волосся та
             давайте рекомендації клієнтам. Спочатку — повторення і слабкі теми.
           </p>
           <div className="session-facts">
-            <span>До 10 запитань</span>
+            <span>{mode === "daily" ? "До 7 запитань" : "До 10 запитань"}</span>
             <span>
               {line
                 ? "Різні формати · лише обрана лінійка"
@@ -234,7 +252,7 @@ export default function Training() {
       ) : !session.questions.length ? (
         <Empty title="Поки немає запитань">
           <p>
-            {params.get("mode") === "weak"
+            {mode === "weak"
               ? "Спершу пройдіть звичайне тренування, щоб визначити теми для повторення."
               : "Додайте більше різних продуктів і лінійок, щоб сформувати варіанти відповідей."}
           </p>
@@ -246,12 +264,10 @@ export default function Training() {
           </button>
           <Link
             className="button primary"
-            to={params.get("mode") === "weak" ? "/training" : "/admin"}
+            to={mode === "weak" ? "/training" : "/admin"}
             onClick={() => setSession(undefined)}
           >
-            {params.get("mode") === "weak"
-              ? "Звичайне тренування"
-              : "Керування продуктами"}
+            {mode === "weak" ? "Звичайне тренування" : "Керування продуктами"}
           </Link>
         </Empty>
       ) : finished ? (
@@ -263,7 +279,8 @@ export default function Training() {
           )}
           <span className="eyebrow">ТРЕНУВАННЯ ЗАВЕРШЕНО</span>
           <p>
-            {difficulty === "normal" ? "Звичайний режим" : "Складний режим"}
+            {mode === "daily" ? "План на сьогодні · " : ""}
+            {difficulty === "normal" ? "звичайний режим" : "складний режим"}
           </p>
           <h2>
             {lives > 0
@@ -372,7 +389,11 @@ export default function Training() {
         <div className="quiz-shell">
           <div className="row small">
             <span>
-              {difficulty === "normal" ? "ЗВИЧАЙНИЙ РЕЖИМ" : "СКЛАДНИЙ РЕЖИМ"}
+              {mode === "daily"
+                ? "ПЛАН НА СЬОГОДНІ"
+                : difficulty === "normal"
+                  ? "ЗВИЧАЙНИЙ РЕЖИМ"
+                  : "СКЛАДНИЙ РЕЖИМ"}
             </span>
             <div className="quiz-counters">
               <strong>

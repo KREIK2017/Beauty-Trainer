@@ -10,7 +10,12 @@ import {
   ProgressBar,
   Tags,
 } from "../components/ui";
-import { mastery } from "../../shared/learning";
+import {
+  LEARNING_STATUS_LABELS,
+  learningStatus,
+  mastery,
+  type LearningStatus,
+} from "../../shared/learning";
 import { counted } from "../../shared/uk";
 import { repeatsMeaningfully } from "../../shared/copy";
 const filterLabels: Record<string, string> = {
@@ -22,7 +27,7 @@ const filterLabels: Record<string, string> = {
   benefit: "Перевага",
 };
 export function CatalogPage() {
-  const { catalog } = useData();
+  const { catalog, stats } = useData();
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const options: Record<string, string[]> = {
@@ -59,6 +64,16 @@ export function CatalogPage() {
   const showProducts =
     !!search.trim() ||
     Object.entries(filters).some(([key, value]) => key !== "brand" && !!value);
+  const brandStatus = (brandId: string): LearningStatus => {
+    const statuses = catalog.lines
+      .filter((line) => line.brand_id === brandId)
+      .map((line) => learningStatus(stats.progress, "line", line.id));
+    if (statuses.some((status) => status === "review")) return "review";
+    if (statuses.length && statuses.every((status) => status === "mastered"))
+      return "mastered";
+    if (statuses.some((status) => status !== "new")) return "learning";
+    return "new";
+  };
   return (
     <>
       <PageHeading
@@ -127,50 +142,58 @@ export function CatalogPage() {
       ) : (
         catalog.brands
           .filter((b) => !filters.brand || b.name === filters.brand)
-          .map((b) => (
-            <section className="brand-section" key={b.id}>
-              <div className="section-heading">
-                <div>
-                  <h2 className="brand-title">{b.name}</h2>
-                  <p>
-                    {counted(
-                      catalog.lines.filter((l) => l.brand_id === b.id).length,
-                      ["лінійка", "лінійки", "лінійок"],
-                    )}{" "}
-                    ·{" "}
-                    {counted(
-                      catalog.products.filter((p) => p.brand_id === b.id)
-                        .length,
-                      ["продукт", "продукти", "продуктів"],
-                    )}
-                  </p>
-                </div>
-              </div>
-              <div className="catalog-lines">
-                {catalog.lines
-                  .filter((l) => l.brand_id === b.id)
-                  .map((l, i) => (
-                    <div key={l.id}>
-                      <LineCard line={l} index={i} />
-                      <div className="nested-products">
-                        {catalog.products
-                          .filter((p) => p.line_id === l.id)
-                          .map((p) => (
-                            <Link key={p.id} to={`/products/${p.id}`}>
-                              <span>
-                                {p.name.startsWith(`${l.name} `)
-                                  ? p.name.slice(l.name.length + 1)
-                                  : p.name}
-                              </span>
-                              <ArrowRight size={13} />
-                            </Link>
-                          ))}
-                      </div>
+          .map((b) => {
+            const status = brandStatus(b.id);
+            return (
+              <section className="brand-section" key={b.id}>
+                <div className="section-heading">
+                  <div>
+                    <div className="brand-heading-row">
+                      <h2 className="brand-title">{b.name}</h2>
+                      <span className={`learning-status status-${status}`}>
+                        {LEARNING_STATUS_LABELS[status]}
+                      </span>
                     </div>
-                  ))}
-              </div>
-            </section>
-          ))
+                    <p>
+                      {counted(
+                        catalog.lines.filter((l) => l.brand_id === b.id).length,
+                        ["лінійка", "лінійки", "лінійок"],
+                      )}{" "}
+                      ·{" "}
+                      {counted(
+                        catalog.products.filter((p) => p.brand_id === b.id)
+                          .length,
+                        ["продукт", "продукти", "продуктів"],
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="catalog-lines">
+                  {catalog.lines
+                    .filter((l) => l.brand_id === b.id)
+                    .map((l, i) => (
+                      <div key={l.id}>
+                        <LineCard line={l} index={i} />
+                        <div className="nested-products">
+                          {catalog.products
+                            .filter((p) => p.line_id === l.id)
+                            .map((p) => (
+                              <Link key={p.id} to={`/products/${p.id}`}>
+                                <span>
+                                  {p.name.startsWith(`${l.name} `)
+                                    ? p.name.slice(l.name.length + 1)
+                                    : p.name}
+                                </span>
+                                <ArrowRight size={13} />
+                              </Link>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </section>
+            );
+          })
       )}
       {!catalog.brands.length && (
         <Empty title="Додайте знання до своєї бібліотеки">

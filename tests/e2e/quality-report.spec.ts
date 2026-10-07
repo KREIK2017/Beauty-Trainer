@@ -25,22 +25,29 @@ test("owner reviews catalog gaps, filters them and opens product editing", async
     "https://alpenstore.com.ua/milk_shake",
   );
 
-  await page.getByLabel("Тип проблеми").selectOption("missing-image");
+  const issue = (
+    [
+      "missing-image",
+      "missing-usage",
+      "short-description",
+      "duplicate-description",
+      "repeated-purpose",
+      "repeated-benefit",
+    ] as const
+  ).find((value) => report.products.some((row) => row.issues.includes(value)))!;
+  const matching = report.products.filter((row) => row.issues.includes(issue));
+  await page.getByLabel("Тип проблеми").selectOption(issue);
   const productPanel = page
     .locator(".detail-panel")
     .filter({ has: page.getByRole("heading", { name: "Проблеми продуктів" }) });
   await expect(
-    productPanel.getByText(
-      `Знайдено продуктів: ${report.summary.missingImage}`,
-    ),
+    productPanel.getByText(`Знайдено продуктів: ${matching.length}`),
   ).toBeVisible();
-  const first = report.products.find((row) =>
-    row.issues.includes("missing-image"),
-  )!;
+  const first = matching[0];
   await expect(
     productPanel
       .locator(".quality-badges")
-      .getByText(productIssueLabels["missing-image"], { exact: true })
+      .getByText(productIssueLabels[issue], { exact: true })
       .first(),
   ).toBeVisible();
   const source = productPanel

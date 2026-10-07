@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import { catalogSchema, type Progress } from "../shared/schema";
 import {
   generateQuestions,
+  learningStatus,
   nextProgress,
+  rateFlashcard,
   normalizeAnswer,
   formatAnswer,
   type PublicQuestion,
@@ -124,6 +126,11 @@ describe("question generation", () => {
       expect(q.options.length).toBeGreaterThan(1);
     }
   });
+  it("builds a shorter personalized daily session", () => {
+    const questions = generateQuestions(catalog, [], "daily", "today");
+    expect(questions).toHaveLength(7);
+    expect(new Set(questions.map((q) => q.id)).size).toBe(7);
+  });
   it("can generate all thirteen formats without ingredient questions", () => {
     const types = new Set<string>();
     for (const difficulty of ["normal", "hard"] as const) {
@@ -215,5 +222,79 @@ describe("spaced repetition", () => {
     expect(nextProgress(p, true, now).next_review_at).toBe(
       "2026-10-14T12:00:00.000Z",
     );
+  });
+  it("uses confidence ratings to schedule flashcards", () => {
+    expect(rateFlashcard(undefined, "again", now)).toMatchObject({
+      mastery_score: 0,
+      incorrect_answers: 1,
+      next_review_at: "2026-09-14T12:10:00.000Z",
+    });
+    expect(rateFlashcard(undefined, "hard", now)).toMatchObject({
+      mastery_score: 3,
+      correct_answers: 0,
+      next_review_at: "2026-09-15T12:00:00.000Z",
+    });
+    expect(rateFlashcard(undefined, "good", now)).toMatchObject({
+      mastery_score: 10,
+      correct_answers: 1,
+      next_review_at: "2026-09-17T12:00:00.000Z",
+    });
+    expect(rateFlashcard(undefined, "easy", now)).toMatchObject({
+      mastery_score: 15,
+      correct_answers: 1,
+      next_review_at: "2026-09-28T12:00:00.000Z",
+    });
+  });
+  it("shows a clear learning status for each topic", () => {
+    const base = {
+      entity_type: "line" as const,
+      entity_id: "line",
+      correct_answers: 1,
+      incorrect_answers: 0,
+      last_reviewed_at: "2026-09-10T12:00:00.000Z",
+    };
+    expect(learningStatus([], "line", "line", now)).toBe("new");
+    expect(
+      learningStatus(
+        [
+          {
+            ...base,
+            mastery_score: 40,
+            next_review_at: "2026-09-15T12:00:00.000Z",
+          },
+        ],
+        "line",
+        "line",
+        now,
+      ),
+    ).toBe("learning");
+    expect(
+      learningStatus(
+        [
+          {
+            ...base,
+            mastery_score: 80,
+            next_review_at: "2026-09-15T12:00:00.000Z",
+          },
+        ],
+        "line",
+        "line",
+        now,
+      ),
+    ).toBe("mastered");
+    expect(
+      learningStatus(
+        [
+          {
+            ...base,
+            mastery_score: 90,
+            next_review_at: "2026-09-14T11:00:00.000Z",
+          },
+        ],
+        "line",
+        "line",
+        now,
+      ),
+    ).toBe("review");
   });
 });
