@@ -2203,7 +2203,21 @@ footer {
   display: block;
   color: var(--muted);
   font-size: 12px;
+}
+.line-meta-row,
+.line-progress-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.line-meta-row {
+  justify-content: space-between;
   margin-bottom: 8px;
+}
+.line-meta-row .learning-status,
+.line-progress-heading .learning-status {
+  margin: 0;
 }
 .line-card .line-content h3 {
   font-size: 18px;

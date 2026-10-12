@@ -210,6 +210,7 @@ export function LinePage() {
   const { catalog, stats } = useData();
   const line = catalog.lines.find((l) => l.id === id);
   if (!line) return <Empty title="Лінійку не знайдено" />;
+  const status = learningStatus(stats.progress, "line", line.id);
   return (
     <>
       <Link className="back-link" to="/catalog">
@@ -252,7 +253,12 @@ export function LinePage() {
           </section>
         </div>
         <div className="row">
-          <h3>Прогрес навчання</h3>
+          <div className="line-progress-heading">
+            <h3>Прогрес навчання</h3>
+            <span className={`learning-status status-${status}`}>
+              {LEARNING_STATUS_LABELS[status]}
+            </span>
+          </div>
           <strong>{mastery(stats.progress, "line", line.id)}%</strong>
         </div>
         <ProgressBar value={mastery(stats.progress, "line", line.id)} />

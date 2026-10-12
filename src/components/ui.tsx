@@ -76,9 +76,14 @@ export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
         )}
       </div>
       <div className="line-content">
-        <span className="line-brand">
-          {catalog.brands.find((b) => b.id === line.brand_id)?.name}
-        </span>
+        <div className="line-meta-row">
+          <span className="line-brand">
+            {catalog.brands.find((b) => b.id === line.brand_id)?.name}
+          </span>
+          <span className={`learning-status status-${status}`}>
+            {LEARNING_STATUS_LABELS[status]}
+          </span>
+        </div>
         <div className="row">
           <h3>{line.name}</h3>
           <ArrowUpRight size={17} />
@@ -98,9 +103,6 @@ export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
           </span>
           <span>{score}% засвоєно</span>
         </div>
-        <span className={`learning-status status-${status}`}>
-          {LEARNING_STATUS_LABELS[status]}
-        </span>
         <ProgressBar value={score} />
       </div>
     </Link>

@@ -7,7 +7,9 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/catalog");
     const sections = [
+      { name: "Daily Naturals", count: 8 },
       { name: "DEPOT", count: 3 },
+      { name: "ESLA Italy", count: 12 },
       { name: "H.Q.Beauty", count: 5 },
       { name: "Insight", count: 14 },
       { name: "milk_shake", count: 22 },
@@ -20,6 +22,9 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
 
     for (const { section, count } of sections) {
       await expect(section.locator(".line-card")).toHaveCount(count);
+      await expect(
+        section.locator(".line-meta-row .learning-status"),
+      ).toHaveCount(count);
       await section.scrollIntoViewIfNeeded();
       for (const card of await section.locator(".line-card").all()) {
         await card.scrollIntoViewIfNeeded();
@@ -95,6 +100,8 @@ test("product thumbnails stay inside line cards for every source ratio", async (
     ...catalog.lines.filter((line) => line.brand_id === "milk-shake"),
     ...catalog.lines.filter((line) => line.brand_id === "depot"),
     ...catalog.lines.filter((line) => line.brand_id === "hq-beauty"),
+    ...catalog.lines.filter((line) => line.brand_id === "daily-naturals"),
+    ...catalog.lines.filter((line) => line.brand_id === "esla"),
   ];
 
   for (const line of lines) {

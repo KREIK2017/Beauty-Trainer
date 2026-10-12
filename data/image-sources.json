@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-09-28",
+  "checked_on": "2026-10-12",
   "sources": [
     {
       "brand": "Insight",
@@ -1520,6 +1520,735 @@
       "page": "H.Q.Beauty_Hair_Care_2026.pptx, slide 47",
       "image": "hq-beauty-hair-loss-control-strengthening-complex.png",
       "width": 1400,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-everyday-balancing",
+      "page": "DN -брошура 0826.pdf, page 8",
+      "image": "/images/daily-naturals/daily-naturals-everyday-balancing.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-intense-hydrating",
+      "page": "DN -брошура 0826.pdf, page 9",
+      "image": "/images/daily-naturals/daily-naturals-intense-hydrating.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-full-bodied-volumising",
+      "page": "DN -брошура 0826.pdf, page 10",
+      "image": "/images/daily-naturals/daily-naturals-full-bodied-volumising.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-anti-frizz-smoothing",
+      "page": "DN -брошура 0826.pdf, page 11",
+      "image": "/images/daily-naturals/daily-naturals-anti-frizz-smoothing.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-blonde-toning",
+      "page": "DN -брошура 0826.pdf, page 13",
+      "image": "/images/daily-naturals/daily-naturals-blonde-toning.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-scalp-clearing",
+      "page": "DN -брошура 0826.pdf, page 12",
+      "image": "/images/daily-naturals/daily-naturals-scalp-clearing.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-care-collection",
+      "page": "DN -брошура 0826.pdf, page 14",
+      "image": "/images/daily-naturals/daily-naturals-care-collection.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "line",
+      "id": "daily-naturals-styling",
+      "page": "DN -брошура 0826.pdf, page 20",
+      "image": "/images/daily-naturals/daily-naturals-styling.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-everyday-balancing-shampoo",
+      "page": "специфікація.xlsx, row 2; DN -брошура 0826.pdf, page 8",
+      "image": "/images/daily-naturals/daily-naturals-everyday-balancing-shampoo.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-everyday-balancing-conditioner",
+      "page": "специфікація.xlsx, row 4; DN -брошура 0826.pdf, page 8",
+      "image": "/images/daily-naturals/daily-naturals-everyday-balancing-conditioner.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-intense-hydrating-shampoo",
+      "page": "специфікація.xlsx, row 6; DN -брошура 0826.pdf, page 9",
+      "image": "/images/daily-naturals/daily-naturals-intense-hydrating-shampoo.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-intense-hydrating-conditioner",
+      "page": "специфікація.xlsx, row 7; DN -брошура 0826.pdf, page 9",
+      "image": "/images/daily-naturals/daily-naturals-intense-hydrating-conditioner.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-full-bodied-volumising-shampoo",
+      "page": "специфікація.xlsx, row 8; DN -брошура 0826.pdf, page 10",
+      "image": "/images/daily-naturals/daily-naturals-full-bodied-volumising-shampoo.webp",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-full-bodied-volumising-conditioner",
+      "page": "специфікація.xlsx, row 9; DN -брошура 0826.pdf, page 10",
+      "image": "/images/daily-naturals/daily-naturals-full-bodied-volumising-conditioner.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-anti-frizz-smoothing-shampoo",
+      "page": "специфікація.xlsx, row 10; DN -брошура 0826.pdf, page 11",
+      "image": "/images/daily-naturals/daily-naturals-anti-frizz-smoothing-shampoo.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-anti-frizz-smoothing-conditioner",
+      "page": "специфікація.xlsx, row 11; DN -брошура 0826.pdf, page 11",
+      "image": "/images/daily-naturals/daily-naturals-anti-frizz-smoothing-conditioner.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-blonde-toning-shampoo",
+      "page": "специфікація.xlsx, row 12; DN -брошура 0826.pdf, page 13",
+      "image": "/images/daily-naturals/daily-naturals-blonde-toning-shampoo.webp",
+      "width": 934,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-blonde-toning-conditioner",
+      "page": "специфікація.xlsx, row 13; DN -брошура 0826.pdf, page 13",
+      "image": "/images/daily-naturals/daily-naturals-blonde-toning-conditioner.webp",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-scalp-clearing-shampoo",
+      "page": "специфікація.xlsx, row 14; DN -брошура 0826.pdf, page 12",
+      "image": "/images/daily-naturals/daily-naturals-scalp-clearing-shampoo.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-moisture-mask",
+      "page": "специфікація.xlsx, row 15; DN -брошура 0826.pdf, page 15",
+      "image": "/images/daily-naturals/daily-naturals-moisture-mask.webp",
+      "width": 1400,
+      "height": 1164
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-detangler-thermal-protection",
+      "page": "специфікація.xlsx, row 17; DN -брошура 0826.pdf, page 18",
+      "image": "/images/daily-naturals/daily-naturals-detangler-thermal-protection.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-defender-leave-in-conditioner",
+      "page": "специфікація.xlsx, row 18; DN -брошура 0826.pdf, page 16",
+      "image": "/images/daily-naturals/daily-naturals-defender-leave-in-conditioner.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-ends-sealer-leave-in-treatment",
+      "page": "специфікація.xlsx, row 19; DN -брошура 0826.pdf, page 17",
+      "image": "/images/daily-naturals/daily-naturals-ends-sealer-leave-in-treatment.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-form-hybrid-styling-lotion",
+      "page": "специфікація.xlsx, row 20; DN -брошура 0826.pdf, page 22",
+      "image": "/images/daily-naturals/daily-naturals-form-hybrid-styling-lotion.webp",
+      "width": 933,
+      "height": 1400
+    },
+    {
+      "brand": "Daily Naturals",
+      "type": "product",
+      "id": "daily-naturals-curl-cream",
+      "page": "специфікація.xlsx, row 21; DN -брошура 0826.pdf, page 21",
+      "image": "/images/daily-naturals/daily-naturals-curl-cream.webp",
+      "width": 1094,
+      "height": 909
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-lucent-color",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 24",
+      "image": "/images/esla/esla-lucent-color.webp",
+      "width": 171,
+      "height": 399
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-hydra-special",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 37",
+      "image": "/images/esla/esla-hydra-special.webp",
+      "width": 233,
+      "height": 273
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-repair-prestige",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 64",
+      "image": "/images/esla/esla-repair-prestige.webp",
+      "width": 233,
+      "height": 273
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-frizz-dominator",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 78",
+      "image": "/images/esla/esla-frizz-dominator.webp",
+      "width": 149,
+      "height": 355
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-volume-supreme",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 89",
+      "image": "/images/esla/esla-volume-supreme.webp",
+      "width": 149,
+      "height": 355
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-curl-couture",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 100",
+      "image": "/images/esla/esla-curl-couture.webp",
+      "width": 602,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-daily",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 116",
+      "image": "/images/esla/esla-daily.webp",
+      "width": 378,
+      "height": 185
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-calming",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 127",
+      "image": "/images/esla/esla-calming.webp",
+      "width": 138,
+      "height": 348
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-sebum-controller",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 138",
+      "image": "/images/esla/esla-sebum-controller.webp",
+      "width": 210,
+      "height": 424
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-detox",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 152",
+      "image": "/images/esla/esla-detox.webp",
+      "width": 230,
+      "height": 397
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-energy",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 163",
+      "image": "/images/esla/esla-energy.webp",
+      "width": 208,
+      "height": 265
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "line",
+      "id": "esla-blonde-care",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 175",
+      "image": "/images/esla/esla-blonde-care.webp",
+      "width": 149,
+      "height": 355
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-lucent-color-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 19",
+      "image": "/images/esla/esla-lucent-color-shampoo.webp",
+      "width": 599,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-lucent-color-conditioner",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 20",
+      "image": "/images/esla/esla-lucent-color-conditioner.webp",
+      "width": 607,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-lucent-color-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 21",
+      "image": "/images/esla/esla-lucent-color-mask.webp",
+      "width": 1400,
+      "height": 688
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-hydra-special-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 31",
+      "image": "/images/esla/esla-hydra-special-shampoo.webp",
+      "width": 490,
+      "height": 1124
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-hydra-special-conditioner",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 32",
+      "image": "/images/esla/esla-hydra-special-conditioner.webp",
+      "width": 522,
+      "height": 1197
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-hydra-special-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 33",
+      "image": "/images/esla/esla-hydra-special-mask.webp",
+      "width": 947,
+      "height": 640
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-hydra-special-serum",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 34",
+      "image": "/images/esla/esla-hydra-special-serum.webp",
+      "width": 418,
+      "height": 1000
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 50",
+      "image": "/images/esla/esla-repair-prestige-shampoo.webp",
+      "width": 411,
+      "height": 960
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-spray",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 51",
+      "image": "/images/esla/esla-repair-prestige-spray.webp",
+      "width": 608,
+      "height": 804
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-conditioner",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 52",
+      "image": "/images/esla/esla-repair-prestige-conditioner.webp",
+      "width": 411,
+      "height": 960
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 53",
+      "image": "/images/esla/esla-repair-prestige-mask.webp",
+      "width": 876,
+      "height": 418
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-thermal-spray",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 54",
+      "image": "/images/esla/esla-repair-prestige-thermal-spray.webp",
+      "width": 670,
+      "height": 886
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-repair-prestige-oil-serum",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 55",
+      "image": "/images/esla/esla-repair-prestige-oil-serum.webp",
+      "width": 698,
+      "height": 899
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-frizz-dominator-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 72",
+      "image": "/images/esla/esla-frizz-dominator-shampoo.webp",
+      "width": 601,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-frizz-dominator-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 73",
+      "image": "/images/esla/esla-frizz-dominator-mask.webp",
+      "width": 1400,
+      "height": 669
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-frizz-dominator-spray",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 74",
+      "image": "/images/esla/esla-frizz-dominator-spray.webp",
+      "width": 1058,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-frizz-dominator-serum",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 75",
+      "image": "/images/esla/esla-frizz-dominator-serum.webp",
+      "width": 1089,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-volume-supreme-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 85",
+      "image": "/images/esla/esla-volume-supreme-shampoo.webp",
+      "width": 610,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-volume-supreme-elixir",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 86",
+      "image": "/images/esla/esla-volume-supreme-elixir.webp",
+      "width": 1054,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-curl-couture-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 95",
+      "image": "/images/esla/esla-curl-couture-shampoo.webp",
+      "width": 601,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-curl-couture-conditioner",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 96",
+      "image": "/images/esla/esla-curl-couture-conditioner.webp",
+      "width": 601,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-curl-couture-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 97",
+      "image": "/images/esla/esla-curl-couture-mask.webp",
+      "width": 1400,
+      "height": 669
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-curl-couture-perfecting-cream",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 98",
+      "image": "/images/esla/esla-curl-couture-perfecting-cream.webp",
+      "width": 1058,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-daily-fine-hair-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 107",
+      "image": "/images/esla/esla-daily-fine-hair-shampoo.webp",
+      "width": 474,
+      "height": 1086
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-daily-fine-hair-conditioner",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 108",
+      "image": "/images/esla/esla-daily-fine-hair-conditioner.webp",
+      "width": 610,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-style-elite-shine-lotion",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 109",
+      "image": "/images/esla/esla-style-elite-shine-lotion.webp",
+      "width": 1050,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-style-elite-multifunctional-mousse",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 110",
+      "image": "/images/esla/esla-style-elite-multifunctional-mousse.webp",
+      "width": 433,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-style-elite-multifunctional-serum",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 111",
+      "image": "/images/esla/esla-style-elite-multifunctional-serum.webp",
+      "width": 942,
+      "height": 1262
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-daily-thick-hair-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 112",
+      "image": "/images/esla/esla-daily-thick-hair-shampoo.webp",
+      "width": 607,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-daily-thick-hair-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 113",
+      "image": "/images/esla/esla-daily-thick-hair-mask.webp",
+      "width": 1400,
+      "height": 690
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-daily-multifunctional-spray-fluid",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 114",
+      "image": "/images/esla/esla-daily-multifunctional-spray-fluid.webp",
+      "width": 389,
+      "height": 912
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-calming-pre-shampoo-fluid",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 121",
+      "image": "/images/esla/esla-calming-pre-shampoo-fluid.webp",
+      "width": 762,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-calming-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 122",
+      "image": "/images/esla/esla-calming-shampoo.webp",
+      "width": 604,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-calming-elixir",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 123",
+      "image": "/images/esla/esla-calming-elixir.webp",
+      "width": 1079,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-sebum-controller-pre-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 133",
+      "image": "/images/esla/esla-sebum-controller-pre-shampoo.webp",
+      "width": 761,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-sebum-controller-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 134",
+      "image": "/images/esla/esla-sebum-controller-shampoo.webp",
+      "width": 596,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-detox-scalp-scrub",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 147",
+      "image": "/images/esla/esla-detox-scalp-scrub.webp",
+      "width": 764,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-detox-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 148",
+      "image": "/images/esla/esla-detox-shampoo.webp",
+      "width": 599,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-energy-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 158",
+      "image": "/images/esla/esla-energy-shampoo.webp",
+      "width": 596,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-energy-lotion",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 159",
+      "image": "/images/esla/esla-energy-lotion.webp",
+      "width": 1049,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-blonde-care-purple-shampoo",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 169",
+      "image": "/images/esla/esla-blonde-care-purple-shampoo.webp",
+      "width": 615,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-blonde-care-purple-mask",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 170",
+      "image": "/images/esla/esla-blonde-care-purple-mask.webp",
+      "width": 1400,
+      "height": 598
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-blonde-care-purple-mousse",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 171",
+      "image": "/images/esla/esla-blonde-care-purple-mousse.webp",
+      "width": 486,
+      "height": 1400
+    },
+    {
+      "brand": "ESLA Italy",
+      "type": "product",
+      "id": "esla-blonde-care-blue-mousse",
+      "page": "ESLA ITALY PRODUCT KNOWLEDGE 2026 UA.pptx, slide 172",
+      "image": "/images/esla/esla-blonde-care-blue-mousse.webp",
+      "width": 486,
       "height": 1400
     }
   ]
