@@ -2281,6 +2281,174 @@ footer {
 .brand-heading-row .learning-status {
   margin: 0;
 }
+.brand-title-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.brand-title-link span {
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+}
+.brand-title-link:hover span {
+  text-decoration: underline;
+}
+.brand-wiki-hero {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.42fr) minmax(0, 1.58fr);
+  overflow: hidden;
+  margin-bottom: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+}
+.brand-wiki-country {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  background: var(--pale);
+  color: var(--green);
+}
+.brand-wiki-country span {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.brand-wiki-country strong {
+  color: var(--ink);
+  font-size: 24px;
+}
+.brand-wiki-story {
+  padding: 32px;
+}
+.brand-wiki-story .lead {
+  max-width: 860px;
+  margin: 10px 0 24px;
+}
+.brand-wiki-numbers {
+  display: flex;
+  gap: 24px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.brand-wiki-numbers span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.brand-wiki-numbers strong {
+  color: var(--ink);
+  font-size: 24px;
+}
+.brand-wiki-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 22px;
+}
+.brand-wiki-grid .detail-panel {
+  margin: 0;
+}
+.brand-wiki-list {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.brand-wiki-list li {
+  position: relative;
+  padding-left: 22px;
+  line-height: 1.55;
+}
+.brand-wiki-list li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  content: "";
+}
+.brand-wiki-subtitle {
+  margin: 24px 0 12px;
+  font-size: 15px;
+}
+.brand-memory-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(0, 1.35fr);
+  gap: 30px;
+  margin-bottom: 42px;
+  border: 1px solid #b9d0bc;
+  border-radius: 14px;
+  padding: 28px 30px;
+  background: var(--pale);
+}
+.brand-memory-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--green);
+}
+.brand-memory-title h2 {
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 21px;
+}
+.brand-memory-panel ol {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-left: 24px;
+  line-height: 1.55;
+}
+.brand-lines-heading {
+  margin-top: 0;
+  scroll-margin-top: 90px;
+}
+.brand-sources {
+  margin-top: 36px;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  color: var(--muted);
+}
+.brand-sources p {
+  margin: 7px 0 12px;
+}
+.brand-sources > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+}
+.brand-sources a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--green);
+  font-weight: 700;
+}
+@media (max-width: 700px) {
+  .brand-title-link span {
+    display: none;
+  }
+  .brand-wiki-hero,
+  .brand-wiki-grid,
+  .brand-memory-panel {
+    grid-template-columns: 1fr;
+  }
+  .brand-wiki-country,
+  .brand-wiki-story,
+  .brand-memory-panel {
+    padding: 22px;
+  }
+}
 .nested-products a {
   align-items: flex-start;
   gap: 12px;

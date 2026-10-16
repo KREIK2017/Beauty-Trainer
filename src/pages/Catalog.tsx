@@ -18,6 +18,7 @@ import {
 } from "../../shared/learning";
 import { counted } from "../../shared/uk";
 import { repeatsMeaningfully } from "../../shared/copy";
+import { brandGuides } from "../data/brandGuides";
 const filterLabels: Record<string, string> = {
   brand: "Бренд",
   line: "Лінійка",
@@ -149,7 +150,18 @@ export function CatalogPage() {
                 <div className="section-heading">
                   <div>
                     <div className="brand-heading-row">
-                      <h2 className="brand-title">{b.name}</h2>
+                      {brandGuides[b.id] ? (
+                        <Link
+                          className="brand-title-link"
+                          to={`/brands/${b.id}`}
+                        >
+                          <h2 className="brand-title">{b.name}</h2>
+                          <span>Про бренд</span>
+                          <ArrowRight size={14} />
+                        </Link>
+                      ) : (
+                        <h2 className="brand-title">{b.name}</h2>
+                      )}
                       <span className={`learning-status status-${status}`}>
                         {LEARNING_STATUS_LABELS[status]}
                       </span>

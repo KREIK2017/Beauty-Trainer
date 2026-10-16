@@ -25,6 +25,7 @@ import AccountMenu from "./components/AccountMenu";
 import AccountSettings from "./pages/AccountSettings";
 import QualityReport from "./pages/QualityReport";
 import { AdminLayout, AdminUsers, AdminUserDetail } from "./pages/AdminPanel";
+import BrandGuidePage from "./pages/BrandGuide";
 const nav = [
   ["/", "Огляд", LayoutDashboard],
   ["/training", "Тренування", Brain],
@@ -103,9 +104,11 @@ export default function App() {
               {nav.find(([to]) => to === location.pathname)?.[1] ??
                 (location.pathname === "/settings"
                   ? "Налаштування"
-                  : location.pathname.startsWith("/admin")
-                    ? "Панель адміністратора"
-                    : "Бібліотека продуктів")}
+                  : location.pathname.startsWith("/brands/")
+                    ? "Енциклопедія бренду"
+                    : location.pathname.startsWith("/admin")
+                      ? "Панель адміністратора"
+                      : "Бібліотека продуктів")}
             </span>
           </div>
           <div className="top-actions">
@@ -141,6 +144,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/catalog" element={<CatalogPage />} />
+            <Route path="/brands/:id" element={<BrandGuidePage />} />
             <Route path="/lines/:id" element={<LinePage />} />
             <Route path="/lines/:id/cards" element={<Flashcards />} />
             <Route path="/products/:id" element={<ProductPage />} />
