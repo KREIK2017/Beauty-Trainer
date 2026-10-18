@@ -6,6 +6,8 @@ import {
   catalogSchema,
   type Progress,
   type History,
+  type FlashcardReview,
+  type LineTestCompletion,
 } from "../shared/schema";
 import {
   generateQuestions,
@@ -38,7 +40,7 @@ async function body(request: Request) {
   }
 }
 async function stats(db: D1Database, userId: string) {
-  const [p, h] = await Promise.all([
+  const [p, h, cards, completions] = await Promise.all([
     db
       .prepare("SELECT * FROM user_progress WHERE user_id=?")
       .bind(userId)
@@ -49,6 +51,18 @@ async function stats(db: D1Database, userId: string) {
       )
       .bind(userId)
       .all<History>(),
+    db
+      .prepare(
+        "SELECT product_id,rating,reviewed_at FROM flashcard_reviews WHERE user_id=? ORDER BY reviewed_at DESC",
+      )
+      .bind(userId)
+      .all<FlashcardReview>(),
+    db
+      .prepare(
+        "SELECT line_id,difficulty,MAX(completed_at) completed_at FROM quiz_sessions WHERE user_id=? AND line_id IS NOT NULL AND difficulty IN ('normal','hard') AND passed=1 GROUP BY line_id,difficulty",
+      )
+      .bind(userId)
+      .all<LineTestCompletion>(),
   ]);
   const days = new Set(h.results.map((x) => x.created_at.slice(0, 10)));
   let streak = 0;
@@ -62,6 +76,8 @@ async function stats(db: D1Database, userId: string) {
   return {
     progress: p.results,
     history: h.results,
+    flashcardReviews: cards.results,
+    lineTestCompletions: completions.results,
     xp: h.results.reduce((n, x) => n + x.xp, 0),
     streak,
   };
@@ -123,6 +139,12 @@ export default {
               ids.line.has(h.line_id) &&
               (!h.product_id || ids.product.has(h.product_id)),
           ),
+          flashcardReviews: saved.flashcardReviews.filter((review) =>
+            ids.product.has(review.product_id),
+          ),
+          lineTestCompletions: saved.lineTestCompletions.filter((completion) =>
+            ids.line.has(completion.line_id),
+          ),
         });
       }
       if (path === "/api/flashcards/rate" && request.method === "POST") {
@@ -144,10 +166,10 @@ export default {
           .bind(userId, input.productId)
           .first<Progress>();
         const next = rateFlashcard(previous ?? undefined, input.rating);
-        await env.DB.prepare(
-          "INSERT INTO user_progress (user_id,entity_type,entity_id,correct_answers,incorrect_answers,mastery_score,last_reviewed_at,next_review_at) VALUES (?,'product',?,?,?,?,?,?) ON CONFLICT(user_id,entity_type,entity_id) DO UPDATE SET correct_answers=excluded.correct_answers,incorrect_answers=excluded.incorrect_answers,mastery_score=excluded.mastery_score,last_reviewed_at=excluded.last_reviewed_at,next_review_at=excluded.next_review_at",
-        )
-          .bind(
+        await env.DB.batch([
+          env.DB.prepare(
+            "INSERT INTO user_progress (user_id,entity_type,entity_id,correct_answers,incorrect_answers,mastery_score,last_reviewed_at,next_review_at) VALUES (?,'product',?,?,?,?,?,?) ON CONFLICT(user_id,entity_type,entity_id) DO UPDATE SET correct_answers=excluded.correct_answers,incorrect_answers=excluded.incorrect_answers,mastery_score=excluded.mastery_score,last_reviewed_at=excluded.last_reviewed_at,next_review_at=excluded.next_review_at",
+          ).bind(
             userId,
             input.productId,
             next.correct_answers,
@@ -155,8 +177,11 @@ export default {
             next.mastery_score,
             next.last_reviewed_at,
             next.next_review_at,
-          )
-          .run();
+          ),
+          env.DB.prepare(
+            "INSERT INTO flashcard_reviews (user_id,product_id,rating,reviewed_at) VALUES (?,?,?,?) ON CONFLICT(user_id,product_id) DO UPDATE SET rating=excluded.rating,reviewed_at=excluded.reviewed_at",
+          ).bind(userId, input.productId, input.rating, next.last_reviewed_at),
+        ]);
         return json({
           entity_type: "product",
           entity_id: input.productId,
@@ -282,13 +307,17 @@ export default {
             403,
           );
         const created = await env.DB.prepare(
-          "INSERT INTO quiz_sessions (id,user_id,questions,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM accounts WHERE id=?) AND COALESCE((SELECT revision FROM account_learning_access WHERE user_id=?),'')=?",
+          "INSERT INTO quiz_sessions (id,user_id,questions,created_at,mode,difficulty,line_id,total_questions) SELECT ?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM accounts WHERE id=?) AND COALESCE((SELECT revision FROM account_learning_access WHERE user_id=?),'')=?",
         )
           .bind(
             id,
             userId,
             JSON.stringify(questions),
             new Date().toISOString(),
+            input.mode,
+            input.difficulty,
+            input.lineId ?? null,
+            questions.length,
             userId,
             userId,
             access.revision,
@@ -464,6 +493,28 @@ export default {
             409,
           );
         }
+        const sessionResult = await env.DB.prepare(
+          "SELECT COUNT(*) answer_count,COALESCE(SUM(CASE WHEN correct=0 THEN 1 ELSE 0 END),0) mistake_count FROM quiz_history WHERE session_id=?",
+        )
+          .bind(answerMatch[1])
+          .first<{ answer_count: number; mistake_count: number }>();
+        const questionCount = (JSON.parse(session.questions) as Question[])
+          .length;
+        const answerCount = Number(sessionResult?.answer_count ?? 0);
+        const mistakeCount = Number(sessionResult?.mistake_count ?? 0);
+        if (answerCount >= questionCount || mistakeCount >= SESSION_LIVES)
+          await env.DB.prepare(
+            "UPDATE quiz_sessions SET completed_at=COALESCE(completed_at,?),passed=COALESCE(passed,?) WHERE id=? AND user_id=?",
+          )
+            .bind(
+              now,
+              Number(
+                answerCount >= questionCount && mistakeCount < SESSION_LIVES,
+              ),
+              answerMatch[1],
+              userId,
+            )
+            .run();
         return json({
           correct: !!saved!.correct,
           xp: saved!.xp,

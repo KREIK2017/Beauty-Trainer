@@ -1,4 +1,4 @@
-import type { Catalog, Progress, EntityType } from "./schema";
+import type { Catalog, Progress, EntityType, Stats } from "./schema";
 import { repeatsMeaningfully } from "./copy";
 export const SESSION_LIVES = 3;
 export type Difficulty = "normal" | "hard";
@@ -173,6 +173,35 @@ export function learningStatus(
   if (!saved) return "new";
   if (saved.next_review_at <= now.toISOString()) return "review";
   return saved.mastery_score >= 80 ? "mastered" : "learning";
+}
+export function lineLearningStatus(
+  stats: Stats,
+  lineId: string,
+  productIds: string[],
+  now = new Date(),
+): LearningStatus {
+  const reviewed = new Set(
+    stats.flashcardReviews.map((review) => review.product_id),
+  );
+  const cardsComplete =
+    productIds.length > 0 && productIds.every((id) => reviewed.has(id));
+  const normalComplete = stats.lineTestCompletions.some(
+    (completion) =>
+      completion.line_id === lineId && completion.difficulty === "normal",
+  );
+  const hardComplete = stats.lineTestCompletions.some(
+    (completion) =>
+      completion.line_id === lineId && completion.difficulty === "hard",
+  );
+  const savedStatus = learningStatus(stats.progress, "line", lineId, now);
+  if (cardsComplete && normalComplete && hardComplete)
+    return savedStatus === "review" ? "review" : "mastered";
+  const started =
+    productIds.some((id) => reviewed.has(id)) ||
+    normalComplete ||
+    hardComplete ||
+    savedStatus !== "new";
+  return started ? "learning" : "new";
 }
 function hash(s: string) {
   let value = 2166136261;

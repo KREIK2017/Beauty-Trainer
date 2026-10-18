@@ -44,7 +44,9 @@ export default function Training() {
         ? "daily"
         : "all";
   const [session, setSession] = useState<Session>();
-  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
+  const [difficulty, setDifficulty] = useState<Difficulty>(() =>
+    params.get("difficulty") === "hard" ? "hard" : "normal",
+  );
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Feedback[]>([]);
   const [selected, setSelected] = useState("");
@@ -136,6 +138,29 @@ export default function Training() {
     ),
   ];
   const weak = [...new Set(answers.filter((a) => !a.correct).map(topic))];
+  const correctCount = answers.filter((answer) => answer.correct).length;
+  const accuracy = answers.length
+    ? Math.round((correctCount / answers.length) * 100)
+    : 0;
+  const reviewProductIds = [
+    ...new Set(
+      answers
+        .filter((answer) => !answer.correct && answer.productId)
+        .map((answer) => answer.productId!),
+    ),
+  ].slice(0, 3);
+  const conclusions = [
+    lives > 0
+      ? `Ви завершили всі ${session?.questions.length ?? answers.length} запитань і склали тест.`
+      : `Тест зупинено після ${answers.length} відповідей: використано всі ${SESSION_LIVES} життя.`,
+    `Точність відповідей — ${accuracy}% (${correctCount} правильних із ${answers.length}).`,
+    weak.length
+      ? `Головний фокус повторення: ${weak.slice(0, 3).join(", ")}.`
+      : "Помилок у цьому тренуванні немає — переходьте до наступного кроку.",
+    strong.length
+      ? `Найкраще закріплені теми: ${strong.slice(0, 3).join(", ")}.`
+      : "Перед новою спробою перегляньте картки продуктів цієї лінійки.",
+  ];
   if (lineId && !line)
     return (
       <Empty title="Лінійку не знайдено">
@@ -299,7 +324,7 @@ export default function Training() {
           <div className="summary-stats">
             <div>
               <strong>
-                {answers.filter((a) => a.correct).length} / {answers.length}
+                {correctCount} / {answers.length}
               </strong>
               <span>Правильні відповіді</span>
             </div>
@@ -308,11 +333,19 @@ export default function Training() {
               <span>Здобуто XP</span>
             </div>
           </div>
+          <section className="result-conclusions">
+            <h3>Що показав результат</h3>
+            <ul>
+              {conclusions.map((conclusion) => (
+                <li key={conclusion}>{conclusion}</li>
+              ))}
+            </ul>
+          </section>
           <div className="detail-grid">
             <section>
               <h3>Сильні теми</h3>
               {strong.length ? (
-                strong.map((t) => <p key={t}>✓ {t}</p>)
+                strong.slice(0, 3).map((t) => <p key={t}>✓ {t}</p>)
               ) : (
                 <p>Продовжуйте: знання закріплюються з практикою.</p>
               )}
@@ -320,7 +353,7 @@ export default function Training() {
             <section>
               <h3>Слабкі теми</h3>
               {weak.length ? (
-                weak.map((t) => <p key={t}>{t}</p>)
+                weak.slice(0, 3).map((t) => <p key={t}>{t}</p>)
               ) : (
                 <p>Усе правильно. Чудова робота!</p>
               )}
@@ -329,28 +362,26 @@ export default function Training() {
           {lives === 0 && (
             <section>
               <h3>Ваші помилки</h3>
-              {answers
-                .filter((a) => !a.correct)
-                .map((a, i) => (
-                  <p key={i}>{a.explanation}</p>
+              {[
+                ...new Set(
+                  answers.filter((a) => !a.correct).map((a) => a.explanation),
+                ),
+              ]
+                .slice(0, 3)
+                .map((explanation) => (
+                  <p key={explanation}>{explanation}</p>
                 ))}
             </section>
           )}
           <section>
             <h3>Продукти для повторення</h3>
-            {[
-              ...new Set(
-                answers
-                  .filter((a) => !a.correct && a.productId)
-                  .map((a) => a.productId!),
-              ),
-            ].map((id) => (
+            {reviewProductIds.map((id) => (
               <Link className="review-link" key={id} to={`/products/${id}`}>
                 {catalog.products.find((p) => p.id === id)?.name}
                 <ArrowRight size={14} />
               </Link>
             ))}
-            {!answers.some((a) => !a.correct && a.productId) && (
+            {!reviewProductIds.length && (
               <p>
                 За результатами цього тренування повторення продуктів не
                 потрібне.

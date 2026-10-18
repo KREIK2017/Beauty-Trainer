@@ -196,7 +196,12 @@ export async function adminRoute(
           400,
         );
       await db.batch([
-        ...["user_progress", "quiz_history", "quiz_sessions"].map((table) =>
+        ...[
+          "flashcard_reviews",
+          "user_progress",
+          "quiz_history",
+          "quiz_sessions",
+        ].map((table) =>
           db.prepare(`DELETE FROM ${table} WHERE user_id=?`).bind(id),
         ),
         db

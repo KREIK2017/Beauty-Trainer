@@ -1414,6 +1414,22 @@ footer {
   justify-content: center;
   margin-top: 30px;
 }
+.result-conclusions {
+  border: 1px solid #b9d0bc;
+  border-radius: 12px;
+  padding: 20px 22px;
+  background: var(--pale);
+}
+.result-conclusions ul {
+  display: grid;
+  gap: 9px;
+  margin: 12px 0 0;
+  padding-left: 20px;
+  text-align: left;
+}
+.result-conclusions li {
+  line-height: 1.5;
+}
 .review-link {
   display: flex;
   align-items: center;
@@ -2286,6 +2302,58 @@ footer {
   font-size: 12px;
   flex-wrap: wrap;
 }
+.line-learning-path {
+  margin-top: 20px;
+}
+.line-path-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.line-path-heading h2 {
+  margin: 7px 0 0;
+  font-size: 23px;
+}
+.line-path-heading > strong {
+  color: var(--green);
+  font-size: 22px;
+}
+.line-path-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.line-path-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--muted);
+}
+.line-path-step.complete {
+  border-color: #b9d0bc;
+  background: var(--pale);
+  color: var(--green);
+}
+.line-path-step div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.line-path-step strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+.line-path-step span {
+  font-size: 12px;
+  line-height: 1.4;
+}
 .learning-status {
   display: inline-flex;
   align-items: center;
@@ -2394,6 +2462,31 @@ footer {
   .brand-section.selected-brand .catalog-lines {
     display: grid;
   }
+  .brand-section.selected-brand .line-card {
+    display: grid;
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+  .brand-section.selected-brand .line-art {
+    height: 100%;
+    min-height: 174px;
+    padding: 10px;
+  }
+  .brand-section.selected-brand .line-content {
+    padding: 14px;
+  }
+  .brand-section.selected-brand .line-content > p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 7px 0 10px;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .brand-section.selected-brand .line-topics {
+    display: none;
+  }
+  .brand-section.selected-brand .line-content h3 {
+    font-size: 16px;
+  }
   .brand-title {
     font-size: 22px !important;
   }
@@ -2412,6 +2505,9 @@ footer {
   }
   .mobile-brand-reset {
     display: none;
+  }
+  .line-path-steps {
+    grid-template-columns: 1fr;
   }
 }
 .brand-wiki-hero {

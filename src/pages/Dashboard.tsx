@@ -13,7 +13,10 @@ import {
 } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { LineCard, PageHeading, ProgressBar } from "../components/ui";
-import { learningStatus, mastery } from "../../shared/learning";
+import {
+  lineLearningStatus,
+  mastery,
+} from "../../shared/learning";
 import { counted } from "../../shared/uk";
 export default function Dashboard() {
   const { catalog, stats } = useData();
@@ -33,13 +36,18 @@ export default function Dashboard() {
   ).length;
   const statusPriority = { review: 0, learning: 1, new: 2, mastered: 3 };
   const suggestedLines = [...catalog.lines]
-    .sort(
-      (a, b) =>
-        statusPriority[learningStatus(stats.progress, "line", a.id)] -
-          statusPriority[learningStatus(stats.progress, "line", b.id)] ||
+    .sort((a, b) => {
+      const productIds = (lineId: string) =>
+        catalog.products
+          .filter((product) => product.line_id === lineId)
+          .map((product) => product.id);
+      return (
+        statusPriority[lineLearningStatus(stats, a.id, productIds(a.id))] -
+          statusPriority[lineLearningStatus(stats, b.id, productIds(b.id))] ||
         mastery(stats.progress, "line", a.id) -
-          mastery(stats.progress, "line", b.id),
-    )
+          mastery(stats.progress, "line", b.id)
+      );
+    })
     .slice(0, 3);
   const lineActivity = (lineId: string) => {
     const productIds = new Set(
@@ -47,34 +55,76 @@ export default function Dashboard() {
         .filter((product) => product.line_id === lineId)
         .map((product) => product.id),
     );
-    return stats.progress.filter(
+    const progress = stats.progress.filter(
       (item) =>
         (item.entity_type === "line" && item.entity_id === lineId) ||
         (item.entity_type === "product" && productIds.has(item.entity_id)),
     );
+    const reviewed = stats.flashcardReviews.filter((review) =>
+      productIds.has(review.product_id),
+    ).length;
+    const tests = stats.lineTestCompletions.filter(
+      (completion) => completion.line_id === lineId,
+    ).length;
+    return { progress, reviewed, tests, productIds: [...productIds] };
   };
   const activeLine = [...catalog.lines]
     .filter((line) => {
       const activity = lineActivity(line.id);
       return (
-        activity.length > 0 &&
-        learningStatus(stats.progress, "line", line.id) !== "mastered"
+        (activity.progress.length > 0 ||
+          activity.reviewed > 0 ||
+          activity.tests > 0) &&
+        lineLearningStatus(stats, line.id, activity.productIds) !== "mastered"
       );
     })
     .sort((a, b) => {
       const aScore = Math.max(
         0,
-        ...lineActivity(a.id).map((item) => item.mastery_score),
+        ...lineActivity(a.id).progress.map((item) => item.mastery_score),
       );
       const bScore = Math.max(
         0,
-        ...lineActivity(b.id).map((item) => item.mastery_score),
+        ...lineActivity(b.id).progress.map((item) => item.mastery_score),
       );
       return aScore - bScore;
     })[0];
-  const newLine = catalog.lines.find(
-    (line) => lineActivity(line.id).length === 0,
-  );
+  const newLine = catalog.lines.find((line) => {
+    const activity = lineActivity(line.id);
+    return !activity.progress.length && !activity.reviewed && !activity.tests;
+  });
+  const activeLineStep = activeLine
+    ? (() => {
+        const activity = lineActivity(activeLine.id);
+        const cardsComplete =
+          activity.productIds.length > 0 &&
+          activity.reviewed === activity.productIds.length;
+        const normalComplete = stats.lineTestCompletions.some(
+          (completion) =>
+            completion.line_id === activeLine.id &&
+            completion.difficulty === "normal",
+        );
+        if (!cardsComplete)
+          return {
+            href: `/lines/${activeLine.id}/cards`,
+            reason: `Ви переглянули ${activity.reviewed} із ${activity.productIds.length} карток. Завершіть коло, щоб перейти до тестів.`,
+            meta: `${activity.productIds.length - activity.reviewed} карток залишилося`,
+          };
+        if (!normalComplete)
+          return {
+            href: `/training?line=${activeLine.id}`,
+            reason:
+              "Картки переглянуто. Тепер складіть звичайний тест, щоб перевірити основи.",
+            meta: "звичайний режим · до 10 запитань",
+          };
+        return {
+          href: `/training?line=${activeLine.id}&difficulty=hard`,
+          reason:
+            "Звичайний тест складено. Залишився складний режим із практичними форматами.",
+          meta: "складний режим · до 10 запитань",
+        };
+      })()
+    : undefined;
   const nextStep = due
     ? {
         title: "Час повернутися до вивченого.",
@@ -85,10 +135,9 @@ export default function Dashboard() {
     : activeLine
       ? {
           title: `Закріпіть лінійку ${activeLine.name}.`,
-          reason:
-            "Ви вже почали цю тему. Короткий тест допоможе перевірити, що залишилося в пам’яті.",
-          href: `/training?line=${activeLine.id}`,
-          meta: "до 10 запитань · 5–7 хв",
+          reason: activeLineStep!.reason,
+          href: activeLineStep!.href,
+          meta: activeLineStep!.meta,
         }
       : newLine
         ? {

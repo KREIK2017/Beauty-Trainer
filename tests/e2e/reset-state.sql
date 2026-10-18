@@ -1,5 +1,6 @@
 DELETE FROM auth_attempts;
 DELETE FROM auth_sessions;
+DELETE FROM flashcard_reviews;
 UPDATE app_settings
 SET registration_open = 1,
     invitation_code_hash = NULL;

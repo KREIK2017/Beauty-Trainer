@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   Search,
   ArrowLeft,
   ArrowRight,
+  Check,
+  Circle,
   Leaf,
   SlidersHorizontal,
 } from "lucide-react";
@@ -18,7 +20,7 @@ import {
 } from "../components/ui";
 import {
   LEARNING_STATUS_LABELS,
-  learningStatus,
+  lineLearningStatus,
   mastery,
   type LearningStatus,
 } from "../../shared/learning";
@@ -46,6 +48,9 @@ export function CatalogPage() {
     (brand) => brand.name === filters.brand,
   );
   const activeBrand = selectedBrand ?? filteredBrand;
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [selectedBrand?.id]);
   const chooseBrand = (id?: string) => {
     const next = new URLSearchParams(searchParams);
     if (id) next.set("brand", id);
@@ -79,9 +84,7 @@ export function CatalogPage() {
   });
   const detailFiltered =
     !!search ||
-    Object.entries(filters).some(
-      ([key, value]) => key !== "brand" && !!value,
-    );
+    Object.entries(filters).some(([key, value]) => key !== "brand" && !!value);
   const filtered = detailFiltered || !!activeBrand;
   const showProducts =
     !!search.trim() ||
@@ -89,7 +92,15 @@ export function CatalogPage() {
   const brandStatus = (brandId: string): LearningStatus => {
     const statuses = catalog.lines
       .filter((line) => line.brand_id === brandId)
-      .map((line) => learningStatus(stats.progress, "line", line.id));
+      .map((line) =>
+        lineLearningStatus(
+          stats,
+          line.id,
+          catalog.products
+            .filter((product) => product.line_id === line.id)
+            .map((product) => product.id),
+        ),
+      );
     if (statuses.some((status) => status === "review")) return "review";
     if (statuses.length && statuses.every((status) => status === "mastered"))
       return "mastered";
@@ -292,7 +303,41 @@ export function LinePage() {
   const { catalog, stats } = useData();
   const line = catalog.lines.find((l) => l.id === id);
   if (!line) return <Empty title="Лінійку не знайдено" />;
-  const status = learningStatus(stats.progress, "line", line.id);
+  const status = lineLearningStatus(
+    stats,
+    line.id,
+    catalog.products
+      .filter((product) => product.line_id === line.id)
+      .map((product) => product.id),
+  );
+  const products = catalog.products.filter((p) => p.line_id === line.id);
+  const reviewedProducts = new Set(
+    stats.flashcardReviews.map((review) => review.product_id),
+  );
+  const reviewedCount = products.filter((product) =>
+    reviewedProducts.has(product.id),
+  ).length;
+  const cardsComplete =
+    products.length > 0 && reviewedCount === products.length;
+  const normalComplete = stats.lineTestCompletions.some(
+    (completion) =>
+      completion.line_id === line.id && completion.difficulty === "normal",
+  );
+  const hardComplete = stats.lineTestCompletions.some(
+    (completion) =>
+      completion.line_id === line.id && completion.difficulty === "hard",
+  );
+  const pathComplete = cardsComplete && normalComplete && hardComplete;
+  const nextStep = !cardsComplete
+    ? { to: `/lines/${line.id}/cards`, label: "Продовжити картки" }
+    : !normalComplete
+      ? { to: `/training?line=${line.id}`, label: "Скласти звичайний тест" }
+      : !hardComplete
+        ? {
+            to: `/training?line=${line.id}&difficulty=hard`,
+            label: "Скласти складний тест",
+          }
+        : { to: `/lines/${line.id}/cards`, label: "Повторити лінійку" };
   return (
     <>
       <Link className="back-link" to="/catalog">
@@ -345,17 +390,79 @@ export function LinePage() {
         </div>
         <ProgressBar value={mastery(stats.progress, "line", line.id)} />
       </div>
+      <section className="detail-panel line-learning-path">
+        <div className="line-path-heading">
+          <div>
+            <span className="eyebrow">ШЛЯХ ЛІНІЙКИ</span>
+            <h2>
+              {pathComplete ? "Лінійку завершено" : "Що потрібно завершити"}
+            </h2>
+          </div>
+          <strong>
+            {
+              [cardsComplete, normalComplete, hardComplete].filter(Boolean)
+                .length
+            }{" "}
+            / 3
+          </strong>
+        </div>
+        <div className="line-path-steps">
+          <LearningStep
+            complete={cardsComplete}
+            title="Переглянути всі картки"
+            detail={`${reviewedCount} із ${products.length} продуктів`}
+          />
+          <LearningStep
+            complete={normalComplete}
+            title="Скласти звичайний тест"
+            detail={
+              normalComplete
+                ? "Тест складено"
+                : "Дайте відповіді на всі запитання"
+            }
+          />
+          <LearningStep
+            complete={hardComplete}
+            title="Скласти складний тест"
+            detail={
+              hardComplete
+                ? "Тест складено"
+                : "Перевірте знання у складних форматах"
+            }
+          />
+        </div>
+        <Link className="button primary" to={nextStep.to}>
+          {nextStep.label} <ArrowRight size={16} />
+        </Link>
+      </section>
       <div className="section-heading">
         <h2>Продукти цієї лінійки</h2>
       </div>
       <div className="product-grid">
-        {catalog.products
-          .filter((p) => p.line_id === id)
-          .map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} />
+        ))}
       </div>
     </>
+  );
+}
+function LearningStep({
+  complete,
+  title,
+  detail,
+}: {
+  complete: boolean;
+  title: string;
+  detail: string;
+}) {
+  return (
+    <div className={`line-path-step ${complete ? "complete" : ""}`}>
+      {complete ? <Check size={18} /> : <Circle size={18} />}
+      <div>
+        <strong>{title}</strong>
+        <span>{detail}</span>
+      </div>
+    </div>
   );
 }
 export function ProductPage() {

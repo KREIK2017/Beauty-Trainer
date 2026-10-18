@@ -129,9 +129,21 @@ export interface History {
   xp: number;
   created_at: string;
 }
+export interface FlashcardReview {
+  product_id: string;
+  rating: "again" | "hard" | "good" | "easy";
+  reviewed_at: string;
+}
+export interface LineTestCompletion {
+  line_id: string;
+  difficulty: "normal" | "hard";
+  completed_at: string;
+}
 export interface Stats {
   progress: Progress[];
   history: History[];
+  flashcardReviews: FlashcardReview[];
+  lineTestCompletions: LineTestCompletion[];
   xp: number;
   streak: number;
 }

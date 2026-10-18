@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { catalogSchema, type Progress } from "../shared/schema";
+import { catalogSchema, type Progress, type Stats } from "../shared/schema";
 import {
   generateQuestions,
   learningStatus,
+  lineLearningStatus,
   nextProgress,
   rateFlashcard,
   normalizeAnswer,
@@ -296,5 +297,31 @@ describe("spaced repetition", () => {
         now,
       ),
     ).toBe("review");
+  });
+  it("only masters a line after cards and both test modes are complete", () => {
+    const stats: Stats = {
+      progress: [],
+      history: [],
+      flashcardReviews: [
+        { product_id: "a", rating: "good", reviewed_at: now.toISOString() },
+        { product_id: "b", rating: "hard", reviewed_at: now.toISOString() },
+      ],
+      lineTestCompletions: [
+        {
+          line_id: "line",
+          difficulty: "normal",
+          completed_at: now.toISOString(),
+        },
+      ],
+      xp: 0,
+      streak: 0,
+    };
+    expect(lineLearningStatus(stats, "line", ["a", "b"], now)).toBe("learning");
+    stats.lineTestCompletions.push({
+      line_id: "line",
+      difficulty: "hard",
+      completed_at: now.toISOString(),
+    });
+    expect(lineLearningStatus(stats, "line", ["a", "b"], now)).toBe("mastered");
   });
 });

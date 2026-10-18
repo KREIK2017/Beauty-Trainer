@@ -405,7 +405,12 @@ export async function authRoute(
     ),
   ];
   if (owner)
-    for (const table of ["user_progress", "quiz_history", "quiz_sessions"])
+    for (const table of [
+      "flashcard_reviews",
+      "user_progress",
+      "quiz_history",
+      "quiz_sessions",
+    ])
       statements.push(
         env.DB.prepare(
           `UPDATE ${table} SET user_id='owner' WHERE user_id='local'`,

@@ -62,6 +62,9 @@ test("flashcard confidence is saved without awarding XP", async ({
   );
   expect(after.xp).toBe(before.xp);
   expect(after.history).toHaveLength(before.history.length);
+  expect(after.flashcardReviews).toContainEqual(
+    expect.objectContaining({ product_id: product.id, rating: "good" }),
+  );
 });
 
 test("flashcard endpoint rejects unknown products and ratings", async ({

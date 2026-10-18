@@ -4,7 +4,7 @@ import { ArrowUpRight, Leaf } from "lucide-react";
 import { useData } from "../hooks/useData";
 import {
   LEARNING_STATUS_LABELS,
-  learningStatus,
+  lineLearningStatus,
   mastery,
 } from "../../shared/learning";
 import type { Line, Product } from "../../shared/schema";
@@ -55,7 +55,13 @@ export function Tags({ values }: { values: string[] }) {
 export function LineCard({ line, index = 0 }: { line: Line; index?: number }) {
   const { catalog, stats } = useData();
   const score = mastery(stats.progress, "line", line.id);
-  const status = learningStatus(stats.progress, "line", line.id);
+  const status = lineLearningStatus(
+    stats,
+    line.id,
+    catalog.products
+      .filter((product) => product.line_id === line.id)
+      .map((product) => product.id),
+  );
   return (
     <Link to={`/lines/${line.id}`} className="line-card">
       <div className={`line-art tone-${index % 4}`}>

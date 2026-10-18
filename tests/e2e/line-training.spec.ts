@@ -1,6 +1,7 @@
 import { anyAnswer, answerInBrowser } from "./quiz-helpers";
 import { test, expect } from "./fixtures";
-import type { Catalog } from "../../shared/schema";
+import { generateQuestions, type Question } from "../../shared/learning";
+import type { Catalog, Stats } from "../../shared/schema";
 
 test("line training creates a scoped session and saves an answer", async ({
   page,
@@ -69,4 +70,73 @@ test("unknown line never starts a general session", async ({
   await expect(
     page.getByRole("button", { name: "Розпочати навчання" }),
   ).toHaveCount(0);
+});
+
+test("line path separately tracks cards and a passed normal test", async ({
+  page,
+  request,
+}) => {
+  const lineId = "curl-passion";
+  const catalog = (await (await request.get("/api/catalog")).json()) as Catalog;
+  const products = catalog.products.filter(
+    (product) => product.line_id === lineId,
+  );
+  for (const product of products) {
+    const response = await request.post("/api/flashcards/rate", {
+      data: { productId: product.id, rating: "good" },
+    });
+    expect(response.ok()).toBe(true);
+  }
+
+  const before = (await (await request.get("/api/progress")).json()) as Stats;
+  const created = await request.post("/api/sessions", {
+    data: { mode: "all", difficulty: "normal", lineId },
+  });
+  expect(created.ok()).toBe(true);
+  const session = (await created.json()) as {
+    id: string;
+    questions: Question[];
+  };
+  const answers = new Map(
+    generateQuestions(
+      catalog,
+      before.progress,
+      "all",
+      session.id,
+      new Date(),
+      lineId,
+      "normal",
+    ).map((question) => [question.id, question.answer]),
+  );
+  for (const question of session.questions) {
+    const response = await request.post(`/api/sessions/${session.id}/answers`, {
+      data: { questionId: question.id, answer: answers.get(question.id) },
+    });
+    expect(response.ok()).toBe(true);
+    expect((await response.json()).correct).toBe(true);
+  }
+
+  const after = (await (await request.get("/api/progress")).json()) as Stats;
+  expect(
+    products.every((product) =>
+      after.flashcardReviews.some((review) => review.product_id === product.id),
+    ),
+  ).toBe(true);
+  expect(after.lineTestCompletions).toContainEqual(
+    expect.objectContaining({ line_id: lineId, difficulty: "normal" }),
+  );
+  expect(after.lineTestCompletions).not.toContainEqual(
+    expect.objectContaining({ line_id: lineId, difficulty: "hard" }),
+  );
+
+  await page.goto(`/lines/${lineId}`);
+  await expect(page.getByText("2 / 3", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(`${products.length} із ${products.length} продуктів`),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Скласти складний тест" }).click();
+  await expect(page).toHaveURL(
+    new RegExp(`training\\?line=${lineId}&difficulty=hard`),
+  );
+  await expect(page.getByRole("radio", { name: /Складний/ })).toBeChecked();
 });

@@ -124,10 +124,17 @@ test("mobile catalog opens brands, then lines, then products", async ({
   await page.getByRole("button", { name: "Додаткові фільтри" }).click();
   await expect(page.locator(".filter-grid")).toBeVisible();
   await page.getByRole("button", { name: "Сховати фільтри" }).click();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page
     .getByRole("link", { name: `Відкрити лінійки ${brand.name}` })
     .click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.locator(".line-card:visible")).toHaveCount(lines.length);
+  const compactCard = await page
+    .locator(".line-card:visible")
+    .first()
+    .boundingBox();
+  expect(compactCard!.height).toBeLessThan(260);
   await page.locator(".line-card:visible").first().click();
   await expect(page).toHaveURL(`/lines/${firstLine.id}`);
   await expect(page.locator(".product-card")).toHaveCount(
