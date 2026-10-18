@@ -19,8 +19,7 @@ export default function Dashboard() {
   const { catalog, stats } = useData();
   const due = stats.progress.filter(
     (p) =>
-      p.entity_type === "product" &&
-      p.next_review_at <= new Date().toISOString(),
+      p.entity_type !== "brand" && p.next_review_at <= new Date().toISOString(),
   ).length;
   const weak = stats.progress
     .filter((p) => p.mastery_score < 60 && p.entity_type !== "brand")
@@ -42,6 +41,75 @@ export default function Dashboard() {
           mastery(stats.progress, "line", b.id),
     )
     .slice(0, 3);
+  const lineActivity = (lineId: string) => {
+    const productIds = new Set(
+      catalog.products
+        .filter((product) => product.line_id === lineId)
+        .map((product) => product.id),
+    );
+    return stats.progress.filter(
+      (item) =>
+        (item.entity_type === "line" && item.entity_id === lineId) ||
+        (item.entity_type === "product" && productIds.has(item.entity_id)),
+    );
+  };
+  const activeLine = [...catalog.lines]
+    .filter((line) => {
+      const activity = lineActivity(line.id);
+      return (
+        activity.length > 0 &&
+        learningStatus(stats.progress, "line", line.id) !== "mastered"
+      );
+    })
+    .sort((a, b) => {
+      const aScore = Math.max(
+        0,
+        ...lineActivity(a.id).map((item) => item.mastery_score),
+      );
+      const bScore = Math.max(
+        0,
+        ...lineActivity(b.id).map((item) => item.mastery_score),
+      );
+      return aScore - bScore;
+    })[0];
+  const newLine = catalog.lines.find(
+    (line) => lineActivity(line.id).length === 0,
+  );
+  const nextStep = due
+    ? {
+        title: "Час повернутися до вивченого.",
+        reason: `${counted(due, ["тема потребує", "теми потребують", "тем потребують"])} запланованого повторення. Почнемо з них, щоб знання не втрачалися.`,
+        href: "/training?mode=daily",
+        meta: "до 7 запитань · 3–5 хв",
+      }
+    : activeLine
+      ? {
+          title: `Закріпіть лінійку ${activeLine.name}.`,
+          reason:
+            "Ви вже почали цю тему. Короткий тест допоможе перевірити, що залишилося в пам’яті.",
+          href: `/training?line=${activeLine.id}`,
+          meta: "до 10 запитань · 5–7 хв",
+        }
+      : newLine
+        ? {
+            title: `Познайомтеся з ${newLine.name}.`,
+            reason:
+              "Це наступна нова лінійка у вашій бібліотеці. Спочатку перегляньте картки продуктів.",
+            href: `/lines/${newLine.id}/cards`,
+            meta: `${counted(
+              catalog.products.filter(
+                (product) => product.line_id === newLine.id,
+              ).length,
+              ["картка", "картки", "карток"],
+            )} · у власному темпі`,
+          }
+        : {
+            title: "Підтримуйте знання актуальними.",
+            reason:
+              "Усі доступні теми вже опрацьовані. Коротке тренування допоможе зберегти результат.",
+            href: "/training?mode=daily",
+            meta: "до 7 запитань · 3–5 хв",
+          };
   const dailyGoal = 7;
   return (
     <>
@@ -65,22 +133,14 @@ export default function Dashboard() {
             <span />
             ВАША ЩОДЕННА ПОРЦІЯ ЗНАНЬ
           </span>
-          <h2>
-            Короткі заняття.
-            <br />
-            Професійна впевненість.
-          </h2>
-          <p>
-            Знайомтеся з продуктами, запитання за запитанням.
-            <br />
-            Наступне тренування чекає на вас.
-          </p>
+          <h2>{nextStep.title}</h2>
+          <p>{nextStep.reason}</p>
           <div className="hero-buttons">
-            <Link className="button light-button" to="/training?mode=daily">
-              Тренування на сьогодні <ArrowRight size={17} />
+            <Link className="button light-button" to={nextStep.href}>
+              Продовжити навчання <ArrowRight size={17} />
             </Link>
             <span>
-              <Clock3 size={15} /> до 7 запитань · 3–5 хв
+              <Clock3 size={15} /> {nextStep.meta}
             </span>
           </div>
         </div>
@@ -211,9 +271,8 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <Link className="button primary full" to="/training?mode=daily">
-            {due ? "Почати повторення" : "Вивчити нове"}
-            <ArrowRight size={16} />
+          <Link className="text-link" to="/training?mode=daily">
+            Відкрити план на сьогодні <ArrowRight size={14} />
           </Link>
           <div className="panel-divider" />
           <div className="row">

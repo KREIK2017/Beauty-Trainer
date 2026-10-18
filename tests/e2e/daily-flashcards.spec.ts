@@ -4,7 +4,10 @@ import type { Catalog, Stats } from "../../shared/schema";
 
 test("dashboard starts a seven-question daily training", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "Тренування на сьогодні" }).click();
+  await expect(
+    page.getByRole("link", { name: "Продовжити навчання" }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Відкрити план на сьогодні" }).click();
   await expect(page).toHaveURL(/training\?mode=daily$/);
   await expect(
     page.getByRole("heading", { name: "Ваше тренування на сьогодні" }),

@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { Search, ArrowLeft, ArrowRight, Leaf } from "lucide-react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Search,
+  ArrowLeft,
+  ArrowRight,
+  Leaf,
+  SlidersHorizontal,
+} from "lucide-react";
 import { useData } from "../hooks/useData";
 import {
   Empty,
@@ -29,17 +35,27 @@ const filterLabels: Record<string, string> = {
 };
 export function CatalogPage() {
   const { catalog, stats } = useData();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const selectedBrand = catalog.brands.find(
+    (brand) => brand.id === searchParams.get("brand"),
+  );
+  const filteredBrand = catalog.brands.find(
+    (brand) => brand.name === filters.brand,
+  );
+  const activeBrand = selectedBrand ?? filteredBrand;
+  const chooseBrand = (id?: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (id) next.set("brand", id);
+    else next.delete("brand");
+    setSearchParams(next);
+  };
   const options: Record<string, string[]> = {
     brand: catalog.brands.map((b) => b.name),
     line: catalog.lines
-      .filter(
-        (l) =>
-          !filters.brand ||
-          catalog.brands.find((b) => b.id === l.brand_id)?.name ===
-            filters.brand,
-      )
+      .filter((l) => !activeBrand || l.brand_id === activeBrand.id)
       .map((l) => l.name),
     hair: catalog.products.flatMap((p) => p.hair_types),
     category: catalog.products.map((p) => p.category),
@@ -53,7 +69,7 @@ export function CatalogPage() {
       `${p.name} ${p.description} ${brand.name} ${line.name} ${p.purpose} ${p.benefits.join(" ")}`
         .toLowerCase()
         .includes(search.toLowerCase()) &&
-      (!filters.brand || filters.brand === brand.name) &&
+      (!activeBrand || activeBrand.id === brand.id) &&
       (!filters.line || filters.line === line.name) &&
       (!filters.hair || p.hair_types.includes(filters.hair)) &&
       (!filters.category || filters.category === p.category) &&
@@ -61,7 +77,12 @@ export function CatalogPage() {
       (!filters.benefit || p.benefits.includes(filters.benefit))
     );
   });
-  const filtered = !!search || Object.values(filters).some(Boolean);
+  const detailFiltered =
+    !!search ||
+    Object.entries(filters).some(
+      ([key, value]) => key !== "brand" && !!value,
+    );
+  const filtered = detailFiltered || !!activeBrand;
   const showProducts =
     !!search.trim() ||
     Object.entries(filters).some(([key, value]) => key !== "brand" && !!value);
@@ -92,19 +113,38 @@ export function CatalogPage() {
             aria-label="Пошук у каталозі"
           />
         </label>
-        <div className="filter-grid">
+        <button
+          type="button"
+          className="button secondary mobile-filter-toggle"
+          aria-expanded={filtersOpen}
+          onClick={() => setFiltersOpen((value) => !value)}
+        >
+          <SlidersHorizontal size={17} />
+          {filtersOpen ? "Сховати фільтри" : "Додаткові фільтри"}
+        </button>
+        <div
+          className={`filter-grid ${filtersOpen ? "mobile-filters-open" : ""}`}
+        >
           {Object.entries(options).map(([key, values]) => (
             <label key={key}>
               <span>{filterLabels[key]}</span>
               <select
-                value={filters[key] ?? ""}
-                onChange={(e) =>
-                  setFilters(
-                    key === "brand"
-                      ? { brand: e.target.value }
-                      : { ...filters, [key]: e.target.value },
-                  )
+                value={
+                  key === "brand"
+                    ? (activeBrand?.name ?? "")
+                    : (filters[key] ?? "")
                 }
+                onChange={(e) => {
+                  if (key === "brand") {
+                    const brand = catalog.brands.find(
+                      (item) => item.name === e.target.value,
+                    );
+                    setFilters(brand ? { brand: brand.name } : {});
+                    chooseBrand(brand?.id);
+                  } else {
+                    setFilters({ ...filters, [key]: e.target.value });
+                  }
+                }}
               >
                 <option value="">Усі варіанти</option>
                 {[...new Set(values)].sort().map((v) => (
@@ -116,10 +156,11 @@ export function CatalogPage() {
         </div>
         {filtered && (
           <button
-            className="text-link"
+            className={`text-link ${selectedBrand && !detailFiltered ? "mobile-brand-reset" : ""}`}
             onClick={() => {
               setFilters({});
               setSearch("");
+              chooseBrand();
             }}
           >
             Скинути фільтри
@@ -141,71 +182,100 @@ export function CatalogPage() {
           )}
         </>
       ) : (
-        catalog.brands
-          .filter((b) => !filters.brand || b.name === filters.brand)
-          .map((b) => {
-            const status = brandStatus(b.id);
-            return (
-              <section className="brand-section" key={b.id}>
-                <div className="section-heading">
-                  <div>
-                    <div className="brand-heading-row">
-                      {brandGuides[b.id] ? (
-                        <Link
-                          className="brand-title-link"
-                          to={`/brands/${b.id}`}
-                        >
+        <>
+          {selectedBrand && (
+            <div className="mobile-catalog-context">
+              <button
+                className="back-link"
+                type="button"
+                onClick={() => {
+                  setFilters({});
+                  chooseBrand();
+                }}
+              >
+                <ArrowLeft size={15} />
+                Усі бренди
+              </button>
+              <p>Оберіть лінійку, щоб побачити її продукти.</p>
+            </div>
+          )}
+          {catalog.brands
+            .filter((b) => !activeBrand || b.id === activeBrand.id)
+            .map((b) => {
+              const status = brandStatus(b.id);
+              return (
+                <section
+                  className={`brand-section ${selectedBrand ? "selected-brand" : ""}`}
+                  key={b.id}
+                >
+                  <div className="section-heading">
+                    <div>
+                      <div className="brand-heading-row">
+                        {brandGuides[b.id] ? (
+                          <Link
+                            className="brand-title-link"
+                            to={`/brands/${b.id}`}
+                          >
+                            <h2 className="brand-title">{b.name}</h2>
+                            <span>Про бренд</span>
+                            <ArrowRight size={14} />
+                          </Link>
+                        ) : (
                           <h2 className="brand-title">{b.name}</h2>
-                          <span>Про бренд</span>
-                          <ArrowRight size={14} />
-                        </Link>
-                      ) : (
-                        <h2 className="brand-title">{b.name}</h2>
-                      )}
-                      <span className={`learning-status status-${status}`}>
-                        {LEARNING_STATUS_LABELS[status]}
-                      </span>
-                    </div>
-                    <p>
-                      {counted(
-                        catalog.lines.filter((l) => l.brand_id === b.id).length,
-                        ["лінійка", "лінійки", "лінійок"],
-                      )}{" "}
-                      ·{" "}
-                      {counted(
-                        catalog.products.filter((p) => p.brand_id === b.id)
-                          .length,
-                        ["продукт", "продукти", "продуктів"],
-                      )}
-                    </p>
-                  </div>
-                </div>
-                <div className="catalog-lines">
-                  {catalog.lines
-                    .filter((l) => l.brand_id === b.id)
-                    .map((l, i) => (
-                      <div key={l.id}>
-                        <LineCard line={l} index={i} />
-                        <div className="nested-products">
-                          {catalog.products
-                            .filter((p) => p.line_id === l.id)
-                            .map((p) => (
-                              <Link key={p.id} to={`/products/${p.id}`}>
-                                <span>
-                                  {p.name.startsWith(`${l.name} `)
-                                    ? p.name.slice(l.name.length + 1)
-                                    : p.name}
-                                </span>
-                                <ArrowRight size={13} />
-                              </Link>
-                            ))}
-                        </div>
+                        )}
+                        <span className={`learning-status status-${status}`}>
+                          {LEARNING_STATUS_LABELS[status]}
+                        </span>
                       </div>
-                    ))}
-                </div>
-              </section>
-            );
-          })
+                      <p>
+                        {counted(
+                          catalog.lines.filter((l) => l.brand_id === b.id)
+                            .length,
+                          ["лінійка", "лінійки", "лінійок"],
+                        )}{" "}
+                        ·{" "}
+                        {counted(
+                          catalog.products.filter((p) => p.brand_id === b.id)
+                            .length,
+                          ["продукт", "продукти", "продуктів"],
+                        )}
+                      </p>
+                    </div>
+                    <Link
+                      className="mobile-brand-select"
+                      to={`/catalog?brand=${encodeURIComponent(b.id)}`}
+                      aria-label={`Відкрити лінійки ${b.name}`}
+                    >
+                      Лінійки <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                  <div className="catalog-lines">
+                    {catalog.lines
+                      .filter((l) => l.brand_id === b.id)
+                      .map((l, i) => (
+                        <div key={l.id}>
+                          <LineCard line={l} index={i} />
+                          <div className="nested-products">
+                            {catalog.products
+                              .filter((p) => p.line_id === l.id)
+                              .map((p) => (
+                                <Link key={p.id} to={`/products/${p.id}`}>
+                                  <span>
+                                    {p.name.startsWith(`${l.name} `)
+                                      ? p.name.slice(l.name.length + 1)
+                                      : p.name}
+                                  </span>
+                                  <ArrowRight size={13} />
+                                </Link>
+                              ))}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </section>
+              );
+            })}
+        </>
       )}
       {!catalog.brands.length && (
         <Empty title="Додайте знання до своєї бібліотеки">

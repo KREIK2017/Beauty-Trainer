@@ -20,6 +20,33 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
       }),
     }));
 
+    if (width === 390) {
+      await expect(page.locator(".brand-section")).toHaveCount(6);
+      await expect(page.locator(".line-card:visible")).toHaveCount(0);
+      await page
+        .getByRole("link", { name: "Відкрити лінійки Daily Naturals" })
+        .click();
+      await expect(page).toHaveURL(/\/catalog\?brand=daily-naturals$/);
+      await expect(page.locator(".brand-section")).toHaveCount(1);
+      await expect(page.locator(".line-card:visible")).toHaveCount(8);
+      await expect(page.locator(".nested-products:visible")).toHaveCount(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await page.screenshot({
+        path: "test-results/catalog-390.png",
+        fullPage: true,
+      });
+      await page.getByRole("button", { name: "Увімкнути темну тему" }).click();
+      await page
+        .locator(".line-card:visible")
+        .first()
+        .screenshot({ path: "test-results/catalog-dark.png" });
+      continue;
+    }
+
     for (const { section, count } of sections) {
       await expect(section.locator(".line-card")).toHaveCount(count);
       await expect(
@@ -80,14 +107,33 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
       path: `test-results/catalog-${width}.png`,
       fullPage: true,
     });
-    if (width === 390) {
-      await page.getByRole("button", { name: "Увімкнути темну тему" }).click();
-      await sections[0].section
-        .locator(".line-card")
-        .first()
-        .screenshot({ path: "test-results/catalog-dark.png" });
-    }
   }
+});
+
+test("mobile catalog opens brands, then lines, then products", async ({
+  page,
+  request,
+}) => {
+  const catalog = (await (await request.get("/api/catalog")).json()) as Catalog;
+  const brand = catalog.brands.find((item) => item.id === "daily-naturals")!;
+  const lines = catalog.lines.filter((line) => line.brand_id === brand.id);
+  const firstLine = lines[0];
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/catalog");
+  await expect(page.locator(".filter-grid")).not.toBeVisible();
+  await page.getByRole("button", { name: "Додаткові фільтри" }).click();
+  await expect(page.locator(".filter-grid")).toBeVisible();
+  await page.getByRole("button", { name: "Сховати фільтри" }).click();
+  await page
+    .getByRole("link", { name: `Відкрити лінійки ${brand.name}` })
+    .click();
+  await expect(page.locator(".line-card:visible")).toHaveCount(lines.length);
+  await page.locator(".line-card:visible").first().click();
+  await expect(page).toHaveURL(`/lines/${firstLine.id}`);
+  await expect(page.locator(".product-card")).toHaveCount(
+    catalog.products.filter((product) => product.line_id === firstLine.id)
+      .length,
+  );
 });
 
 test("product thumbnails stay inside line cards for every source ratio", async ({
