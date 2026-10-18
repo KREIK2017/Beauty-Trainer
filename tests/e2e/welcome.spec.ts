@@ -1,5 +1,17 @@
 import { test, expect } from "@playwright/test";
 
+test("public pages include browser security headers", async ({ request }) => {
+  const response = await request.get("/");
+  expect(response.headers()["content-security-policy"]).toContain(
+    "frame-ancestors 'none'",
+  );
+  expect(response.headers()["x-frame-options"]).toBe("DENY");
+  expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(response.headers()["referrer-policy"]).toBe(
+    "strict-origin-when-cross-origin",
+  );
+});
+
 test("new visitors learn about the site before choosing login or registration", async ({
   page,
 }) => {
@@ -36,4 +48,9 @@ test("new visitors learn about the site before choosing login or registration", 
   await expect(
     page.getByRole("button", { name: "Увійти", exact: true }),
   ).toBeVisible();
+  await page.goto("/help");
+  await expect(
+    page.getByRole("heading", { name: "Як користуватися Beauty Trainer" }),
+  ).toBeVisible();
+  await expect(page.getByText("Які дані зберігаються")).toBeVisible();
 });

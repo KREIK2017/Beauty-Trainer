@@ -164,8 +164,9 @@ export default function Welcome({
         </section>
       </main>
       <footer className="welcome-footer">
-        Beauty Trainer · Більше знань. Кращий догляд.
+        <span>Beauty Trainer · Більше знань. Кращий догляд.</span>
         <span>Навчальні матеріали з професійного догляду за волоссям.</span>
+        <Link to="/help">Допомога та приватність</Link>
       </footer>
     </div>
   );

@@ -798,17 +798,25 @@ main {
   font-size: 10px;
 }
 .progress-track {
+  display: block;
+  width: 100%;
   height: 5px;
-  overflow: hidden;
-  background: var(--pale);
+  appearance: none;
+  border: 0;
   border-radius: 9px;
   margin-top: 10px;
 }
-.progress-track > div {
-  height: 100%;
+.progress-track::-webkit-progress-bar {
+  background: var(--pale);
+  border-radius: 9px;
+}
+.progress-track::-webkit-progress-value {
   background: #81a67c;
   border-radius: 9px;
-  transition: width 0.3s;
+}
+.progress-track::-moz-progress-bar {
+  background: #81a67c;
+  border-radius: 9px;
 }
 .learning-tip {
   display: flex;
@@ -1472,6 +1480,39 @@ footer {
   max-width: 45px;
   background: #9ab994;
   border-radius: 4px;
+}
+.activity-height-0 {
+  height: 5px;
+}
+.activity-height-1 {
+  height: 10px;
+}
+.activity-height-2 {
+  height: 20px;
+}
+.activity-height-3 {
+  height: 30px;
+}
+.activity-height-4 {
+  height: 40px;
+}
+.activity-height-5 {
+  height: 50px;
+}
+.activity-height-6 {
+  height: 60px;
+}
+.activity-height-7 {
+  height: 70px;
+}
+.activity-height-8 {
+  height: 80px;
+}
+.activity-height-9 {
+  height: 90px;
+}
+.activity-height-10 {
+  height: 100px;
 }
 .table-wrap {
   overflow: auto;
@@ -2447,6 +2488,106 @@ footer {
   .brand-wiki-story,
   .brand-memory-panel {
     padding: 22px;
+  }
+}
+
+.password-required {
+  padding: 14px 16px;
+  border: 1px solid #d6a84b;
+  border-radius: 9px;
+  background: #fff8e8;
+  color: #60430c;
+}
+.temporary-password {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--soft);
+}
+.temporary-password p {
+  flex-basis: 100%;
+}
+.temporary-password code {
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: var(--card);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
+}
+.help-page {
+  min-height: 100vh;
+  background: var(--background, #f7f8f5);
+}
+.help-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+.help-header .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.help-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 56px 32px 80px;
+}
+.help-main > h1 {
+  max-width: 720px;
+  margin: 10px 0 16px;
+}
+.help-lead {
+  max-width: 780px;
+  color: var(--muted);
+  font-size: 18px;
+}
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 38px;
+}
+.help-grid .detail-panel {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+.help-grid svg {
+  color: var(--green);
+}
+.help-contact {
+  max-width: 780px;
+  margin-top: 18px;
+}
+@media (max-width: 760px) {
+  .help-header,
+  .help-main {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .help-main {
+    padding-top: 32px;
+  }
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+  .temporary-password {
+    align-items: stretch;
+  }
+  .temporary-password code,
+  .temporary-password .button {
+    width: 100%;
   }
 }
 .nested-products a {

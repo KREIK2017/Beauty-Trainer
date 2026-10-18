@@ -20,6 +20,7 @@ const credentials = z.object({
     .min(12, "Пароль має містити щонайменше 12 символів.")
     .max(128),
   setupKey: z.string().max(256).optional(),
+  invitationCode: z.string().trim().max(128).optional(),
 });
 const encoder = new TextEncoder();
 const hex = (value: ArrayBuffer | Uint8Array) =>
@@ -30,6 +31,7 @@ const random = () => hex(crypto.getRandomValues(new Uint8Array(32)));
 async function digest(value: string) {
   return hex(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
 }
+export const secretHash = digest;
 export async function passwordHash(password: string, salt: string) {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -118,10 +120,20 @@ export async function currentUser(
   if (!/^[a-f0-9]{64}$/.test(value)) return null;
   return db
     .prepare(
-      "SELECT a.id,a.username,a.role FROM auth_sessions s JOIN accounts a ON a.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?",
+      "SELECT a.id,a.username,a.role,a.must_change_password FROM auth_sessions s JOIN accounts a ON a.id=s.user_id WHERE s.token_hash=? AND s.expires_at>?",
     )
     .bind(await digest(value), Date.now())
-    .first<User>();
+    .first<User & { must_change_password?: number }>()
+    .then((user) =>
+      user
+        ? {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+            mustChangePassword: !!user.must_change_password,
+          }
+        : null,
+    );
 }
 async function signIn(
   request: Request,
@@ -177,7 +189,7 @@ async function limited(request: Request, db: D1Database, username: string) {
   return results.some(
     (r, i) =>
       Number((r.results[0] as { attempts: number }).attempts) >
-      (i === 0 ? 60 : 30),
+      (i === 0 ? 300 : 30),
   );
 }
 async function clearUserAttempts(db: D1Database, username: string) {
@@ -191,11 +203,14 @@ export async function authRoute(
   env: AuthEnv,
 ): Promise<Response> {
   const path = new URL(request.url).pathname;
-  if (path === "/api/auth/me" && request.method === "GET")
+  if (path === "/api/auth/me" && request.method === "GET") {
+    const settings = await siteSettings(env.DB);
     return json({
       user: await currentUser(request, env.DB),
-      registrationOpen: (await siteSettings(env.DB)).registrationOpen,
+      registrationOpen: settings.registrationOpen,
+      invitationCodeRequired: settings.invitationCodeConfigured,
     });
+  }
   if (path === "/api/auth/logout" && request.method === "POST") {
     await env.DB.prepare("DELETE FROM auth_sessions WHERE token_hash=?")
       .bind(await digest(token(request)))
@@ -262,7 +277,7 @@ export async function authRoute(
     const hash = await passwordHash(parsed.data.newPassword, salt);
     const changed = await env.DB.batch([
       env.DB.prepare(
-        "UPDATE accounts SET password_hash=?,salt=? WHERE id=? AND password_hash=?",
+        "UPDATE accounts SET password_hash=?,salt=?,must_change_password=0 WHERE id=? AND password_hash=?",
       ).bind(hash, salt, user.id, account.password_hash),
       env.DB.prepare(
         "DELETE FROM auth_sessions WHERE user_id=? AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND password_hash=?)",
@@ -270,7 +285,12 @@ export async function authRoute(
     ]);
     if (!changed[0].meta.changes)
       return json({ error: "Пароль уже змінився. Спробуйте ще раз." }, 409);
-    return signIn(request, env.DB, user, hash);
+    return signIn(
+      request,
+      env.DB,
+      { ...user, mustChangePassword: false },
+      hash,
+    );
   }
   if (
     !["/api/auth/login", "/api/auth/register", "/api/auth/setup"].includes(
@@ -290,7 +310,7 @@ export async function authRoute(
   const parsed = credentials.safeParse(data);
   if (!parsed.success)
     return json({ error: parsed.error.issues[0].message }, 400);
-  const { username, password, setupKey } = parsed.data;
+  const { username, password, setupKey, invitationCode } = parsed.data;
   if (await limited(request, env.DB, username))
     return json({ error: "Забагато спроб. Спробуйте через 15 хвилин." }, 429, {
       "Retry-After": "900",
@@ -300,7 +320,13 @@ export async function authRoute(
       "SELECT * FROM accounts WHERE username=?",
     )
       .bind(username)
-      .first<User & { password_hash: string; salt: string }>();
+      .first<
+        User & {
+          password_hash: string;
+          salt: string;
+          must_change_password: number;
+        }
+      >();
     const hash = await passwordHash(
       password,
       account?.salt ?? "missing-account-dummy-salt",
@@ -315,12 +341,14 @@ export async function authRoute(
         id: account.id,
         username: account.username,
         role: account.role,
+        mustChangePassword: !!account.must_change_password,
       },
       account.password_hash,
     );
   }
   const owner = path === "/api/auth/setup";
-  if (!owner && !(await siteSettings(env.DB)).registrationOpen)
+  const settings = await siteSettings(env.DB);
+  if (!owner && !settings.registrationOpen)
     return json(
       {
         error:
@@ -328,6 +356,17 @@ export async function authRoute(
       },
       403,
     );
+  if (!owner && settings.invitationCodeConfigured) {
+    const saved = await env.DB.prepare(
+      "SELECT invitation_code_hash FROM app_settings WHERE id=1",
+    ).first<{ invitation_code_hash: string }>();
+    if (
+      !invitationCode ||
+      !saved?.invitation_code_hash ||
+      !equal(await digest(invitationCode), saved.invitation_code_hash)
+    )
+      return json({ error: "Неправильний корпоративний код запрошення." }, 403);
+  }
   if (owner) {
     const keyError = await ownerKeyError(env.OWNER_SETUP_KEY, setupKey);
     if (keyError)
@@ -348,6 +387,7 @@ export async function authRoute(
     id: owner ? "owner" : crypto.randomUUID(),
     username,
     role: owner ? "admin" : "learner",
+    mustChangePassword: false,
   };
   const salt = random();
   const hash = await passwordHash(password, salt);

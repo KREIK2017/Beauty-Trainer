@@ -9,24 +9,32 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import type { User } from "../../shared/auth";
 import { api } from "../services/api";
 import Welcome from "../pages/Welcome";
+import HelpPage from "../pages/Help";
 
 const Context = createContext<{
   user: User;
   logout: () => Promise<void>;
+  refreshAuth: () => void;
 } | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [user, setUser] = useState<User | null>();
   const [registrationOpen, setRegistrationOpen] = useState(true);
+  const [invitationCodeRequired, setInvitationCodeRequired] = useState(false);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
-    api<{ user: User | null; registrationOpen: boolean }>("/auth/me")
+    api<{
+      user: User | null;
+      registrationOpen: boolean;
+      invitationCodeRequired: boolean;
+    }>("/auth/me")
       .then((result) => {
         if (active) {
           setUser(result.user);
           setRegistrationOpen(result.registrationOpen);
+          setInvitationCodeRequired(result.invitationCodeRequired);
           setError("");
         }
       })
@@ -65,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError((e as Error).message);
     }
   }
+  const refreshAuth = () => setRevision((value) => value + 1);
   if (user === undefined)
     return (
       <div className="startup">
@@ -80,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   if (location.pathname === "/welcome" || (!user && location.pathname === "/"))
     return <Welcome signedIn={!!user} registrationOpen={registrationOpen} />;
+  if (location.pathname === "/help") return <HelpPage signedIn={!!user} />;
   if (user && ["/login", "/register", "/setup"].includes(location.pathname))
     return <Navigate to="/" replace />;
   if (!user)
@@ -87,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       <AuthForm
         key={location.pathname}
         registrationOpen={registrationOpen}
+        invitationCodeRequired={invitationCodeRequired}
         onSuccess={(value) => {
           setError("");
           setUser(value);
@@ -94,8 +105,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }}
       />
     );
+  if (user.mustChangePassword && location.pathname !== "/settings")
+    return <Navigate to="/settings" replace />;
   return (
-    <Context.Provider value={{ user, logout }}>
+    <Context.Provider value={{ user, logout, refreshAuth }}>
       {error && (
         <div role="alert" className="error">
           {error}
@@ -108,9 +121,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 function AuthForm({
   onSuccess,
   registrationOpen,
+  invitationCodeRequired,
 }: {
   onSuccess: (user: User) => void;
   registrationOpen: boolean;
+  invitationCodeRequired: boolean;
 }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -161,6 +176,7 @@ function AuthForm({
                   username: form.get("username"),
                   password: form.get("password"),
                   setupKey: form.get("setupKey") || undefined,
+                  invitationCode: form.get("invitationCode") || undefined,
                 }),
               },
             );
@@ -233,6 +249,20 @@ function AuthForm({
               />
             </label>
           )}
+          {register && invitationCodeRequired && (
+            <label>
+              Корпоративний код запрошення
+              <input
+                name="invitationCode"
+                type="password"
+                autoComplete="off"
+                required
+                minLength={8}
+                maxLength={128}
+              />
+              <small>Отримайте код у відповідального за навчання.</small>
+            </label>
+          )}
           {setup && (
             <label>
               Ключ налаштування власника
@@ -268,6 +298,9 @@ function AuthForm({
         )}
         <Link className="back-link" to="/welcome">
           Про Beauty Trainer
+        </Link>
+        <Link className="back-link" to="/help">
+          Допомога та приватність
         </Link>
       </form>
     </div>

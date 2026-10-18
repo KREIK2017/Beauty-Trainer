@@ -124,11 +124,45 @@ test("registration settings affect new accounts but preserve existing access", a
     password: "Settings-password-12345",
   };
   try {
+    await request.patch("/api/admin/settings", {
+      data: {
+        registrationOpen: true,
+        clearInvitationCode: true,
+      },
+    });
     expect(
       (await visitor.post("/api/auth/register", { data: credentials })).ok(),
     ).toBe(true);
     await visitor.post("/api/auth/logout");
     await page.goto("/settings");
+    await page
+      .getByLabel("Новий корпоративний код запрошення")
+      .fill("Company-invite-123");
+    await page.getByRole("button", { name: "Зберегти налаштування" }).click();
+    await expect(
+      page.getByText(
+        "Код налаштовано. Він потрібен для створення нового акаунта.",
+      ),
+    ).toBeVisible();
+    expect(
+      (await (await visitor.get("/api/auth/me")).json()).invitationCodeRequired,
+    ).toBe(true);
+    expect(
+      (
+        await visitor.post("/api/auth/register", {
+          data: { ...credentials, username: `${credentials.username}-no-code` },
+        })
+      ).status(),
+    ).toBe(403);
+    const invited = {
+      ...credentials,
+      username: `${credentials.username}-invited`,
+      invitationCode: "Company-invite-123",
+    };
+    expect(
+      (await visitor.post("/api/auth/register", { data: invited })).ok(),
+    ).toBe(true);
+    await visitor.post("/api/auth/logout");
     await page
       .getByRole("checkbox", { name: "Дозволити самостійну реєстрацію" })
       .uncheck();
@@ -176,11 +210,96 @@ test("registration settings affect new accounts but preserve existing access", a
     expect(
       (
         await request.patch("/api/admin/settings", {
-          data: { registrationOpen: original.registrationOpen },
+          data: {
+            registrationOpen: original.registrationOpen,
+            clearInvitationCode: true,
+          },
         })
       ).ok(),
     ).toBe(true);
     await visitor.dispose();
+  }
+});
+
+test("owner resets a learner password and the learner must replace it", async ({
+  page,
+  playwright,
+}) => {
+  const learner = await playwright.request.newContext({
+    baseURL: "http://127.0.0.1:8788",
+  });
+  const credentials = {
+    username: `reset-${Date.now()}`,
+    password: "Initial-password-12345",
+  };
+  let user: { id: string } | undefined;
+  try {
+    const registered = await learner.post("/api/auth/register", {
+      data: credentials,
+    });
+    expect(registered.ok()).toBe(true);
+    user = (await registered.json()).user;
+    await page.goto(`/admin/users/${user!.id}`);
+    await page
+      .getByRole("button", { name: "Створити тимчасовий пароль" })
+      .click();
+    const temporaryPassword = await page
+      .locator(".temporary-password code")
+      .textContent();
+    expect(temporaryPassword).toHaveLength(18);
+    expect((await learner.get("/api/progress")).status()).toBe(401);
+    expect(
+      (await learner.post("/api/auth/login", { data: credentials })).status(),
+    ).toBe(401);
+    expect(
+      (
+        await learner.post("/api/auth/login", {
+          data: { ...credentials, password: temporaryPassword },
+        })
+      ).ok(),
+    ).toBe(true);
+    expect(
+      (await (await learner.get("/api/auth/me")).json()).user,
+    ).toMatchObject({ mustChangePassword: true });
+    expect((await learner.post("/api/sessions", { data: {} })).status()).toBe(
+      403,
+    );
+    await page.context().clearCookies();
+    await page.context().addCookies((await learner.storageState()).cookies);
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/settings$/);
+    await expect(
+      page.getByText(/Адміністратор надав вам тимчасовий пароль/),
+    ).toBeVisible();
+    const finalPassword = "Final-password-123456";
+    await page
+      .getByLabel("Поточний пароль", { exact: true })
+      .fill(temporaryPassword!);
+    await page.getByLabel("Новий пароль", { exact: true }).fill(finalPassword);
+    await page
+      .getByLabel("Повторіть новий пароль", { exact: true })
+      .fill(finalPassword);
+    await page.getByRole("button", { name: "Змінити пароль" }).click();
+    await expect(
+      page.getByText("Пароль змінено. Попередні сесії завершено."),
+    ).toBeVisible();
+    await page.goto("/");
+    await expect(page).toHaveURL("/");
+  } finally {
+    if (user) {
+      const owner = await playwright.request.newContext({
+        baseURL: "http://127.0.0.1:8788",
+      });
+      try {
+        await owner.post("/api/auth/login", { data: ownerCredentials });
+        await owner.delete(`/api/admin/users/${user.id}`, {
+          data: { username: credentials.username },
+        });
+      } finally {
+        await owner.dispose();
+      }
+    }
+    await learner.dispose();
   }
 });
 

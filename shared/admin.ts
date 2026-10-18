@@ -4,6 +4,7 @@ import type { Progress } from "./schema";
 
 export interface SiteSettings {
   registrationOpen: boolean;
+  invitationCodeConfigured: boolean;
   updatedAt: string;
 }
 export interface AdminAccount extends User {

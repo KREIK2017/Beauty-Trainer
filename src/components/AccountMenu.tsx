@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Settings, Users, SlidersHorizontal, LogOut } from "lucide-react";
+import {
+  Settings,
+  Users,
+  SlidersHorizontal,
+  LogOut,
+  CircleHelp,
+} from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
 export default function AccountMenu({ onOpen }: { onOpen: () => void }) {
@@ -62,6 +68,10 @@ export default function AccountMenu({ onOpen }: { onOpen: () => void }) {
             <Link to="/settings">
               <Settings size={18} aria-hidden="true" />
               Налаштування
+            </Link>
+            <Link to="/help">
+              <CircleHelp size={18} aria-hidden="true" />
+              Допомога та приватність
             </Link>
             {user.role === "admin" && (
               <>

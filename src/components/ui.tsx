@@ -33,16 +33,12 @@ export function PageHeading({
 }
 export function ProgressBar({ value }: { value: number }) {
   return (
-    <div
+    <progress
       className="progress-track"
-      role="progressbar"
       aria-label="Засвоєння"
-      aria-valuenow={value}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      <div style={{ width: `${value}%` }} />
-    </div>
+      value={Math.max(0, Math.min(100, value))}
+      max={100}
+    />
   );
 }
 export function Tags({ values }: { values: string[] }) {

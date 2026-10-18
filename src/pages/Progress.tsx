@@ -113,6 +113,7 @@ export function ProgressPage() {
       count: stats.history.filter((h) => h.created_at.startsWith(key)).length,
     };
   });
+  const maxActivity = Math.max(10, ...days.map((day) => day.count));
   return (
     <>
       <PageHeading
@@ -147,9 +148,7 @@ export function ProgressPage() {
             >
               <span>{d.count}</span>
               <div
-                style={{
-                  height: `${Math.max(5, (d.count / Math.max(10, ...days.map((x) => x.count))) * 100)}px`,
-                }}
+                className={`activity-height-${Math.round((d.count / maxActivity) * 10)}`}
               />
               <small>{d.date.slice(8)}</small>
             </div>

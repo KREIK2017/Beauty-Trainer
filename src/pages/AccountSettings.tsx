@@ -5,12 +5,19 @@ import { api } from "../services/api";
 import { PageHeading } from "../components/ui";
 
 export function PasswordSettings() {
+  const { user, refreshAuth } = useAuth();
   const [passwordBusy, setPasswordBusy] = useState(false);
   const [passwordNotice, setPasswordNotice] = useState("");
   const [passwordError, setPasswordError] = useState("");
   return (
     <section className="detail-panel admin-settings">
       <h2>Змінити мій пароль</h2>
+      {user.mustChangePassword && (
+        <p className="password-required" role="alert">
+          Адміністратор надав вам тимчасовий пароль. Створіть новий пароль, щоб
+          продовжити навчання.
+        </p>
+      )}
       <p>
         Після зміни попередні сесії буде завершено. У цьому браузері ви
         залишитеся в акаунті.
@@ -45,6 +52,7 @@ export function PasswordSettings() {
             form.reset();
             setPasswordNotice("Пароль змінено. Попередні сесії завершено.");
             localStorage.setItem("beauty-auth-change", crypto.randomUUID());
+            refreshAuth();
           } catch (e) {
             setPasswordError((e as Error).message);
           } finally {
@@ -141,16 +149,24 @@ function RegistrationSettings() {
           onSubmit={async (event) => {
             event.preventDefault();
             if (busy) return;
-            const registrationOpen =
-              new FormData(event.currentTarget).get("registrationOpen") ===
-              "on";
+            const values = new FormData(event.currentTarget);
+            const registrationOpen = values.get("registrationOpen") === "on";
+            const invitationCode = String(
+              values.get("invitationCode") ?? "",
+            ).trim();
+            const clearInvitationCode =
+              values.get("clearInvitationCode") === "on";
             setBusy(true);
             setNotice("");
             setError("");
             try {
               await api("/admin/settings", {
                 method: "PATCH",
-                body: JSON.stringify({ registrationOpen }),
+                body: JSON.stringify({
+                  registrationOpen,
+                  invitationCode: invitationCode || undefined,
+                  clearInvitationCode,
+                }),
               });
               setNotice("Налаштування реєстрації збережено.");
               setRevision((value) => value + 1);
@@ -170,6 +186,37 @@ function RegistrationSettings() {
             />
             Дозволити самостійну реєстрацію
           </label>
+          <label>
+            Новий корпоративний код запрошення
+            <input
+              type="password"
+              name="invitationCode"
+              minLength={8}
+              maxLength={128}
+              autoComplete="off"
+              placeholder={
+                data.invitationCodeConfigured
+                  ? "Залиште порожнім, щоб не змінювати"
+                  : "Щонайменше 8 символів"
+              }
+              disabled={busy}
+            />
+          </label>
+          <p className="small muted">
+            {data.invitationCodeConfigured
+              ? "Код налаштовано. Він потрібен для створення нового акаунта."
+              : "Код не налаштовано. За відкритої реєстрації зареєструватися може кожен."}
+          </p>
+          {data.invitationCodeConfigured && (
+            <label className="admin-check">
+              <input
+                type="checkbox"
+                name="clearInvitationCode"
+                disabled={busy}
+              />
+              Видалити чинний код запрошення
+            </label>
+          )}
           <button className="button primary" disabled={busy}>
             {busy ? "Зберігаємо…" : "Зберегти налаштування"}
           </button>

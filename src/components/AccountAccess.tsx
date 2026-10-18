@@ -21,6 +21,10 @@ export default function AccountAccess({
   const [error, setError] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [resetBusy, setResetBusy] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [temporaryPassword, setTemporaryPassword] = useState("");
+  const [copied, setCopied] = useState(false);
   const toggle = (key: "brandIds" | "lineIds", id: string, checked: boolean) =>
     setAccess((current) => ({
       ...current,
@@ -128,6 +132,70 @@ export default function AccountAccess({
             </button>
           </fieldset>
         </form>
+      </section>
+      <section className="detail-panel account-password-reset">
+        <h2>Відновлення доступу</h2>
+        <p>
+          Створіть тимчасовий пароль, якщо учасник не може увійти. Усі його
+          активні сесії завершаться, а після входу сайт попросить встановити
+          новий пароль.
+        </p>
+        {resetError && (
+          <p className="error" role="alert">
+            {resetError}
+          </p>
+        )}
+        {temporaryPassword ? (
+          <div className="temporary-password" role="status">
+            <p>
+              Передайте цей пароль учаснику. Після закриття він не збережеться.
+            </p>
+            <code>{temporaryPassword}</code>
+            <button
+              type="button"
+              className="button secondary"
+              onClick={async () => {
+                await navigator.clipboard.writeText(temporaryPassword);
+                setCopied(true);
+              }}
+            >
+              {copied ? "Скопійовано" : "Скопіювати пароль"}
+            </button>
+            <button
+              type="button"
+              className="text-link"
+              onClick={() => {
+                setTemporaryPassword("");
+                setCopied(false);
+              }}
+            >
+              Приховати пароль
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="button secondary"
+            disabled={resetBusy}
+            onClick={async () => {
+              setResetBusy(true);
+              setResetError("");
+              try {
+                const result = await api<{ temporaryPassword: string }>(
+                  `/admin/users/${account.id}/reset-password`,
+                  { method: "POST" },
+                );
+                setTemporaryPassword(result.temporaryPassword);
+              } catch (e) {
+                setResetError((e as Error).message);
+              } finally {
+                setResetBusy(false);
+              }
+            }}
+          >
+            {resetBusy ? "Створюємо…" : "Створити тимчасовий пароль"}
+          </button>
+        )}
       </section>
       <section className="detail-panel account-delete">
         <h2>Видалення акаунта</h2>

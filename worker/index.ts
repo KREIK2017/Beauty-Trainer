@@ -85,6 +85,14 @@ export default {
           { error: "Увійдіть у свій акаунт.", code: "AUTH_REQUIRED" },
           401,
         );
+      if (user.mustChangePassword && !["GET", "HEAD"].includes(request.method))
+        return json(
+          {
+            error: "Спочатку змініть тимчасовий пароль.",
+            code: "PASSWORD_CHANGE_REQUIRED",
+          },
+          403,
+        );
       const userId = user.id;
       if (path === "/api/catalog" && request.method === "GET")
         return json((await learningCatalog(env.DB, user)).catalog);

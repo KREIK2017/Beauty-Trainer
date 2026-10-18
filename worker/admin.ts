@@ -5,6 +5,7 @@ import { siteSettings } from "./settings";
 import { learningAccessSchema } from "../shared/access";
 import { learningAccess } from "./access";
 import { getCatalog } from "./db/catalog";
+import { passwordHash, secretHash } from "./auth";
 
 const json = (data: unknown, status = 200) =>
   Response.json(data, { status, headers: { "Cache-Control": "no-store" } });
@@ -18,7 +19,7 @@ const accountQuery = `WITH learning AS (
   FROM user_progress p JOIN products product ON product.id=p.entity_id
   WHERE p.entity_type='product' GROUP BY p.user_id
 )
-SELECT a.id,a.username,a.role,a.created_at,a.last_login_at,l.last_practice_at,
+SELECT a.id,a.username,a.role,a.must_change_password mustChangePassword,a.created_at,a.last_login_at,l.last_practice_at,
 COALESCE(l.xp,0) xp,COALESCE(l.answers,0) answers,COALESCE(l.correct_answers,0) correct_answers,
 COALESCE(l.sessions,0) sessions,COALESCE(m.mastered_products,0) mastered_products,COALESCE(m.weak_products,0) weak_products
 FROM accounts a LEFT JOIN learning l ON l.user_id=a.id LEFT JOIN mastery m ON m.user_id=a.id`;
@@ -46,16 +47,32 @@ export async function adminRoute(
         return json({ error: "Некоректний JSON" }, 400);
       }
       const parsed = z
-        .object({ registrationOpen: z.boolean() })
+        .object({
+          registrationOpen: z.boolean(),
+          invitationCode: z.string().trim().min(8).max(128).optional(),
+          clearInvitationCode: z.boolean().optional(),
+        })
         .strict()
+        .refine(
+          (value) => !(value.invitationCode && value.clearInvitationCode),
+          "Оберіть новий код або видалення чинного коду.",
+        )
         .safeParse(data);
       if (!parsed.success)
         return json({ error: "Вкажіть, чи дозволена реєстрація." }, 400);
       await db
         .prepare(
-          "UPDATE app_settings SET registration_open=?,updated_at=? WHERE id=1",
+          "UPDATE app_settings SET registration_open=?,invitation_code_hash=CASE WHEN ?=1 THEN NULL WHEN ?=1 THEN ? ELSE invitation_code_hash END,updated_at=? WHERE id=1",
         )
-        .bind(Number(parsed.data.registrationOpen), new Date().toISOString())
+        .bind(
+          Number(parsed.data.registrationOpen),
+          Number(!!parsed.data.clearInvitationCode),
+          Number(!!parsed.data.invitationCode),
+          parsed.data.invitationCode
+            ? await secretHash(parsed.data.invitationCode)
+            : null,
+          new Date().toISOString(),
+        )
         .run();
       return json(await siteSettings(db));
     }
@@ -108,13 +125,50 @@ export async function adminRoute(
   const accessMatch = url.pathname.match(
     /^\/api\/admin\/users\/([a-z0-9-]+)\/access$/,
   );
+  const passwordResetMatch = url.pathname.match(
+    /^\/api\/admin\/users\/([a-z0-9-]+)\/reset-password$/,
+  );
+  if (passwordResetMatch && request.method === "POST") {
+    const account = await db
+      .prepare("SELECT id,username,role FROM accounts WHERE id=?")
+      .bind(passwordResetMatch[1])
+      .first<{ id: string; username: string; role: User["role"] }>();
+    if (!account) return json({ error: "Акаунт не знайдено." }, 404);
+    if (account.role === "admin" || account.id === user.id)
+      return json(
+        { error: "Пароль власника змінюється в особистих налаштуваннях." },
+        403,
+      );
+    const alphabet =
+      "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(14));
+    const temporaryPassword = `${Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("")}aA1!`;
+    const salt = Array.from(
+      crypto.getRandomValues(new Uint8Array(32)),
+      (byte) => byte.toString(16).padStart(2, "0"),
+    ).join("");
+    const hash = await passwordHash(temporaryPassword, salt);
+    const changed = await db.batch([
+      db
+        .prepare(
+          "UPDATE accounts SET password_hash=?,salt=?,must_change_password=1 WHERE id=? AND role='learner'",
+        )
+        .bind(hash, salt, account.id),
+      db.prepare("DELETE FROM auth_sessions WHERE user_id=?").bind(account.id),
+    ]);
+    if (!changed[0].meta.changes)
+      return json({ error: "Не вдалося скинути пароль." }, 409);
+    return json({ temporaryPassword });
+  }
   if (
     (match && request.method === "DELETE") ||
     (accessMatch && request.method === "PUT")
   ) {
     const id = (accessMatch ?? match)![1];
     const account = await db
-      .prepare("SELECT id,username,role FROM accounts WHERE id=?")
+      .prepare(
+        "SELECT id,username,role,must_change_password mustChangePassword FROM accounts WHERE id=?",
+      )
       .bind(id)
       .first<User>();
     if (!account) return json({ error: "Акаунт не знайдено." }, 404);
