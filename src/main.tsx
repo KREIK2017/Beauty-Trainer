@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "@fontsource-variable/manrope";
 import { BrowserRouter } from "react-router-dom";
 import { DataProvider } from "./hooks/useData";
 import App from "./App";

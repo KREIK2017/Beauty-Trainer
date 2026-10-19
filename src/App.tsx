@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -38,6 +38,12 @@ export default function App() {
   const [dark, setDark] = useState(
     () => localStorage.getItem("beauty-theme") === "dark",
   );
+  useEffect(() => {
+    const syncTheme = () =>
+      setDark(localStorage.getItem("beauty-theme") === "dark");
+    window.addEventListener("beauty-theme-change", syncTheme);
+    return () => window.removeEventListener("beauty-theme-change", syncTheme);
+  }, []);
   function theme() {
     const next = !dark;
     setDark(next);
