@@ -25,9 +25,12 @@ test("cards hide answers, repeat difficult products and lead to the line test", 
     await page.getByRole("button", { name: "Відкрити відповідь" }).click();
     await page.getByRole("button", { name: "Знаю", exact: true }).click();
   }
-  await expect(
-    page.getByText("Не пам’ятаю: 1 · Важко: 0 · Знаю: 3 · Легко: 0"),
-  ).toBeVisible();
+  await expect(page.locator(".p1-rating-summary span")).toContainText([
+    "1Не пам’ятаю",
+    "0Важко",
+    "3Знаю",
+    "0Легко",
+  ]);
   await page.getByRole("button", { name: "Повторити складні картки" }).click();
   await expect(card.getByRole("heading", { level: 2 })).toHaveText(firstName);
   await expect(page.getByText("Картка 1 із 1")).toBeVisible();

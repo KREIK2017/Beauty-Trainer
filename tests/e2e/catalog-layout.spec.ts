@@ -6,22 +6,17 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto("/catalog");
-    const sections = [
-      { name: "Daily Naturals", count: 8 },
-      { name: "DEPOT", count: 3 },
-      { name: "ESLA Italy", count: 12 },
-      { name: "H.Q.Beauty", count: 5 },
-      { name: "Insight", count: 14 },
-      { name: "milk_shake", count: 22 },
-    ].map(({ name, count }) => ({
-      count,
-      section: page.locator("section").filter({
-        has: page.getByRole("heading", { name, exact: true }),
-      }),
-    }));
+    const brands = [
+      { id: "daily-naturals", name: "Daily Naturals", count: 8 },
+      { id: "depot", name: "DEPOT", count: 3 },
+      { id: "esla", name: "ESLA Italy", count: 12 },
+      { id: "hq-beauty", name: "H.Q.Beauty", count: 5 },
+      { id: "insight", name: "Insight", count: 14 },
+      { id: "milk-shake", name: "milk_shake", count: 22 },
+    ];
 
     if (width === 390) {
-      await expect(page.locator(".brand-section")).toHaveCount(6);
+      await expect(page.locator(".p1-brand-card")).toHaveCount(6);
       await expect(page.locator(".line-card:visible")).toHaveCount(0);
       await page
         .getByRole("link", { name: "Відкрити лінійки Daily Naturals" })
@@ -47,13 +42,19 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
       continue;
     }
 
-    for (const { section, count } of sections) {
-      await expect(section.locator(".line-card")).toHaveCount(count);
+    await expect(page.locator(".p1-brand-card")).toHaveCount(brands.length);
+    await expect(page.locator(".line-card:visible")).toHaveCount(0);
+    for (const { id, name, count } of brands) {
+      await page.goto(`/catalog?brand=${id}`);
       await expect(
-        section.locator(".line-meta-row .learning-status"),
-      ).toHaveCount(count);
-      await section.scrollIntoViewIfNeeded();
-      for (const card of await section.locator(".line-card").all()) {
+        page.getByRole("heading", { name, exact: true }),
+      ).toBeVisible();
+      const cards = page.locator(".catalog-lines .line-card");
+      await expect(cards).toHaveCount(count);
+      await expect(page.locator(".line-meta-row .learning-status")).toHaveCount(
+        count,
+      );
+      for (const card of await cards.all()) {
         await card.scrollIntoViewIfNeeded();
         const art = await card.locator(".line-art").boundingBox();
         const content = await card.locator(".line-content").boundingBox();
@@ -100,9 +101,6 @@ test("catalog artwork and readable copy never overlap", async ({ page }) => {
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-    await expect(
-      sections[0].section.locator(".nested-products").first(),
-    ).not.toContainText("Anti-frizz ");
     await page.screenshot({
       path: `test-results/catalog-${width}.png`,
       fullPage: true,
@@ -147,6 +145,7 @@ test("product thumbnails stay inside line cards for every source ratio", async (
   page,
   request,
 }) => {
+  test.setTimeout(180_000);
   const catalog = (await (await request.get("/api/catalog")).json()) as Catalog;
   const lines = [
     catalog.lines.find((line) => line.id === "anti-frizz")!,

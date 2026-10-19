@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   BookOpen,
   Brain,
-  ChartNoAxesCombined,
   Leaf,
   Flame,
   Zap,
@@ -27,11 +26,10 @@ import QualityReport from "./pages/QualityReport";
 import { AdminLayout, AdminUsers, AdminUserDetail } from "./pages/AdminPanel";
 import BrandGuidePage from "./pages/BrandGuide";
 const nav = [
-  ["/", "Огляд", LayoutDashboard],
-  ["/training", "Тренування", Brain],
+  ["/", "Головна", LayoutDashboard],
+  ["/training", "Навчання", Brain],
   ["/catalog", "Каталог продуктів", BookOpen],
-  ["/weak", "Слабкі теми", Target],
-  ["/progress", "Мій прогрес", ChartNoAxesCombined],
+  ["/weak", "Повторення", Target],
 ] as const;
 export default function App() {
   const { stats, catalog } = useData();
@@ -57,7 +55,7 @@ export default function App() {
             <small>БІЛЬШЕ ЗНАНЬ. КРАЩИЙ ДОГЛЯД.</small>
           </span>
         </Link>
-        <div className="nav-label">ВАШ НАВЧАЛЬНИЙ ПРОСТІР</div>
+        <div className="nav-label">РОБОЧИЙ ПРОСТІР</div>
         <nav>
           {nav.map(([to, label, Icon]) => (
             <NavLink

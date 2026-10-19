@@ -42,11 +42,8 @@ test("brand encyclopedia explains every catalog brand", async ({
 test("catalog opens a responsive brand guide", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/catalog");
-  await page
-    .getByRole("link", { name: /milk_shake/ })
-    .first()
-    .click();
-
+  await page.getByRole("link", { name: "Відкрити лінійки milk_shake" }).click();
+  await page.getByRole("link", { name: "milk_shake", exact: true }).click();
   await expect(page).toHaveURL(/\/brands\/milk-shake$/);
   await expect(page.getByText("Країна бренду")).toBeVisible();
   await page.getByRole("link", { name: "Обрати лінійку" }).click();

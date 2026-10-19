@@ -6,6 +6,7 @@ import {
   ChartNoAxesCombined,
   Leaf,
   RotateCcw,
+  Search,
 } from "lucide-react";
 
 export default function Welcome({
@@ -29,9 +30,21 @@ export default function Welcome({
             <strong>beauty</strong>trainer
           </span>
         </Link>
-        <Link className="button secondary" to={signedIn ? "/" : "/login"}>
-          {signedIn ? "Мій простір" : "Увійти"}
-        </Link>
+        <nav aria-label="Про платформу">
+          <a href="#how-it-works">Можливості</a>
+          <a href="#how-it-works">Як це працює</a>
+          <a href="#for-whom">Для кого</a>
+        </nav>
+        <div className="actions">
+          <Link className="button secondary" to={signedIn ? "/" : "/login"}>
+            {signedIn ? "Мій простір" : "Увійти"}
+          </Link>
+          {!signedIn && registrationOpen && (
+            <Link className="button primary" to="/register">
+              Створити акаунт <ArrowRight size={17} />
+            </Link>
+          )}
+        </div>
       </header>
       <main className="welcome-main">
         <section className="welcome-hero">
@@ -69,45 +82,41 @@ export default function Welcome({
                 : "Реєстрацію нових учасників тимчасово закрито. Наявні акаунти працюють."}
             </p>
           </div>
-          <aside className="welcome-preview" aria-label="Що є у тренуванні">
-            <span className="question-type">
-              <Brain size={18} />
-              Від знайомства до впевненості
-            </span>
-            <h2>
-              Не лише прочитати.
-              <br />
-              Пригадати й застосувати.
-            </h2>
-            <ul>
-              <li>
-                <span>01</span>
-                <div>
-                  <strong>Познайомтеся з лінійкою</strong>
-                  <p>Типи волосся, призначення й переваги кожного продукту.</p>
-                </div>
-              </li>
-              <li>
-                <span>02</span>
-                <div>
-                  <strong>Перевірте себе</strong>
-                  <p>
-                    Запитання про продукти та клієнтські ситуації з поясненнями.
-                  </p>
-                </div>
-              </li>
-              <li>
-                <span>03</span>
-                <div>
-                  <strong>Поверніться до складного</strong>
-                  <p>Повторення тем, у яких ще бракує впевненості.</p>
-                </div>
-              </li>
-            </ul>
-            <div className="welcome-session">
-              <span>До 10 запитань</span>
-              <span>3 життя</span>
-              <span>Власний темп</span>
+          <aside
+            className="welcome-preview"
+            aria-label="Приклад навчального простору"
+          >
+            <div className="welcome-product-preview">
+              <div>
+                <span className="eyebrow">ПРИКЛАД КАРТКИ</span>
+                <h2>Insight Anti-Frizz</h2>
+                <p>
+                  Зволоження, розгладження та захист для неслухняного волосся.
+                </p>
+                <span className="welcome-progress">
+                  <i /> 67%
+                </span>
+              </div>
+              <img
+                src="/images/insight/anti-frizz-zvolozhuiuchyi-shampun.webp"
+                alt="Insight Anti-Frizz"
+              />
+            </div>
+            <div className="welcome-route-preview">
+              <strong>Ваш маршрут навчання</strong>
+              <span>
+                <b>1</b> Картки
+              </span>
+              <span>
+                <b>2</b> Звичайний тест
+              </span>
+              <span>
+                <b>3</b> Складний тест
+              </span>
+            </div>
+            <div className="welcome-search-preview">
+              <Search size={18} />
+              <span>Знайти продукт, лінійку або потребу</span>
             </div>
           </aside>
         </section>
@@ -133,8 +142,8 @@ export default function Welcome({
               },
               {
                 Icon: ChartNoAxesCombined,
-                title: "Особистий прогрес",
-                text: "Слідкуйте за засвоєнням продуктів, накопичуйте XP та бачте результат своєї практики.",
+                title: "Знання для роботи",
+                text: "Швидко знаходьте потрібний продукт і повертайтеся до матеріалу перед консультацією клієнта.",
               },
             ].map(({ Icon, title, text }) => (
               <article key={title}>
@@ -145,7 +154,7 @@ export default function Welcome({
             ))}
           </div>
         </section>
-        <section className="welcome-start">
+        <section id="for-whom" className="welcome-start">
           <div>
             <h2>Почніть з однієї лінійки</h2>
             <p>

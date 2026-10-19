@@ -1,11 +1,29 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Clock3, Target, TrendingUp } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, ProgressBar } from "../components/ui";
 import type { EntityType } from "../../shared/schema";
 import { counted, entityLabels, weakHeadings } from "../../shared/uk";
 export function WeakAreas() {
   const { catalog, stats } = useData();
+  const now = new Date().toISOString();
+  const reviewProducts = stats.progress
+    .filter(
+      (item) =>
+        item.entity_type === "product" &&
+        (item.next_review_at <= now || item.mastery_score < 60),
+    )
+    .sort((a, b) => {
+      const aDue = a.next_review_at <= now ? 0 : 1;
+      const bDue = b.next_review_at <= now ? 0 : 1;
+      return aDue - bDue || a.mastery_score - b.mastery_score;
+    })
+    .map((progress) => ({
+      progress,
+      product: catalog.products.find((item) => item.id === progress.entity_id),
+    }))
+    .filter((item) => item.product)
+    .slice(0, 8);
   const confused = new Map<string, number>();
   stats.history
     .filter(
@@ -19,19 +37,81 @@ export function WeakAreas() {
       const key = [h.correct_answer, h.selected_answer].sort().join(" ↔ ");
       confused.set(key, (confused.get(key) ?? 0) + 1);
     });
+  const confusionPairs = [...confused].sort((a, b) => b[1] - a[1]);
+  const ConfusionRow = ({ pair, count }: { pair: string; count: number }) => (
+    <div className="confusion-row" key={pair}>
+      <span>{pair}</span>
+      <span className="tag">
+        {counted(count, ["плутанина", "плутанини", "плутанин"])}
+      </span>
+    </div>
+  );
   return (
     <>
       <PageHeading
-        eyebrow="ПЕРЕТВОРЮЙТЕ ПРОГАЛИНИ НА СИЛЬНІ СТОРОНИ"
-        title="Теми, що потребують уваги."
-        description="До цих тем варто повернутися. Саме так знання стають міцнішими."
+        eyebrow="КОРОТКЕ ПОВТОРЕННЯ"
+        title="Що повторити сьогодні"
+        description="Поверніться до продуктів, які настав час пригадати або які було складно розрізнити."
         action={
           <Link className="button primary" to="/training?mode=weak">
-            Повторити слабкі теми
+            Почати повторення
             <ArrowRight size={16} />
           </Link>
         }
       />
+      <section className="detail-panel p1-review-queue">
+        <div className="section-heading">
+          <div>
+            <h2>Продукти для повторення</h2>
+            <p>Почніть із найважливішого та рухайтеся по черзі.</p>
+          </div>
+          <strong>{reviewProducts.length} карток</strong>
+        </div>
+        {reviewProducts.length ? (
+          <div className="p1-review-queue-list">
+            {reviewProducts.map(({ product, progress }) => (
+              <Link key={product!.id} to={`/products/${product!.id}`}>
+                <span className="p1-review-queue-image">
+                  {product!.image ? (
+                    <img src={product!.image} alt="" />
+                  ) : (
+                    <Target size={22} />
+                  )}
+                </span>
+                <span>
+                  <small>
+                    {
+                      catalog.lines.find((line) => line.id === product!.line_id)
+                        ?.name
+                    }
+                  </small>
+                  <strong>{product!.name}</strong>
+                  <em>
+                    <Clock3 size={13} />{" "}
+                    {progress.next_review_at <= now
+                      ? "Час повторити"
+                      : `Засвоєно на ${progress.mastery_score}%`}
+                  </em>
+                </span>
+                <ArrowRight size={18} />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="p1-review-complete">
+            <span>✓</span>
+            <div>
+              <strong>На сьогодні все повторено</strong>
+              <p>
+                Можна перейти до нової лінійки або пройти звичайне тренування.
+              </p>
+            </div>
+            <Link className="button secondary" to="/catalog">
+              Відкрити каталог
+            </Link>
+          </div>
+        )}
+      </section>
       <div className="weak-grid">
         {(["brand", "line", "product"] as EntityType[]).map((type) => {
           const rows = stats.progress
@@ -76,17 +156,20 @@ export function WeakAreas() {
       </div>
       <section className="detail-panel">
         <h2>Продукти, які часто плутаються</h2>
-        {confused.size ? (
-          [...confused]
-            .sort((a, b) => b[1] - a[1])
-            .map(([pair, count]) => (
-              <div className="confusion-row" key={pair}>
-                <span>{pair}</span>
-                <span className="tag">
-                  {counted(count, ["плутанина", "плутанини", "плутанин"])}
-                </span>
-              </div>
-            ))
+        {confusionPairs.length ? (
+          <>
+            {confusionPairs.slice(0, 12).map(([pair, count]) => (
+              <ConfusionRow key={pair} pair={pair} count={count} />
+            ))}
+            {confusionPairs.length > 12 && (
+              <details className="p1-more-confusions">
+                <summary>Показати ще {confusionPairs.length - 12}</summary>
+                {confusionPairs.slice(12).map(([pair, count]) => (
+                  <ConfusionRow key={pair} pair={pair} count={count} />
+                ))}
+              </details>
+            )}
+          </>
         ) : (
           <p className="muted">
             Тут з’являться пари продуктів, коли ви оберете один замість іншого.

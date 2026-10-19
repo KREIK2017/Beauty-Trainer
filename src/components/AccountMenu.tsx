@@ -6,6 +6,7 @@ import {
   SlidersHorizontal,
   LogOut,
   CircleHelp,
+  ChartNoAxesCombined,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
@@ -72,6 +73,10 @@ export default function AccountMenu({ onOpen }: { onOpen: () => void }) {
             <Link to="/help">
               <CircleHelp size={18} aria-hidden="true" />
               Допомога та приватність
+            </Link>
+            <Link to="/progress">
+              <ChartNoAxesCombined size={18} aria-hidden="true" />
+              Мій прогрес
             </Link>
             {user.role === "admin" && (
               <>

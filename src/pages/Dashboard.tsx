@@ -1,424 +1,322 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Flame,
-  Zap,
   BookOpen,
-  Layers,
-  Clock3,
-  Sparkles,
-  Target,
   Check,
-  Leaf,
+  Clock3,
+  LockKeyhole,
+  RotateCcw,
+  Search,
 } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { LineCard, PageHeading, ProgressBar } from "../components/ui";
-import {
-  lineLearningStatus,
-  mastery,
-} from "../../shared/learning";
+import { lineLearningStatus, mastery } from "../../shared/learning";
 import { counted } from "../../shared/uk";
+
 export default function Dashboard() {
   const { catalog, stats } = useData();
-  const due = stats.progress.filter(
-    (p) =>
-      p.entity_type !== "brand" && p.next_review_at <= new Date().toISOString(),
-  ).length;
-  const weak = stats.progress
-    .filter((p) => p.mastery_score < 60 && p.entity_type !== "brand")
-    .sort((a, b) => a.mastery_score - b.mastery_score)
-    .slice(0, 3);
-  const learned = stats.progress.filter(
-    (p) => p.entity_type === "product" && p.mastery_score >= 80,
-  ).length;
-  const today = stats.history.filter(
-    (h) => h.created_at.slice(0, 10) === new Date().toISOString().slice(0, 10),
-  ).length;
+  const productIds = (lineId: string) =>
+    catalog.products
+      .filter((product) => product.line_id === lineId)
+      .map((product) => product.id);
+  const lineActivity = (lineId: string) => {
+    const ids = new Set(productIds(lineId));
+    const progress = stats.progress.filter(
+      (item) =>
+        (item.entity_type === "line" && item.entity_id === lineId) ||
+        (item.entity_type === "product" && ids.has(item.entity_id)),
+    );
+    const reviewed = new Set(
+      stats.flashcardReviews
+        .filter((review) => ids.has(review.product_id))
+        .map((review) => review.product_id),
+    ).size;
+    const normalComplete = stats.lineTestCompletions.some(
+      (completion) =>
+        completion.line_id === lineId && completion.difficulty === "normal",
+    );
+    const hardComplete = stats.lineTestCompletions.some(
+      (completion) =>
+        completion.line_id === lineId && completion.difficulty === "hard",
+    );
+    return {
+      progress,
+      reviewed,
+      normalComplete,
+      hardComplete,
+      productIds: [...ids],
+    };
+  };
   const statusPriority = { review: 0, learning: 1, new: 2, mastered: 3 };
   const suggestedLines = [...catalog.lines]
     .sort((a, b) => {
-      const productIds = (lineId: string) =>
-        catalog.products
-          .filter((product) => product.line_id === lineId)
-          .map((product) => product.id);
+      const aIds = productIds(a.id);
+      const bIds = productIds(b.id);
       return (
-        statusPriority[lineLearningStatus(stats, a.id, productIds(a.id))] -
-          statusPriority[lineLearningStatus(stats, b.id, productIds(b.id))] ||
+        statusPriority[lineLearningStatus(stats, a.id, aIds)] -
+          statusPriority[lineLearningStatus(stats, b.id, bIds)] ||
         mastery(stats.progress, "line", a.id) -
           mastery(stats.progress, "line", b.id)
       );
     })
     .slice(0, 3);
-  const lineActivity = (lineId: string) => {
-    const productIds = new Set(
-      catalog.products
-        .filter((product) => product.line_id === lineId)
-        .map((product) => product.id),
-    );
-    const progress = stats.progress.filter(
-      (item) =>
-        (item.entity_type === "line" && item.entity_id === lineId) ||
-        (item.entity_type === "product" && productIds.has(item.entity_id)),
-    );
-    const reviewed = stats.flashcardReviews.filter((review) =>
-      productIds.has(review.product_id),
-    ).length;
-    const tests = stats.lineTestCompletions.filter(
-      (completion) => completion.line_id === lineId,
-    ).length;
-    return { progress, reviewed, tests, productIds: [...productIds] };
-  };
   const activeLine = [...catalog.lines]
     .filter((line) => {
       const activity = lineActivity(line.id);
       return (
         (activity.progress.length > 0 ||
           activity.reviewed > 0 ||
-          activity.tests > 0) &&
+          activity.normalComplete ||
+          activity.hardComplete) &&
         lineLearningStatus(stats, line.id, activity.productIds) !== "mastered"
       );
     })
-    .sort((a, b) => {
-      const aScore = Math.max(
-        0,
-        ...lineActivity(a.id).progress.map((item) => item.mastery_score),
+    .sort(
+      (a, b) =>
+        mastery(stats.progress, "line", a.id) -
+        mastery(stats.progress, "line", b.id),
+    )[0];
+  const focusLine =
+    activeLine ??
+    catalog.lines.find((line) => {
+      const activity = lineActivity(line.id);
+      return (
+        !activity.progress.length &&
+        !activity.reviewed &&
+        !activity.normalComplete &&
+        !activity.hardComplete
       );
-      const bScore = Math.max(
-        0,
-        ...lineActivity(b.id).progress.map((item) => item.mastery_score),
-      );
-      return aScore - bScore;
-    })[0];
-  const newLine = catalog.lines.find((line) => {
-    const activity = lineActivity(line.id);
-    return !activity.progress.length && !activity.reviewed && !activity.tests;
-  });
-  const activeLineStep = activeLine
-    ? (() => {
-        const activity = lineActivity(activeLine.id);
-        const cardsComplete =
-          activity.productIds.length > 0 &&
-          activity.reviewed === activity.productIds.length;
-        const normalComplete = stats.lineTestCompletions.some(
-          (completion) =>
-            completion.line_id === activeLine.id &&
-            completion.difficulty === "normal",
-        );
-        if (!cardsComplete)
-          return {
-            href: `/lines/${activeLine.id}/cards`,
-            reason: `Ви переглянули ${activity.reviewed} із ${activity.productIds.length} карток. Завершіть коло, щоб перейти до тестів.`,
-            meta: `${activity.productIds.length - activity.reviewed} карток залишилося`,
-          };
-        if (!normalComplete)
-          return {
-            href: `/training?line=${activeLine.id}`,
-            reason:
-              "Картки переглянуто. Тепер складіть звичайний тест, щоб перевірити основи.",
-            meta: "звичайний режим · до 10 запитань",
-          };
-        return {
-          href: `/training?line=${activeLine.id}&difficulty=hard`,
-          reason:
-            "Звичайний тест складено. Залишився складний режим із практичними форматами.",
-          meta: "складний режим · до 10 запитань",
-        };
-      })()
-    : undefined;
-  const nextStep = due
-    ? {
-        title: "Час повернутися до вивченого.",
-        reason: `${counted(due, ["тема потребує", "теми потребують", "тем потребують"])} запланованого повторення. Почнемо з них, щоб знання не втрачалися.`,
-        href: "/training?mode=daily",
-        meta: "до 7 запитань · 3–5 хв",
-      }
-    : activeLine
-      ? {
-          title: `Закріпіть лінійку ${activeLine.name}.`,
-          reason: activeLineStep!.reason,
-          href: activeLineStep!.href,
-          meta: activeLineStep!.meta,
-        }
-      : newLine
-        ? {
-            title: `Познайомтеся з ${newLine.name}.`,
-            reason:
-              "Це наступна нова лінійка у вашій бібліотеці. Спочатку перегляньте картки продуктів.",
-            href: `/lines/${newLine.id}/cards`,
-            meta: `${counted(
-              catalog.products.filter(
-                (product) => product.line_id === newLine.id,
-              ).length,
-              ["картка", "картки", "карток"],
-            )} · у власному темпі`,
-          }
-        : {
-            title: "Підтримуйте знання актуальними.",
-            reason:
-              "Усі доступні теми вже опрацьовані. Коротке тренування допоможе зберегти результат.",
-            href: "/training?mode=daily",
-            meta: "до 7 запитань · 3–5 хв",
-          };
-  const dailyGoal = 7;
+    }) ??
+    catalog.lines[0];
+  const focusActivity = focusLine ? lineActivity(focusLine.id) : undefined;
+  const focusProducts = focusLine ? productIds(focusLine.id) : [];
+  const cardsComplete =
+    !!focusActivity &&
+    focusProducts.length > 0 &&
+    focusActivity.reviewed === focusProducts.length;
+  const continueTo = !focusLine
+    ? "/catalog"
+    : !cardsComplete
+      ? `/lines/${focusLine.id}/cards`
+      : !focusActivity?.normalComplete
+        ? `/training?line=${focusLine.id}`
+        : `/training?line=${focusLine.id}&difficulty=hard`;
+  const dueProducts = stats.progress
+    .filter(
+      (item) =>
+        item.entity_type === "product" &&
+        item.next_review_at <= new Date().toISOString(),
+    )
+    .sort((a, b) => a.mastery_score - b.mastery_score)
+    .map((item) =>
+      catalog.products.find((product) => product.id === item.entity_id),
+    )
+    .filter((product) => product !== undefined)
+    .slice(0, 3);
+  const focusImage =
+    focusLine?.image ??
+    catalog.products.find((product) => product.line_id === focusLine?.id)
+      ?.image;
+
   return (
     <>
       <PageHeading
-        eyebrow="ТРОХИ ПРАКТИКИ — БІЛЬШЕ ВПЕВНЕНОСТІ"
-        title="Ваша впевненість починається зі знань."
-        description="Вивчайте продукти та перетворюйте знання на впевнені рекомендації."
+        eyebrow="РОБОЧИЙ ПРОСТІР"
+        title="Продовжуйте навчання"
+        description="Вивчайте продукцію та знаходьте потрібну інформацію під час роботи."
         action={
-          <span className="date-pill">
-            {new Date().toLocaleDateString("uk-UA", {
-              month: "short",
-              day: "numeric",
-              weekday: "short",
-            })}
-          </span>
+          <Link className="button secondary" to="/training?mode=daily">
+            Тренування на сьогодні <ArrowRight size={16} />
+          </Link>
         }
       />
-      <section className="hero">
-        <div className="hero-copy">
-          <span className="hero-badge">
-            <span />
-            ВАША ЩОДЕННА ПОРЦІЯ ЗНАНЬ
-          </span>
-          <h2>{nextStep.title}</h2>
-          <p>{nextStep.reason}</p>
-          <div className="hero-buttons">
-            <Link className="button light-button" to={nextStep.href}>
-              Продовжити навчання <ArrowRight size={17} />
-            </Link>
-            <span>
-              <Clock3 size={15} /> {nextStep.meta}
-            </span>
-          </div>
-        </div>
-        <div className="hero-art" aria-hidden="true">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="floating-label">
-            <Sparkles size={16} /> Щодня трохи більше знань
-          </div>
-          <div className="bottle bottle-tall">
-            <div className="bottle-cap" />
-            <span>milk_shake</span>
-            <small>LIFESTYLING</small>
-            <div className="bottle-rule" />
-            <b>
-              стиль.
-              <br />
-              захист.
-              <br />
-              блиск.
-            </b>
-            <small>ВАШ НОВИЙ КРОК</small>
-          </div>
-          <div className="bottle bottle-short">
-            <div className="bottle-cap" />
-            <span>INSIGHT</span>
-            <small>DAILY USE</small>
-            <Leaf size={30} />
-            <b>
-              щоденний
-              <br />
-              догляд.
-            </b>
-          </div>
-          <div className="art-spark spark-one">✳</div>
-          <div className="art-spark spark-two">✧</div>
-        </div>
-      </section>
-      <section className="stats-grid">
-        {[
-          [Flame, "Серія навчання", `${stats.streak}`, "днів поспіль", "peach"],
-          [
-            Zap,
-            "Усього XP",
-            stats.xp.toLocaleString("uk-UA"),
-            "здобуто у тренуваннях",
-            "yellow",
-          ],
-          [
-            BookOpen,
-            "Засвоєні продукти",
-            `${learned}`,
-            `із ${catalog.products.length} у бібліотеці`,
-            "green",
-          ],
-          [
-            Layers,
-            "Лінійки продуктів",
-            `${catalog.lines.length}`,
-            `брендів у бібліотеці: ${catalog.brands.length}`,
-            "purple",
-          ],
-        ].map(([Icon, label, value, sub, tone]) => {
-          const I = Icon as typeof Flame;
-          return (
-            <div className="stat-card" key={String(label)}>
-              <div className="row">
-                <span>{String(label)}</span>
-                <div className={`stat-icon ${tone}`}>
-                  <I size={18} />
-                </div>
+
+      {focusLine ? (
+        <section className="p1-learning-hero">
+          <div className="p1-learning-summary">
+            <div>
+              <span className="eyebrow">ПРОДОВЖИТИ НАВЧАННЯ</span>
+              <h2>{focusLine.name}</h2>
+              <p>{focusLine.short_description}</p>
+            </div>
+            {focusImage && (
+              <div className="p1-focus-image">
+                <img src={focusImage} alt="" />
               </div>
-              <strong>{String(value)}</strong>
-              <small>{String(sub)}</small>
-            </div>
-          );
-        })}
-      </section>
-      <div className="dashboard-columns">
-        <div>
-          <div className="section-heading">
-            <div>
-              <h2>Продовжуйте вивчення</h2>
-              <p>Ще один крок до знання кожної лінійки.</p>
-            </div>
-            <Link to="/catalog">
-              До каталогу <ArrowRight size={15} />
-            </Link>
-          </div>
-          <div className="line-grid">
-            {suggestedLines.map((l, i) => (
-              <LineCard key={l.id} line={l} index={i} />
-            ))}
-          </div>
-          <div className="learning-tip">
-            <span className="tip-icon">
-              <Sparkles size={20} />
-            </span>
-            <div>
-              <strong>Запам’ятовуйте продукт і те, кому він підходить.</strong>
-              <p>
-                Клієнтські ситуації допомагають застосовувати знання в реальних
-                розмовах.
-              </p>
-            </div>
-            <Link to="/training" aria-label="Практикувати клієнтські ситуації">
-              <ArrowRight size={20} />
-            </Link>
-          </div>
-        </div>
-        <aside className="review-panel">
-          <div className="row">
-            <h2>Фокус на сьогодні</h2>
-            <span className="tag green-tag">РОЗВИВАЙМОСЯ</span>
-          </div>
-          <div className="review-count">
-            <span className="stat-icon green">
-              <Clock3 size={21} />
-            </span>
-            <div>
-              <strong>
-                {counted(due, ["тема", "теми", "тем"])} для повторення
-              </strong>
-              <p>
-                {due
-                  ? "Повторення допомагає запам’ятати."
-                  : "Саме час дізнатися щось нове."}
-              </p>
-            </div>
-          </div>
-          <Link className="text-link" to="/training?mode=daily">
-            Відкрити план на сьогодні <ArrowRight size={14} />
-          </Link>
-          <div className="panel-divider" />
-          <div className="row">
-            <h3>Теми, що потребують уваги</h3>
-            <Target size={16} />
-          </div>
-          {weak.length ? (
-            weak.map((p) => (
-              <div className="weak-mini" key={p.entity_type + p.entity_id}>
-                <div className="row">
-                  <span>
-                    {
-                      (p.entity_type === "line"
-                        ? catalog.lines
-                        : catalog.products
-                      ).find((x) => x.id === p.entity_id)?.name
-                    }
-                  </span>
-                  <small>{p.mastery_score}%</small>
-                </div>
-                <ProgressBar value={p.mastery_score} />
-              </div>
-            ))
-          ) : (
-            <p className="muted small">
-              Тут з’являтимуться теми для повторення. Кожна відповідь допомагає
-              підібрати наступне тренування.
-            </p>
-          )}
-          <Link className="text-link" to="/weak">
-            Переглянути слабкі теми <ArrowRight size={14} />
-          </Link>
-        </aside>
-      </div>
-      <section className="bottom-grid">
-        <div className="daily-goal">
-          <div className="row">
-            <div>
-              <span className="eyebrow">ФОРМУЙТЕ ЗВИЧКУ</span>
-              <h3>Ваша щоденна ціль</h3>
-            </div>
-            <span className="goal-check">
-              <Check size={19} />
-            </span>
-          </div>
-          <div className="row small">
-            <span>
-              {Math.min(today, dailyGoal)} відповідей із {dailyGoal}
-            </span>
-            <strong>
-              {Math.min(Math.round((today / dailyGoal) * 100), 100)}%
-            </strong>
-          </div>
-          <ProgressBar
-            value={Math.min(Math.round((today / dailyGoal) * 100), 100)}
-          />
-          <p>Кілька хвилин уваги сьогодні — відчутний результат завтра.</p>
-        </div>
-        <div className="library-overview">
-          <div>
-            <span className="eyebrow">ВАША БІБЛІОТЕКА ЗРОСТАЄ</span>
-            <h3>
-              {counted(catalog.brands.length, ["бренд", "бренди", "брендів"])}.
-              Ще більше для вивчення.
-            </h3>
-            <p>Дізнайтеся, що робить кожен продукт особливим.</p>
-            <Link className="text-link" to="/catalog">
-              Відкрити каталог <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div className="brand-stack">
-            {catalog.brands.slice(0, 2).map((b) => (
-              <span key={b.id}>
-                {b.name}
-                <small>
-                  {counted(
-                    catalog.lines.filter((l) => l.brand_id === b.id).length,
-                    ["лінійка", "лінійки", "лінійок"],
-                  )}{" "}
-                  ·{" "}
-                  {Math.round(
-                    catalog.lines
-                      .filter((l) => l.brand_id === b.id)
-                      .reduce(
-                        (n, l) => n + mastery(stats.progress, "line", l.id),
-                        0,
-                      ) /
-                      (catalog.lines.filter((l) => l.brand_id === b.id)
-                        .length || 1),
-                  )}
-                  % засвоєно
-                </small>
+            )}
+            <div className="p1-focus-progress">
+              <ProgressBar
+                value={
+                  focusProducts.length
+                    ? Math.round(
+                        ((focusActivity?.reviewed ?? 0) /
+                          focusProducts.length) *
+                          100,
+                      )
+                    : 0
+                }
+              />
+              <span>
+                {focusActivity?.reviewed ?? 0} з {focusProducts.length} карток
               </span>
-            ))}
+            </div>
+            <Link className="button light-button" to={continueTo}>
+              Продовжити <ArrowRight size={18} />
+            </Link>
+          </div>
+          <div className="p1-route" aria-label="Ваш навчальний маршрут">
+            <h2>Ваш навчальний маршрут</h2>
+            <RouteStep
+              number={1}
+              title="Картки"
+              description="Вивчіть ключову інформацію про продукти."
+              state={cardsComplete ? "complete" : "active"}
+            />
+            <RouteStep
+              number={2}
+              title="Звичайний тест"
+              description="Перевірте базові знання лінійки."
+              state={
+                focusActivity?.normalComplete
+                  ? "complete"
+                  : cardsComplete
+                    ? "active"
+                    : "locked"
+              }
+            />
+            <RouteStep
+              number={3}
+              title="Складний тест"
+              description="Закріпіть знання у практичних форматах."
+              state={
+                focusActivity?.hardComplete
+                  ? "complete"
+                  : focusActivity?.normalComplete
+                    ? "active"
+                    : "locked"
+              }
+            />
+          </div>
+        </section>
+      ) : null}
+
+      <section className="p1-catalog-shortcut">
+        <div>
+          <BookOpen size={25} />
+          <div>
+            <h2>Каталог продуктів</h2>
+            <p>Знайдіть продукт, лінійку або рішення для потреби клієнта.</p>
           </div>
         </div>
+        <Link to="/catalog" className="p1-search-link">
+          <Search size={19} />
+          <span>Знайти продукт, лінійку або потребу</span>
+          <ArrowRight size={18} />
+        </Link>
+        <div className="p1-brand-chips" aria-label="Бренди каталогу">
+          {catalog.brands.slice(0, 6).map((brand) => (
+            <Link key={brand.id} to={`/catalog?brand=${brand.id}`}>
+              {brand.name}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="section-heading">
+          <div>
+            <h2>Призначено вам</h2>
+            <p>Лінійки, з яких варто продовжити навчання.</p>
+          </div>
+          <Link to="/catalog">
+            Усі лінійки <ArrowRight size={15} />
+          </Link>
+        </div>
+        <div className="line-grid p1-assigned-lines">
+          {suggestedLines.map((line, index) => (
+            <LineCard key={line.id} line={line} index={index} />
+          ))}
+        </div>
+      </section>
+
+      <section className="p1-review-strip">
+        <div className="section-heading">
+          <div>
+            <h2>Повторити сьогодні</h2>
+            <p>
+              {dueProducts.length
+                ? `${counted(dueProducts.length, ["продукт", "продукти", "продуктів"])} готові до короткого повторення.`
+                : "На сьогодні запланованих повторень немає."}
+            </p>
+          </div>
+          <Link to="/weak">
+            Усі повторення <ArrowRight size={15} />
+          </Link>
+        </div>
+        {dueProducts.length ? (
+          <div className="p1-review-items">
+            {dueProducts.map((product) => (
+              <Link key={product.id} to={`/products/${product.id}`}>
+                <span className="p1-review-thumb">
+                  {product.image ? (
+                    <img src={product.image} alt="" />
+                  ) : (
+                    <RotateCcw size={20} />
+                  )}
+                </span>
+                <span>
+                  <small>
+                    {
+                      catalog.brands.find(
+                        (brand) => brand.id === product.brand_id,
+                      )?.name
+                    }
+                  </small>
+                  <strong>{product.name}</strong>
+                </span>
+                <ArrowRight size={17} />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="p1-review-empty">
+            <Check size={20} />
+            <span>Можна продовжити нову лінійку або відкрити каталог.</span>
+            <Link to="/catalog">До каталогу</Link>
+          </div>
+        )}
       </section>
     </>
+  );
+}
+
+function RouteStep({
+  number,
+  title,
+  description,
+  state,
+}: {
+  number: number;
+  title: string;
+  description: string;
+  state: "active" | "complete" | "locked";
+}) {
+  return (
+    <div className={`p1-route-step ${state}`}>
+      <span className="p1-route-number">
+        {state === "complete" ? (
+          <Check size={17} />
+        ) : state === "locked" ? (
+          <LockKeyhole size={16} />
+        ) : (
+          number
+        )}
+      </span>
+      <span>
+        <strong>{title}</strong>
+        <small>{description}</small>
+      </span>
+      {state === "active" && <Clock3 size={17} />}
+    </div>
   );
 }

@@ -107,12 +107,21 @@ export function CatalogPage() {
     if (statuses.some((status) => status !== "new")) return "learning";
     return "new";
   };
+  const quickNeeds = [...new Set(catalog.products.flatMap((p) => p.hair_types))]
+    .filter(Boolean)
+    .slice(0, 4);
+  const brandImage = (brandId: string) =>
+    catalog.lines.find((line) => line.brand_id === brandId && line.image)
+      ?.image ??
+    catalog.products.find(
+      (product) => product.brand_id === brandId && product.image,
+    )?.image;
   return (
     <>
       <PageHeading
-        eyebrow="ЗНАЙТЕ СВОЇ ПРОДУКТИ"
-        title="Бібліотека продуктів"
-        description="Знайомтеся з брендами, вивчайте лінійки та знаходьте потрібний продукт."
+        eyebrow="ДОВІДНИК ДЛЯ РОБОТИ"
+        title="Каталог продуктів"
+        description="Знаходьте бренди, лінійки та продукти без пошуку у презентаціях."
       />
       <div className="filter-panel">
         <label className="search">
@@ -194,7 +203,7 @@ export function CatalogPage() {
         </>
       ) : (
         <>
-          {selectedBrand && (
+          {activeBrand && (
             <div className="mobile-catalog-context">
               <button
                 className="back-link"
@@ -210,82 +219,121 @@ export function CatalogPage() {
               <p>Оберіть лінійку, щоб побачити її продукти.</p>
             </div>
           )}
-          {catalog.brands
-            .filter((b) => !activeBrand || b.id === activeBrand.id)
-            .map((b) => {
-              const status = brandStatus(b.id);
-              return (
-                <section
-                  className={`brand-section ${selectedBrand ? "selected-brand" : ""}`}
-                  key={b.id}
-                >
-                  <div className="section-heading">
-                    <div>
-                      <div className="brand-heading-row">
-                        {brandGuides[b.id] ? (
-                          <Link
-                            className="brand-title-link"
-                            to={`/brands/${b.id}`}
-                          >
-                            <h2 className="brand-title">{b.name}</h2>
-                            <span>Про бренд</span>
-                            <ArrowRight size={14} />
-                          </Link>
-                        ) : (
-                          <h2 className="brand-title">{b.name}</h2>
-                        )}
-                        <span className={`learning-status status-${status}`}>
-                          {LEARNING_STATUS_LABELS[status]}
-                        </span>
-                      </div>
-                      <p>
-                        {counted(
-                          catalog.lines.filter((l) => l.brand_id === b.id)
-                            .length,
-                          ["лінійка", "лінійки", "лінійок"],
-                        )}{" "}
-                        ·{" "}
-                        {counted(
-                          catalog.products.filter((p) => p.brand_id === b.id)
-                            .length,
-                          ["продукт", "продукти", "продуктів"],
-                        )}
-                      </p>
-                    </div>
+          {!activeBrand ? (
+            <>
+              <div className="section-heading p1-catalog-heading">
+                <div>
+                  <h2>Оберіть бренд</h2>
+                  <p>
+                    Перейдіть до лінійок бренду або знайдіть конкретний продукт
+                    через пошук.
+                  </p>
+                </div>
+              </div>
+              <div className="p1-brand-grid">
+                {catalog.brands.map((brand) => {
+                  const status = brandStatus(brand.id);
+                  const image = brandImage(brand.id);
+                  return (
                     <Link
-                      className="mobile-brand-select"
-                      to={`/catalog?brand=${encodeURIComponent(b.id)}`}
-                      aria-label={`Відкрити лінійки ${b.name}`}
+                      key={brand.id}
+                      className="p1-brand-card"
+                      to={`/catalog?brand=${encodeURIComponent(brand.id)}`}
+                      aria-label={`Відкрити лінійки ${brand.name}`}
                     >
-                      Лінійки <ArrowRight size={16} />
-                    </Link>
-                  </div>
-                  <div className="catalog-lines">
-                    {catalog.lines
-                      .filter((l) => l.brand_id === b.id)
-                      .map((l, i) => (
-                        <div key={l.id}>
-                          <LineCard line={l} index={i} />
-                          <div className="nested-products">
-                            {catalog.products
-                              .filter((p) => p.line_id === l.id)
-                              .map((p) => (
-                                <Link key={p.id} to={`/products/${p.id}`}>
-                                  <span>
-                                    {p.name.startsWith(`${l.name} `)
-                                      ? p.name.slice(l.name.length + 1)
-                                      : p.name}
-                                  </span>
-                                  <ArrowRight size={13} />
-                                </Link>
-                              ))}
-                          </div>
+                      <div className="p1-brand-copy">
+                        <div className="row">
+                          <h2>{brand.name}</h2>
+                          <span className={`learning-status status-${status}`}>
+                            {LEARNING_STATUS_LABELS[status]}
+                          </span>
                         </div>
-                      ))}
+                        <p>{brand.description}</p>
+                        <span className="p1-brand-counts">
+                          {counted(
+                            catalog.lines.filter(
+                              (line) => line.brand_id === brand.id,
+                            ).length,
+                            ["лінійка", "лінійки", "лінійок"],
+                          )}{" "}
+                          ·{" "}
+                          {counted(
+                            catalog.products.filter(
+                              (product) => product.brand_id === brand.id,
+                            ).length,
+                            ["продукт", "продукти", "продуктів"],
+                          )}
+                        </span>
+                        <strong>
+                          Переглянути лінійки <ArrowRight size={16} />
+                        </strong>
+                      </div>
+                      <div className="p1-brand-image">
+                        {image ? (
+                          <img src={image} alt="" loading="lazy" />
+                        ) : (
+                          <Leaf size={52} strokeWidth={0.8} />
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+              {!!quickNeeds.length && (
+                <section className="p1-quick-needs">
+                  <div>
+                    <h2>Швидкий підбір</h2>
+                    <p>Почніть пошук із потреби волосся.</p>
+                  </div>
+                  <div>
+                    {quickNeeds.map((need) => (
+                      <button
+                        type="button"
+                        key={need}
+                        onClick={() => setFilters({ hair: need })}
+                      >
+                        {need} <ArrowRight size={15} />
+                      </button>
+                    ))}
                   </div>
                 </section>
-              );
-            })}
+              )}
+            </>
+          ) : (
+            <section className="brand-section selected-brand">
+              <div className="section-heading">
+                <div>
+                  <div className="brand-heading-row">
+                    {brandGuides[activeBrand.id] ? (
+                      <Link
+                        className="brand-title-link"
+                        to={`/brands/${activeBrand.id}`}
+                      >
+                        <h2 className="brand-title">{activeBrand.name}</h2>
+                        <span>Про бренд</span>
+                        <ArrowRight size={14} />
+                      </Link>
+                    ) : (
+                      <h2 className="brand-title">{activeBrand.name}</h2>
+                    )}
+                    <span
+                      className={`learning-status status-${brandStatus(activeBrand.id)}`}
+                    >
+                      {LEARNING_STATUS_LABELS[brandStatus(activeBrand.id)]}
+                    </span>
+                  </div>
+                  <p>Оберіть лінійку, щоб перейти до її продуктів.</p>
+                </div>
+              </div>
+              <div className="catalog-lines p1-catalog-lines">
+                {catalog.lines
+                  .filter((line) => line.brand_id === activeBrand.id)
+                  .map((line, index) => (
+                    <LineCard key={line.id} line={line} index={index} />
+                  ))}
+              </div>
+            </section>
+          )}
         </>
       )}
       {!catalog.brands.length && (
@@ -359,36 +407,44 @@ export function LinePage() {
           </div>
         }
       />
-      <div className="detail-panel">
-        <p className="lead">{line.description}</p>
-        <div className="detail-grid">
-          <section>
-            <h3>Для яких типів волосся</h3>
-            <Tags values={line.hair_types} />
-          </section>
-          <section>
-            <h3>Основні призначення</h3>
-            <Tags values={line.purposes} />
-          </section>
-          <section>
-            <h3>Переваги</h3>
-            <Tags values={line.benefits} />
-          </section>
-          <section>
-            <h3>Ключові слова для запам’ятовування</h3>
-            <Tags values={line.keywords} />
-          </section>
-        </div>
-        <div className="row">
-          <div className="line-progress-heading">
-            <h3>Прогрес навчання</h3>
-            <span className={`learning-status status-${status}`}>
-              {LEARNING_STATUS_LABELS[status]}
-            </span>
+      <div className="detail-panel p1-line-overview">
+        {line.image && (
+          <div className="p1-line-visual">
+            <img src={line.image} alt={`Лінійка ${line.name}`} />
           </div>
-          <strong>{mastery(stats.progress, "line", line.id)}%</strong>
+        )}
+        <div className="p1-line-overview-copy">
+          <span className="eyebrow">КОРОТКО ПРО ЛІНІЙКУ</span>
+          <p className="lead">{line.description}</p>
+          <div className="detail-grid">
+            <section>
+              <h3>Для яких типів волосся</h3>
+              <Tags values={line.hair_types} />
+            </section>
+            <section>
+              <h3>Основні призначення</h3>
+              <Tags values={line.purposes} />
+            </section>
+            <section>
+              <h3>Переваги</h3>
+              <Tags values={line.benefits} />
+            </section>
+            <section>
+              <h3>Ключові слова для запам’ятовування</h3>
+              <Tags values={line.keywords} />
+            </section>
+          </div>
+          <div className="row">
+            <div className="line-progress-heading">
+              <h3>Прогрес навчання</h3>
+              <span className={`learning-status status-${status}`}>
+                {LEARNING_STATUS_LABELS[status]}
+              </span>
+            </div>
+            <strong>{mastery(stats.progress, "line", line.id)}%</strong>
+          </div>
+          <ProgressBar value={mastery(stats.progress, "line", line.id)} />
         </div>
-        <ProgressBar value={mastery(stats.progress, "line", line.id)} />
       </div>
       <section className="detail-panel line-learning-path">
         <div className="line-path-heading">
@@ -497,7 +553,7 @@ export function ProductPage() {
           </div>
         }
       />
-      <div className="product-detail">
+      <div className="product-detail p1-product-detail">
         <div className="product-image">
           {p.image ? (
             <img src={p.image} alt={p.name} />

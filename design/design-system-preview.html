@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Beauty Trainer — Design System</title>
+    <style>
+      :root {
+        --ink: #102b36;
+        --ink-2: #23434d;
+        --green: #176b53;
+        --green-hover: #218064;
+        --cream: #f7f6f1;
+        --surface: #fff;
+        --body: #405860;
+        --muted: #66787e;
+        --border: #dee5e5;
+        --subtle: #eef2f1;
+        --sage: #e6efe5;
+        --sky: #e0eef5;
+        --blue: #246f91;
+        --apricot: #f4e6d8;
+        --amber: #faebcb;
+        --amber-text: #8a5a08;
+        --red: #f8e4e1;
+        --red-text: #a84235;
+        --shadow: 0 12px 32px rgb(16 43 54 / 8%);
+        font-family: Manrope, Inter, "Segoe UI", Arial, sans-serif;
+        color: var(--ink);
+        background: var(--cream);
+        font-size: 16px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 2px;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 230px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      aside {
+        background: var(--ink);
+        color: white;
+        padding: 28px 22px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 22px;
+        font-weight: 750;
+      }
+      .logo-mark {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: #70c6a5;
+        color: var(--ink);
+      }
+      aside p {
+        color: #bdcacd;
+        line-height: 1.55;
+        margin-top: 42px;
+      }
+      aside nav {
+        display: grid;
+        gap: 8px;
+        margin-top: 28px;
+      }
+      aside a {
+        color: #dce5e6;
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 8px;
+      }
+      aside a.active {
+        background: #294954;
+        color: white;
+      }
+      main {
+        padding: 48px clamp(24px, 4vw, 64px) 80px;
+        max-width: 1440px;
+        width: 100%;
+      }
+      .eyebrow {
+        color: var(--green);
+        letter-spacing: 0.14em;
+        font-size: 12px;
+        font-weight: 750;
+      }
+      h1 {
+        font-size: clamp(34px, 4vw, 48px);
+        line-height: 1.08;
+        margin: 8px 0 12px;
+        letter-spacing: -0.04em;
+      }
+      .lead {
+        max-width: 760px;
+        color: var(--body);
+        font-size: 18px;
+        line-height: 1.6;
+      }
+      section {
+        margin-top: 48px;
+      }
+      h2 {
+        font-size: 26px;
+        margin: 0 0 18px;
+        letter-spacing: -0.02em;
+      }
+      h3 {
+        font-size: 18px;
+        margin: 0 0 12px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .colors {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .swatch {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        background: white;
+      }
+      .swatch-color {
+        height: 88px;
+      }
+      .swatch div:last-child {
+        padding: 12px;
+        display: grid;
+        gap: 3px;
+      }
+      .swatch small {
+        color: var(--muted);
+      }
+      .type-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .panel {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgb(16 43 54 / 4%);
+      }
+      .display {
+        font-size: 44px;
+        line-height: 1.08;
+        font-weight: 750;
+        letter-spacing: -0.04em;
+      }
+      .h1 {
+        font-size: 36px;
+        line-height: 1.15;
+        font-weight: 750;
+      }
+      .h2 {
+        font-size: 26px;
+        font-weight: 750;
+      }
+      .body {
+        color: var(--body);
+        line-height: 1.6;
+      }
+      .small {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .component-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+      .btn {
+        min-height: 44px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 10px 18px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .primary {
+        background: var(--green);
+        color: white;
+      }
+      .primary:hover {
+        background: var(--green-hover);
+      }
+      .secondary {
+        background: white;
+        border-color: var(--border);
+        color: var(--ink);
+      }
+      .ghost {
+        background: transparent;
+        color: var(--green);
+      }
+      .danger {
+        background: var(--red-text);
+        color: white;
+      }
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      label {
+        display: grid;
+        gap: 8px;
+        color: var(--ink);
+        font-weight: 650;
+      }
+      input {
+        min-height: 48px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 14px;
+        color: var(--ink);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .new {
+        background: var(--subtle);
+        color: var(--body);
+      }
+      .learning {
+        background: var(--amber);
+        color: var(--amber-text);
+      }
+      .review {
+        background: var(--sky);
+        color: var(--blue);
+      }
+      .mastered {
+        background: var(--sage);
+        color: var(--green);
+      }
+      .route {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .step {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 18px;
+        min-height: 138px;
+      }
+      .step.active {
+        border-color: var(--green);
+        background: linear-gradient(135deg, white, var(--sage));
+      }
+      .step.locked {
+        color: var(--muted);
+        background: #fafbfa;
+      }
+      .step-num {
+        display: grid;
+        place-items: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--subtle);
+        margin-bottom: 14px;
+        font-weight: 750;
+      }
+      .active .step-num {
+        background: var(--green);
+        color: white;
+      }
+      .step p {
+        margin: 0;
+        color: var(--body);
+        line-height: 1.5;
+      }
+      .feedback {
+        border-radius: 12px;
+        padding: 20px;
+        display: grid;
+        gap: 6px;
+      }
+      .feedback.good {
+        background: var(--sage);
+        border: 1px solid #c4ddca;
+      }
+      .feedback.warn {
+        background: var(--amber);
+        border: 1px solid #ecd39d;
+      }
+      .feedback.bad {
+        background: var(--red);
+        border: 1px solid #e9bdb6;
+      }
+      .product {
+        display: grid;
+        grid-template-columns: 132px 1fr;
+        gap: 20px;
+        align-items: center;
+      }
+      .product-art {
+        aspect-ratio: 1;
+        border-radius: 10px;
+        background: linear-gradient(145deg, var(--sage), #fff);
+        display: grid;
+        place-items: center;
+        color: var(--green);
+        font-weight: 750;
+        text-align: center;
+        padding: 16px;
+      }
+      .product p {
+        color: var(--body);
+        line-height: 1.55;
+      }
+      footer {
+        margin-top: 64px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @media (max-width: 900px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        aside {
+          position: static;
+          height: auto;
+          padding: 18px 20px;
+        }
+        aside p,
+        aside nav {
+          display: none;
+        }
+        main {
+          padding-top: 32px;
+        }
+        .colors {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .type-grid,
+        .component-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        main {
+          padding: 24px 16px 56px;
+        }
+        section {
+          margin-top: 36px;
+        }
+        .display {
+          font-size: 34px;
+        }
+        .h1 {
+          font-size: 30px;
+        }
+        .colors {
+          grid-template-columns: 1fr 1fr;
+        }
+        .route {
+          grid-template-columns: 1fr;
+        }
+        .product {
+          grid-template-columns: 92px 1fr;
+        }
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside>
+        <div class="logo"><span class="logo-mark">◒</span> beautytrainer</div>
+        <p>
+          Єдина система для навчання продукції та швидкого пошуку інформації під
+          час роботи.
+        </p>
+        <nav>
+          <a class="active" href="#foundation">Основа</a>
+          <a href="#components">Компоненти</a>
+          <a href="#learning">Навчання</a>
+          <a href="#responsive">Адаптивність</a>
+        </nav>
+      </aside>
+      <main>
+        <header id="foundation">
+          <div class="eyebrow">P1 · DESIGN SYSTEM</div>
+          <h1>Спокійний робочий простір для впевненого знання продуктів.</h1>
+          <p class="lead">
+            Візуальна система Beauty Trainer для працівників 25+: читабельна,
+            професійна та однаково зручна для навчання і щоденного пошуку в
+            каталозі.
+          </p>
+        </header>
+
+        <section>
+          <h2>Кольорова палітра</h2>
+          <div class="grid colors">
+            <div class="swatch">
+              <div class="swatch-color" style="background: #102b36"></div>
+              <div><b>Ink 950</b><small>#102B36 · навігація</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #176b53"></div>
+              <div><b>Emerald 700</b><small>#176B53 · головна дія</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #f7f6f1"></div>
+              <div><b>Cream 50</b><small>#F7F6F1 · фон</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #e6efe5"></div>
+              <div><b>Sage 100</b><small>#E6EFE5 · запам’ятати</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #e0eef5"></div>
+              <div><b>Sky 100</b><small>#E0EEF5 · інформація</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #f4e6d8"></div>
+              <div>
+                <b>Apricot 100</b><small>#F4E6D8 · м’який акцент</small>
+              </div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #faebcb"></div>
+              <div><b>Amber 100</b><small>#FAEBCB · повторити</small></div>
+            </div>
+            <div class="swatch">
+              <div class="swatch-color" style="background: #f8e4e1"></div>
+              <div><b>Red 100</b><small>#F8E4E1 · помилка</small></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Типографіка</h2>
+          <div class="grid type-grid">
+            <div class="panel">
+              <div class="display">Робочий простір</div>
+              <p class="small">Display · 44/48 · 700</p>
+            </div>
+            <div class="panel">
+              <div class="h1">Каталог продуктів</div>
+              <p class="small">H1 · 36/41 · 700</p>
+            </div>
+            <div class="panel">
+              <div class="h2">Продовжити навчання</div>
+              <p class="small">H2 · 26/31 · 700</p>
+            </div>
+            <div class="panel">
+              <p class="body">
+                Знаходьте потрібний продукт, вивчайте його призначення та
+                впевнено радьте клієнтові.
+              </p>
+              <p class="small">Body · 16/26 · 400</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="components">
+          <h2>Основні компоненти</h2>
+          <div class="grid component-grid">
+            <div class="panel">
+              <h3>Кнопки</h3>
+              <div class="actions">
+                <button class="btn primary">Продовжити</button>
+                <button class="btn secondary">До каталогу</button>
+                <button class="btn ghost">Детальніше</button>
+                <button class="btn danger">Видалити</button>
+                <button class="btn primary" disabled>Недоступно</button>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Пошук і поля</h3>
+              <label
+                >Пошук у каталозі<input
+                  value=""
+                  placeholder="Продукт, лінійка або потреба"
+              /></label>
+            </div>
+            <div class="panel">
+              <h3>Статуси навчання</h3>
+              <div class="chips">
+                <span class="chip new">Нове</span
+                ><span class="chip learning">Вивчається</span
+                ><span class="chip review">Час повторити</span
+                ><span class="chip mastered">Засвоєно</span>
+              </div>
+            </div>
+            <div class="panel product">
+              <div class="product-art">PRODUCT<br />IMAGE</div>
+              <div>
+                <div class="eyebrow">INSIGHT · ANTI-FRIZZ</div>
+                <h3>Зволожуюча маска</h3>
+                <p>
+                  Живить сухе й пухнасте волосся та допомагає його розгладити.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="learning">
+          <h2>Навчальний маршрут</h2>
+          <div class="route">
+            <div class="step active">
+              <div class="step-num">1</div>
+              <h3>Картки</h3>
+              <p>Вивчіть ключову інформацію про продукти.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <h3>Звичайний тест</h3>
+              <p>Перевірте базове розуміння лінійки.</p>
+            </div>
+            <div class="step locked">
+              <div class="step-num">3</div>
+              <h3>Складний тест</h3>
+              <p>Відкриється після звичайного тесту.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Зворотний зв’язок</h2>
+          <div class="grid component-grid">
+            <div class="feedback good">
+              <b>Правильно</b
+              ><span
+                >Маска інтенсивно живить і допомагає контролювати
+                пухнастість.</span
+              >
+            </div>
+            <div class="feedback warn">
+              <b>Час повторити</b
+              ><span>Перегляньте картку продукту перед наступною спробою.</span>
+            </div>
+            <div class="feedback bad">
+              <b>Відповідь не зараховано</b
+              ><span>Порівняйте основне призначення двох продуктів.</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="responsive" class="panel">
+          <h2>Адаптивність і доступність</h2>
+          <p class="body">
+            320–479: один стовпець і drawer-навігація · 480–767: мобільний
+            простір · 768–1023: планшет · 1024–1439: desktop · 1440+:
+            контрольована максимальна ширина.
+          </p>
+          <p class="body">
+            <b>Базові правила:</b> 44 px зона натискання, видимий фокус, без
+            горизонтального скролу сторінки, `object-fit: contain` для
+            продукції, текст не обрізається там, де змінюється зміст.
+          </p>
+        </section>
+
+        <footer>
+          Beauty Trainer · P1 design system preview · Production UI unchanged
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

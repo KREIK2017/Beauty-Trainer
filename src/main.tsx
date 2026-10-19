@@ -5,6 +5,7 @@ import { DataProvider } from "./hooks/useData";
 import App from "./App";
 import { AuthProvider } from "./hooks/useAuth";
 import "./styles.css";
+import "./p1.css";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>

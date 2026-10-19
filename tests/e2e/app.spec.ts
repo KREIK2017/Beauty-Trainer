@@ -14,7 +14,7 @@ test("dashboard, catalog, details, mobile layout, and persistent theme", async (
   await expect(page.locator("html")).toHaveAttribute("lang", "uk");
   await expect(
     page.getByRole("heading", {
-      name: "Ваша впевненість починається зі знань.",
+      name: "Продовжуйте навчання",
     }),
   ).toBeVisible();
   await page.screenshot({
@@ -41,6 +41,31 @@ test("dashboard, catalog, details, mobile layout, and persistent theme", async (
   await expect(
     page.getByRole("heading", { name: "Продукти цієї лінійки" }),
   ).toBeVisible();
+  await page.screenshot({
+    path: "test-results/line-desktop.png",
+    fullPage: true,
+  });
+  await page.getByRole("link", { name: "Вивчити картки" }).first().click();
+  await expect(page.getByText(/Картка 1 із/)).toBeVisible();
+  await page.screenshot({
+    path: "test-results/flashcard-desktop.png",
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "Відкрити відповідь" }).click();
+  await expect(page.getByText("Наскільки легко пригадали?")).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(250);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "test-results/flashcard-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.getByRole("link", { name: /До лінійки/ }).click();
   await page.getByRole("button", { name: "Увімкнути темну тему" }).click();
   await page.reload();
   await expect(page.locator(".app")).toHaveClass(/dark/);
@@ -49,7 +74,7 @@ test("dashboard, catalog, details, mobile layout, and persistent theme", async (
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "Ваша впевненість починається зі знань.",
+      name: "Продовжуйте навчання",
     }),
   ).toBeVisible();
   expect(
@@ -61,7 +86,7 @@ test("dashboard, catalog, details, mobile layout, and persistent theme", async (
     path: "test-results/dashboard-mobile.png",
     fullPage: true,
   });
-  await page.getByRole("button", { name: "Відкрити або закрити меню" }).click();
+  await page.getByRole("button", { name: /Меню акаунта/ }).click();
   await page.getByRole("link", { name: "Мій прогрес", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Прогрес — запитання за запитанням." }),
@@ -122,9 +147,9 @@ test("complete ten-question browser session with feedback and persisted progress
   expect(after.streak).toBeGreaterThan(0);
   await page.goto("/weak");
   await expect(
-    page.getByRole("heading", { name: "Продукти для повторення" }),
+    page.getByRole("heading", { name: "Продукти для повторення" }).first(),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Повторити слабкі теми" }).click();
+  await page.getByRole("link", { name: "Почати повторення" }).click();
   await page.getByRole("button", { name: "Розпочати навчання" }).click();
   await expect(page.locator(".question-card")).toBeVisible();
 });

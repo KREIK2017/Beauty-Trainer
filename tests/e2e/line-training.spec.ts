@@ -48,7 +48,7 @@ test("line training creates a scoped session and saves an answer", async ({
   const feedback = await (await answerPromise).json();
   expect(feedback.lineId).toBe("curl-passion");
   await expect(page.locator(".feedback")).toBeVisible();
-  await page.getByRole("link", { name: "Тренування", exact: true }).click();
+  await page.getByRole("link", { name: "Навчання", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Розпочати навчання" }),
   ).toBeVisible();

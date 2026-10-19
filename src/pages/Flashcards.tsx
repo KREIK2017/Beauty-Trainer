@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ArrowRight, Check, RotateCcw } from "lucide-react";
 import { useData } from "../hooks/useData";
 import { Empty, PageHeading, Tags } from "../components/ui";
 import type { Line, Product } from "../../shared/schema";
@@ -78,20 +79,35 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
         <Empty title="У цій лінійці ще немає продуктів" />
       ) : finished ? (
         <section
-          className="detail-panel flashcards"
+          className="detail-panel flashcards p1-flashcard-summary"
           aria-label="Підсумок карток"
         >
+          <span className="p1-summary-icon">
+            <Check size={28} />
+          </span>
+          <span className="eyebrow">КАРТКИ ПЕРЕГЛЯНУТО</span>
           <h2>Коло завершено</h2>
-          <p>
-            Не пам’ятаю: {ratings.again} · Важко: {ratings.hard} · Знаю:{" "}
-            {ratings.good} · Легко: {ratings.easy}
-          </p>
+          <div className="p1-rating-summary">
+            <span>
+              <strong>{ratings.again}</strong>Не пам’ятаю
+            </span>
+            <span>
+              <strong>{ratings.hard}</strong>Важко
+            </span>
+            <span>
+              <strong>{ratings.good}</strong>Знаю
+            </span>
+            <span>
+              <strong>{ratings.easy}</strong>Легко
+            </span>
+          </div>
           <div className="actions">
             {repeat.length > 0 && (
               <button
                 className="button primary"
                 onClick={() => restart(repeat)}
               >
+                <RotateCcw size={16} />
                 Повторити складні картки
               </button>
             )}
@@ -99,51 +115,79 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
               className="button secondary"
               onClick={() => restart(products.map((p) => p.id))}
             >
+              <RotateCcw size={16} />
               Усі картки ще раз
             </button>
             <Link className="button primary" to={`/training?line=${line.id}`}>
-              Пройти тест лінійки
+              Пройти тест лінійки <ArrowRight size={16} />
             </Link>
           </div>
         </section>
       ) : product ? (
         <section
-          className="detail-panel flashcards"
+          className={`detail-panel flashcards p1-flashcards ${revealed ? "is-revealed" : ""}`}
           aria-label="Навчальна картка"
         >
-          <p className="muted" aria-live="polite">
-            Картка {index + 1} із {queue.length}
-          </p>
-          <span className="eyebrow">{product.category}</span>
-          <h2>{product.name}</h2>
-          <p>Для чого цей продукт? Кому він підходить і які має переваги?</p>
-          {!revealed ? (
-            <button
-              className="button primary"
-              onClick={() => setRevealed(true)}
-            >
-              Відкрити відповідь
-            </button>
-          ) : (
-            <>
-              <div
-                className="flashcard-answer"
-                role="region"
-                aria-label="Відповідь"
-              >
-                <h3>Призначення</h3>
-                <p>{product.purpose}</p>
-                <h3>Типи волосся</h3>
-                <Tags values={product.hair_types} />
-                <h3>Переваги</h3>
-                <Tags values={product.benefits} />
-                {product.usage && (
-                  <>
-                    <h3>Спосіб застосування</h3>
-                    <p>{product.usage}</p>
-                  </>
-                )}
-              </div>
+          <div className="p1-flashcard-progress">
+            <span aria-live="polite">
+              Картка {index + 1} із {queue.length}
+            </span>
+            <div aria-hidden="true">
+              <i style={{ width: `${((index + 1) / queue.length) * 100}%` }} />
+            </div>
+          </div>
+          <div className="p1-flashcard-layout">
+            <div className="p1-flashcard-visual">
+              {product.image ? (
+                <img src={product.image} alt={product.name} />
+              ) : (
+                <span>{product.name}</span>
+              )}
+            </div>
+            <div className="p1-flashcard-copy">
+              <span className="eyebrow">{product.category}</span>
+              <h2>{product.name}</h2>
+              {!revealed ? (
+                <>
+                  <p className="p1-flashcard-prompt">
+                    Для чого цей продукт? Кому він підходить і який результат
+                    дає?
+                  </p>
+                  <p className="muted">
+                    Спочатку сформулюйте відповідь своїми словами.
+                  </p>
+                  <button
+                    className="button primary"
+                    onClick={() => setRevealed(true)}
+                  >
+                    Відкрити відповідь <ArrowRight size={16} />
+                  </button>
+                </>
+              ) : (
+                <div
+                  className="flashcard-answer"
+                  role="region"
+                  aria-label="Відповідь"
+                >
+                  <h3>Призначення</h3>
+                  <p>{product.purpose}</p>
+                  <h3>Типи волосся</h3>
+                  <Tags values={product.hair_types} />
+                  <h3>Переваги</h3>
+                  <Tags values={product.benefits} />
+                  {product.usage && (
+                    <>
+                      <h3>Спосіб застосування</h3>
+                      <p>{product.usage}</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          {revealed && (
+            <div className="p1-rating-bar">
+              <span>Наскільки легко пригадали?</span>
               <div className="actions">
                 <button
                   className="button secondary"
@@ -160,7 +204,7 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
                   Важко
                 </button>
                 <button
-                  className="button primary"
+                  className="button secondary"
                   disabled={busy}
                   onClick={() => void rate("good")}
                 >
@@ -180,7 +224,7 @@ function Deck({ line, products }: { line: Line; products: Product[] }) {
                   {error}
                 </p>
               )}
-            </>
+            </div>
           )}
         </section>
       ) : (
