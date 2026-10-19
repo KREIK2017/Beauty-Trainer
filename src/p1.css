@@ -1190,9 +1190,7 @@ textarea {
 
 /* Account and owner tools */
 .admin-nav {
-  position: sticky;
-  top: 74px;
-  z-index: 12;
+  position: static;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;

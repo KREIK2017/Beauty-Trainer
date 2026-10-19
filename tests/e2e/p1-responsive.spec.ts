@@ -60,6 +60,11 @@ test("P1 learning and account screens remain readable on desktop and mobile", as
         exact: true,
       }),
     ).toBeVisible();
+    expect(
+      await page
+        .getByRole("navigation", { name: "Розділи адміністратора" })
+        .evaluate((element) => getComputedStyle(element).position),
+    ).toBe("static");
     await page.screenshot({
       path: `test-results/p1-admin-users-${width}.png`,
       fullPage: true,
