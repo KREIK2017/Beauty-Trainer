@@ -723,10 +723,6 @@ main {
   border-radius: 10px;
   overflow: hidden;
   background: var(--card);
-  transition: transform 0.15s;
-}
-.line-card:hover {
-  transform: translateY(-3px);
 }
 .line-art {
   height: 125px;

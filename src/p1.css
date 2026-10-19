@@ -498,8 +498,7 @@
 
 .line-card:hover {
   border-color: color-mix(in srgb, var(--green) 48%, var(--border));
-  box-shadow: 0 10px 24px rgb(16 43 54 / 9%);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgb(16 43 54 / 7%);
 }
 
 .line-art {
@@ -661,8 +660,7 @@ textarea {
 
 .p1-brand-card:hover {
   border-color: color-mix(in srgb, var(--green) 48%, var(--border));
-  box-shadow: 0 10px 24px rgb(16 43 54 / 9%);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgb(16 43 54 / 7%);
 }
 
 .p1-brand-copy {
@@ -1091,7 +1089,6 @@ textarea {
 
 .p1-review-queue-list > a:hover {
   border-color: var(--green);
-  transform: translateX(2px);
 }
 
 .p1-review-queue-image {
