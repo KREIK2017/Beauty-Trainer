@@ -53,5 +53,16 @@ test("P1 learning and account screens remain readable on desktop and mobile", as
       path: `test-results/p1-settings-${width}.png`,
       fullPage: true,
     });
+    await page.goto("/admin/users");
+    await expect(
+      page.getByRole("heading", {
+        name: "Акаунти та навчання",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `test-results/p1-admin-users-${width}.png`,
+      fullPage: true,
+    });
   }
 });

@@ -31,3 +31,22 @@ settings, and responsive single-column behavior.
   and will be implemented as a separate feature rather than nonfunctional UI.
 - P3: the production page is intentionally longer than the concept because theme
   and registration settings remain visible and usable on the same route.
+
+## Admin accounts
+
+Reference: `design/concepts/admin-desktop.png` and
+`design/concepts/admin-mobile.png`.
+
+Implementation captures:
+
+- `test-results/p1-admin-users-1440.png`
+- `test-results/p1-admin-users-390.png`
+
+Final result: passed
+
+The account list now uses a compact desktop table and readable mobile records. It
+shows only data supported by the current API: activity, XP, answer count, accuracy,
+and products due for review. Search, pagination, account detail navigation, and
+owner-only access remain functional. The desktop side drawer and role/activity
+filters remain future features because their interactions and API contracts do not
+exist yet.

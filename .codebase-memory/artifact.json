@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "5401041a264982080a269ebb1c43f25c2a002bef",
-    "indexed_at": "2026-10-19T10:43:41Z",
+    "commit": "1efdd11b1e6b38c2fd515b5cd4d7154e0a7406d2",
+    "indexed_at": "2026-10-19T11:15:40Z",
     "project": "beauty-trainer",
-    "nodes": 664,
-    "edges": 1213,
+    "nodes": 665,
+    "edges": 1212,
     "original_size": 2818048,
-    "compressed_size": 455022,
+    "compressed_size": 455934,
     "compression_level": 3
 }

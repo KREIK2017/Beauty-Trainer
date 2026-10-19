@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useParams } from "react-router-dom";
+import {
+  Activity,
+  ArrowRight,
+  RefreshCw,
+  Search,
+  UsersRound,
+  Zap,
+} from "lucide-react";
 import type { AdminAccounts, AdminAccountDetail } from "../../shared/admin";
 import AccountAccess from "../components/AccountAccess";
 import { useAuth } from "../hooks/useAuth";
@@ -58,11 +66,11 @@ export function AdminLayout() {
   return (
     <>
       <nav className="admin-nav" aria-label="Розділи адміністратора">
-        <NavLink to="/admin/users">Акаунти та прогрес</NavLink>
+        <NavLink to="/admin/users">Акаунти</NavLink>
         <NavLink to="/admin" end>
           Матеріали
         </NavLink>
-        <NavLink to="/admin/quality">Якість матеріалів</NavLink>
+        <NavLink to="/admin/quality">Якість даних</NavLink>
       </nav>
       <Outlet />
     </>
@@ -83,6 +91,7 @@ export function AdminUsers() {
         description="Переглядайте активність, результати та теми, які потребують повторення."
         action={
           <button className="button secondary" onClick={reload}>
+            <RefreshCw size={16} aria-hidden="true" />
             Оновити
           </button>
         }
@@ -90,16 +99,31 @@ export function AdminUsers() {
       {data && (
         <div className="admin-metrics">
           <div>
-            <strong>{data.summary.accounts}</strong>
-            <span>Усього акаунтів</span>
+            <span className="admin-metric-icon" aria-hidden="true">
+              <UsersRound size={22} />
+            </span>
+            <span>
+              <strong>{data.summary.accounts}</strong>
+              <small>Усього акаунтів</small>
+            </span>
           </div>
           <div>
-            <strong>{data.summary.activeLearners}</strong>
-            <span>Відповідали в тестах за останні 7 днів</span>
+            <span className="admin-metric-icon" aria-hidden="true">
+              <Activity size={22} />
+            </span>
+            <span>
+              <strong>{data.summary.activeLearners}</strong>
+              <small>Активні за 7 днів</small>
+            </span>
           </div>
           <div>
-            <strong>{data.summary.totalXp}</strong>
-            <span>Загальний XP</span>
+            <span className="admin-metric-icon" aria-hidden="true">
+              <Zap size={22} />
+            </span>
+            <span>
+              <strong>{data.summary.totalXp}</strong>
+              <small>Загальний XP</small>
+            </span>
           </div>
         </div>
       )}
@@ -111,14 +135,17 @@ export function AdminUsers() {
           setPage(1);
         }}
       >
-        <label>
+        <label className="admin-search-field">
           Пошук за логіном
-          <input
-            value={draft}
-            maxLength={40}
-            onChange={(event) => setDraft(event.target.value)}
-            placeholder="Введіть логін"
-          />
+          <span>
+            <Search size={19} aria-hidden="true" />
+            <input
+              value={draft}
+              maxLength={40}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder="Введіть логін"
+            />
+          </span>
         </label>
         <button className="button primary">Знайти</button>
         {search && (
@@ -143,44 +170,79 @@ export function AdminUsers() {
             Знайдено акаунтів: {data.total}. Дати показано за часовим поясом
             вашого пристрою.
           </p>
-          <div className="admin-user-grid">
+          <div className="admin-user-table">
+            <div className="admin-user-table-head" aria-hidden="true">
+              <span>Користувач</span>
+              <span>Остання активність</span>
+              <span>XP</span>
+              <span>Відповіді</span>
+              <span>Результат</span>
+              <span>Повторити</span>
+              <span />
+            </div>
             {data.users.map((account) => (
               <article className="admin-user-card" key={account.id}>
-                <h2>
-                  <Link to={`/admin/users/${account.id}`}>
-                    {account.username}
-                  </Link>
-                </h2>
-                <p>{account.role === "admin" ? "Власник" : "Учасник"}</p>
-                <dl>
-                  <dt>XP</dt>
-                  <dd>{account.xp}</dd>
-                  <dt>Відповідей</dt>
-                  <dd>{account.answers}</dd>
-                  <dt>Правильних</dt>
-                  <dd>
+                <div className="admin-user-identity">
+                  <span className="admin-user-avatar" aria-hidden="true">
+                    {account.username.slice(0, 1).toUpperCase()}
+                  </span>
+                  <span>
+                    <Link to={`/admin/users/${account.id}`}>
+                      {account.username}
+                    </Link>
+                    <small>
+                      {account.role === "admin" ? "Власник" : "Учасник"}
+                    </small>
+                  </span>
+                </div>
+                <div className="admin-user-activity">
+                  <small>Остання активність</small>
+                  <span>
+                    {date(account.last_practice_at ?? account.last_login_at)}
+                  </span>
+                </div>
+                <div className="admin-user-value">
+                  <small>XP</small>
+                  <strong>{account.xp}</strong>
+                </div>
+                <div className="admin-user-value">
+                  <small>Відповіді</small>
+                  <strong>{account.answers}</strong>
+                </div>
+                <div className="admin-user-value">
+                  <small>Результат</small>
+                  <strong>
                     {account.answers
                       ? `${Math.round((account.correct_answers / account.answers) * 100)}%`
-                      : "Ще немає відповідей"}
-                  </dd>
-                  <dt>Засвоєно продуктів</dt>
-                  <dd>{account.mastered_products}</dd>
-                  <dt>Продуктів для повторення</dt>
-                  <dd>{account.weak_products}</dd>
-                </dl>
-                <p className="small">
-                  Останній вхід: {date(account.last_login_at)}
-                  <br />
-                  Остання відповідь: {date(account.last_practice_at)}
-                  <br />
-                  Реєстрація: {date(account.created_at)}
-                </p>
+                      : "—"}
+                  </strong>
+                </div>
+                <div className="admin-user-review">
+                  <small>Повторити</small>
+                  <strong>{account.weak_products}</strong>
+                  <span
+                    className={`admin-learning-status ${
+                      !account.answers
+                        ? "new"
+                        : account.weak_products
+                          ? "review"
+                          : "active"
+                    }`}
+                  >
+                    {!account.answers
+                      ? "Не починав"
+                      : account.weak_products
+                        ? "Є слабкі теми"
+                        : "Навчається"}
+                  </span>
+                </div>
                 <Link
-                  className="button secondary"
+                  className="button secondary admin-user-open"
                   to={`/admin/users/${account.id}`}
                   aria-label={`Переглянути прогрес ${account.username}`}
                 >
-                  Переглянути прогрес
+                  Відкрити
+                  <ArrowRight size={15} aria-hidden="true" />
                 </Link>
               </article>
             ))}

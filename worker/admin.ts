@@ -90,7 +90,7 @@ export async function adminRoute(
     if (!parsed.success)
       return json({ error: "Некоректні параметри пошуку." }, 400);
     const { search, page } = parsed.data;
-    const pageSize = 25;
+    const pageSize = 10;
     const [users, total, summary] = await Promise.all([
       db
         .prepare(
